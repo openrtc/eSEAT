@@ -31,4 +31,8 @@ Copyright (C) 2014 Isao Hara, AIST Japan,  All Rights Reserverd
 
  Released under the MIT License <http://opensource.org/licenses/MIT> 
  
+Documents
+=========
+All documents of eSEAT is on http://hara.jpn.com/_default/ja/Software/eSEAT2.html .
+I'm sorry the all is written in japanese.
  
