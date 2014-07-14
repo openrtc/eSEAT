@@ -1,25 +1,34 @@
 eSEAT
 =====
 
-eSEAT is the extension of the SEAT. eSEAT supports a simple GUI and the pseudo FSM  RTC developments.
+eSEAT is the extension of the SEAT.
+Originally the SEAT developed by I.Hara with C-Language in 2003.
+Dr.Matsusaka and OpenHRI development team rewrite the SEAT with python from scratch and released under ELP-1.0.
+The secound version had been supported the connection with the OpenRTM-aist, but suppoeted data-type was only 'String'.
+
+The eSEAT is extened the secound version and has released under the MIT License.
+
+eSEAT supports a simple GUI and the pseudo FSM  RTC developments.
 
 This software has been developed by the OpenRTM-aist development team.
 
-You can use the eSEAT under the MIT License.
-
 Rquirements
 ============
-SEATSAT requires following libraries:
+eSEAT requires following libraries:
 
 lxml
-  http://codespeak.net/lxml/
+  http://lxml.de/
 
-BeautifulSoup
+BeautifulSoup4
   http://www.crummy.com/software/BeautifulSoup/
   
-  
+OpenRTM-aist-1.1.0 for python
+  http://openrtm.org/
   
 Copyright
 ==========
-Copyright (C) Isao Hara, AIST, 2014
-  
+Copyright (C) 2014 Isao Hara, AIST Japan,  All Rights Reserverd
+
+ Released under the MIT License <http://opensource.org/licenses/MIT> 
+ 
+ 
