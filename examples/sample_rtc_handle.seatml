@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="guicommand">
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="str_in" type="rtcin" datatype="TimedString" />
+
+    <script execfile="rtc_handle/rtc_handle.py" />
+    <script execfile="rtc_handle_tool.py" />
+
+      <script>
+def printText(msg, txt="in2"):
+  global seat
+  seat.appendText(txt, msg+"\n")
+
+      </script>
+  </general>
+
+  <state name="main_mode">
+    <label text="Mode:" />
+
+    <button label="Sub Mode" bg_color="#ff0000" color="#ffffff">
+      <message sendto="str_out">sub_mode</message>
+      <statetransition>sub_mode</statetransition>
+    </button>
+
+    <brk />
+
+    <label text="Input:" />
+    <input id="in1" width="50" colspan="3">
+      <message sendto="str_out" input="in1" />
+    </input>
+
+    <brk />
+    <text id="in2" width="70" height="25" colspan="4" />
+
+    <brk />
+
+    <label text="This RTC:" />
+
+    <button label="portInfo" >
+      <message sendto="str_out" encode="shift-jis" input="in1" />
+      <script>print seat._port</script>
+    </button>
+
+    <button label="DisconnectAll" >
+      <script>seat.disconnectAll()</script>
+    </button>
+
+    <brk />
+    <label text="RtcHandle:" />
+    <button label="getRtcList" >
+      <script>
+handle_list=get_handle_list()
+no=1
+for n in handle_list:
+  line = "%d : %s" % (no, n)
+  rtc_list[no] = get_handle(n, NS)
+  printText(line)
+  no += 1
+      </script>
+    </button>
+
+    <button label="showPort" >
+      <script>
+vv = seat.getEntry("in1")
+lst = get_port_info(vv.strip())
+
+printText(vv+":")
+for x in lst:
+  printText("   "+x)
+      </script>
+    </button>
+
+    <brk />
+    <label text="For connection:" />
+    <button label="connect" >
+      <script>
+vv = seat.getEntry("in1")
+name1, name2 = vv.split(',')
+con=connect_ports(name1.strip(), name2.strip())
+if con :
+  printText(" Connection:"+con.name)
+else:
+  printText(" ERROR in connect_ports:"+vv)
+      </script>
+    </button>
+
+    <button label="disconnect" >
+      <script>
+vv = seat.getEntry("in1")
+name1, name2 = vv.split(',')
+con=disconnect_ports(name1.strip(), name2.strip())
+if con :
+  printText(" Disconnect:"+con)
+else:
+  printText(" ERROR in disconnect_ports:"+vv)
+      </script>
+    </button>
+
+    <brk />
+    <label text="For component:" />
+
+    <button label="activate" >
+      <script>
+res=activate_rtcs(seat.getEntry("in1"))
+printText(res)
+      </script>
+    </button>
+
+    <button label="deactivate" >
+      <script>
+res=deactivate_rtcs(seat.getEntry("in1"))
+printText(res)
+      </script>
+    </button>
+
+    <button label="exit" >
+      <script>
+res=exit_rtcs(seat.getEntry("in1"))
+printText(res)
+      </script>
+    </button>
+
+
+    <brk />
+    <label text="Misc:" />
+    <button label="println" >
+      <script>
+printText(seat.getEntry("in1"))
+      </script>
+    </button>
+
+    <button label="clear" >
+      <script>
+seat.clearText("in2")
+      </script>
+    </button>
+
+  </state>
+
+  <state name="sub_mode">
+    <label text="Mode:" />
+
+    <button label="Main Mode" >
+      <message sendto="str_out">main_mode</message>
+      <statetransition>main_mode</statetransition>
+    </button>
+
+    <brk />
+    <text id="pyin" width="70" height="25" colspan="5" />
+    <brk />
+    <label text="exec:" />
+    <button label="exec all" >
+      <script>
+pycode = seat.getText("pyin")
+exec(pycode, globals())
+      </script>
+    </button>
+
+    <button label="exec lastLine" >
+      <script>
+pycode = seat.getLastLine("pyin")
+exec(pycode, globals())
+      </script>
+    </button>
+
+  </state>
+
+</seatml>

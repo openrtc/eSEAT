@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="calc">
+   <script>
+def pushKey(n, id):
+  tmp=seat.getEntry(id)
+  if tmp == "0":
+    seat.setEntry(id, n)
+  else:
+    seat.setEntry(id, tmp+n)
+   </script>
+  </general>
+
+  <state name="main_mode">
+    <label text="SimpleCalc" bg_color="#ff0000" color="#ffffff" colspan="4" /> <brk />
+
+    <input id="in1" width="50" colspan="4">0</input><brk />
+
+    <button label="C" ><script>seat.setEntry("in1","0")</script></button>
+
+    <space length="2" />
+
+    <button label="+" ><script>pushKey("+", "in1")</script></button>
+
+    <brk />
+    <button label="1" ><script>pushKey("1", "in1")</script></button>
+    <button label="2" ><script>pushKey("2", "in1")</script></button>
+    <button label="3" ><script>pushKey("3", "in1")</script></button>
+    <button label="-" ><script>pushKey("-", "in1")</script></button>
+
+    <brk />
+    <button label="4" ><script>pushKey("4", "in1")</script></button>
+    <button label="5" ><script>pushKey("5", "in1")</script></button>
+    <button label="6" ><script>pushKey("6", "in1")</script></button>
+    <button label="*" ><script>pushKey("*", "in1")</script></button>
+
+    <brk />
+    <button label="7" ><script>pushKey("7", "in1")</script></button>
+    <button label="8" ><script>pushKey("8", "in1")</script></button>
+    <button label="9" ><script>pushKey("9", "in1")</script></button>
+    <button label="/" ><script>pushKey("/", "in1")</script></button>
+
+    <brk />
+    <button label="" ></button>
+    <button label="0" ><script>pushKey("0", "in1")</script></button>
+    <button label="." ><script>pushKey(".", "in1")</script></button>
+    <button label="=" >
+      <script>
+try:
+  expr=seat.getEntry("in1")
+  ans=eval(expr)
+  seat.setEntry("in1", ans)
+except:
+  seat.setEntry("in1", "ERROR")
+      </script>
+    </button>
+  </state>
+</seatml>

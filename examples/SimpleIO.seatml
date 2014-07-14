@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="SimpleIO">
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="str_in" type="rtcin" datatype="TimedString" />
+  </general>
+
+  <state name="main_mode">
+
+    <label text="SimpleIO" colspan="3" bg_color="blue" />
+
+    <brk />
+    <label text="Input:" />
+    <input id="textIn" width="50" >
+        <message sendto="str_out" input="textIn" />
+    </input>
+    <button label="Send">
+        <message sendto="str_out" input="textIn" />
+    </button>
+    <brk />
+  
+    <label text="Coming Text:" />
+    <text id="textOut" width="50" height="5" colspan="2" >
+	    INIT String...
+    </text>
+ 
+    <rule source="str_in">
+      <script>
+seat.appendText("textOut", rtc_in_data.data+"\n")
+      </script>
+    </rule>
+
+  </state>
+
+</seatml>

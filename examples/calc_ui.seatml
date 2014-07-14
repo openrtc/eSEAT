@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="calc">
+    <adaptor name="out" type="rtcout" datatype="TimedString" />
+    <adaptor name="in" type="rtcin" datatype="TimedString" />
+  </general>
+
+  <state name="main_mode">
+    <label text="SimpleCalc" bg_color="#ff0000" color="#ffffff" colspan="4" />
+	     
+    <brk />
+    <input id="disp" width="50" colspan="4">0</input>
+
+    <brk />
+    <button label="C" > <message sendto="out">Clear</message> </button>
+    <space length="2" />
+    <button label="+" > <message sendto="out">Add</message> </button>
+
+    <brk />
+    <button label="1" > <message sendto="out">1</message> </button>
+    <button label="2" > <message sendto="out">2</message> </button>
+    <button label="3" > <message sendto="out">3</message> </button>
+
+    <button label="-" > <message sendto="out">Subtract</message> </button>
+
+    <brk />
+    <button label="4" > <message sendto="out">4</message> </button>
+    <button label="5" > <message sendto="out">5</message> </button>
+    <button label="6" > <message sendto="out">6</message> </button>
+
+    <button label="*" > <message sendto="out">Multiply</message> </button>
+
+    <brk />
+    <button label="7" > <message sendto="out">7</message> </button>
+    <button label="8" > <message sendto="out">8</message> </button>
+    <button label="9" > <message sendto="out">9</message> </button>
+    <button label="/" > <message sendto="out">Divide</message> </button>
+
+    <brk />
+    <space length="1" />
+    <button label="0" > <message sendto="out">0</message> </button>
+    <button label="." > <message sendto="out">Comma</message> </button>
+    <button label="=" > <message sendto="out">Equal</message> </button>
+
+    <rule source="in" >
+	    <script>
+seat.setEntry("disp", rtc_in_data.data)
+	    </script>
+    </rule>
+  </state>
+
+</seatml>
