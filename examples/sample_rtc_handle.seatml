@@ -27,7 +27,7 @@ def printText(msg, txt="main_mode:in2"):
 
     <label text="Input:" />
     <input id="in1" width="50" colspan="3">
-      <message sendto="str_out" input="in1" />
+      <message sendto="str_out" input="main_mode:in1" />
     </input>
 
     <brk />
@@ -38,7 +38,7 @@ def printText(msg, txt="main_mode:in2"):
     <label text="This RTC:" />
 
     <button label="portInfo" >
-      <message sendto="str_out" encode="shift-jis" input="in1" />
+      <message sendto="str_out" encode="shift-jis" input="main_mode:in1" />
       <script>print seat._port</script>
     </button>
 

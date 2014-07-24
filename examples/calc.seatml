@@ -16,7 +16,7 @@ def pushKey(n, id):
 
     <input id="in1" width="50" colspan="4">0</input><brk />
 
-    <button label="C" ><script>seat.setEntry("in1","0")</script></button>
+    <button label="C" ><script>seat.setEntry("main_mode:in1","0")</script></button>
 
     <space length="2" />
 
@@ -47,11 +47,11 @@ def pushKey(n, id):
     <button label="=" >
       <script>
 try:
-  expr=seat.getEntry("in1")
+  expr=seat.getEntry("main_mode:in1")
   ans=eval(expr)
-  seat.setEntry("in1", ans)
+  seat.setEntry("main_mode:in1", ans)
 except:
-  seat.setEntry("in1", "ERROR")
+  seat.setEntry("main_mode:in1", "ERROR")
       </script>
     </button>
   </state>

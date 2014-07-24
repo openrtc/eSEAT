@@ -12,17 +12,15 @@
     <brk />
     <label text="Input:" />
     <input id="textIn" width="50" >
-        <message sendto="str_out" input="textIn" />
+        <message sendto="str_out" input="main_mode:textIn" />
     </input>
     <button label="Send">
-        <message sendto="str_out" input="textIn" />
+        <message sendto="str_out" input="main_mode:textIn" />
     </button>
     <brk />
   
     <label text="Coming Text:" />
-    <text id="textOut" width="50" height="5" colspan="2" >
-	    INIT String...
-    </text>
+    <text id="textOut" width="50" height="5" colspan="2" />
  
     <rule source="str_in">
       <script>
