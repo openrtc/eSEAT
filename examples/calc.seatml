@@ -3,11 +3,11 @@
   <general name="calc">
    <script>
 def pushKey(n, id):
-  tmp=seat.getEntry(id)
+  tmp=seat.getEntry("main_mode:"+id)
   if tmp == "0":
-    seat.setEntry(id, n)
+    seat.setEntry("main_mode:"+id, n)
   else:
-    seat.setEntry(id, tmp+n)
+    seat.setEntry("main_mode:"+id, tmp+n)
    </script>
   </general>
 

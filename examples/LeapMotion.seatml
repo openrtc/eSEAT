@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="LeapMotion">
+    <script>
+import ssr
+    </script>
+
+    <adaptor name="gesture_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="frame_in" type="rtcin" datatype="ssr.Frame" />
+
+    <script execfile="textutil.py" />
+    <script execfile="rtc_handle_tool.py">
+get_handle_list()
+    </script>
+  </general>
+
+  <state name="Mode0">
+    <rule source="frame_in">
+     <script>
+ges=rtc_in_data.gestures
+if ges :
+  print "Gesture["
+  for g in ges:
+    print g.type
+  print "]"
+	    </script>
+    </rule>
+
+    <button label="Connect" >
+      <script>
+connect_ports("LeapMotion:frame_in", "LaviZ.host_cxt/LeapRTC0:frame")
+      </script>
+    </button> 
+    <button label="Disconnect" >
+      <script>
+disconnect_ports("LeapMotion:frame_in", "LaviZ.host_cxt/LeapRTC0:frame")
+      </script>
+    </button> 
+
+    <button label="Activate" >
+      <script>
+activate_rtc("LeapMotion")
+      </script>
+    </button> 
+    <button label="Deactivate" >
+      <script>
+deactivate_rtc("LeapMotion")
+      </script>
+    </button> 
+    <brk />
+
+    <label text="Geature:" />
+    <input id="InfoOut" width="50" colspan="8"></input>
+    <brk />
+
+    <label text="Sample" />
+    <button label="Change" >
+	    <script>
+seat.setButtonConfig("Mode0:Change", text="red")
+	    </script>
+    </button>
+    <button label="Back" >
+	    <script>
+seat.setLabelConfig("Mode0:Sample", text="Sample")
+	    </script>
+    </button>
+  </state>
+</seatml>

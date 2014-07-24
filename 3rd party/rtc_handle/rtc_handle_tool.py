@@ -1,6 +1,6 @@
 #
 #
-#execfile("rtc_handle/rtc_handle.py")
+execfile("rtc_handle.py")
 
 def initNS(hostname="localhost"):
   global rtm
@@ -39,6 +39,8 @@ def get_handle(name, ns=None):
   try:
     return ns.rtc_handles[name]
   except:
+    get_handle_list()
+    print ns.rtc_handles
     return None
 
 def get_port_info(name, ns=None):
@@ -64,11 +66,14 @@ def get_named_dataport(name, port, ns=None):
   if name.count(".rtc") == 0 : name = name+".rtc"
   hndl=get_handle(name, ns)
 
+  print "handle = ",hndl
+
   if hndl and port:
     if port in hndl.inports.keys():
       return hndl.inports[port]
     if port in hndl.outports.keys():
       return hndl.outports[port]
+
   return None
 
 def get_name_port(path1):
@@ -81,10 +86,13 @@ def create_connection_name(path1, path2):
 
   name1, port1 =  get_name_port(path1)
   name2, port2 =  get_name_port(path2)
+  print name1, port1, name2, port2 
 
   try:
     pp1 = get_named_dataport(name1, port1, NS)
+    print pp1
     pp2 = get_named_dataport(name2, port2, NS)
+    print pp2
     pn1 = string.join([name1,pp1.name, name2, pp2.name], '_')
     pn2 = string.join([name2,pp2.name, name1, pp1.name], '_')
     return [pn1, pn2]
@@ -107,6 +115,9 @@ def connect_ports(path1, path2):
   pp2 = None
   con = None
   cnames = create_connection_name(path1, path2)
+  if not cnames:
+    print "Invalid Path: %s, %s" % (path1, path2)
+    return None
 
   if check_connection_list(cnames, connections):
     print "Connection already exist."
@@ -133,6 +144,9 @@ def connect_ports(path1, path2):
 def find_connection(path1, path2):
   global NS, connections
   cnames = create_connection_name(path1, path2)
+
+  if not cnames:
+    print "Invalid Path: %s, %s" % (path1, path2)
 
   if cnames[0] in connections:
       return [cnames[0], connections[cnames[0]] ]

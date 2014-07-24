@@ -12,10 +12,12 @@
   <xs:element name="general">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="adaptor"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="agent"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="var"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="adaptor"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="agent"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="var"/>
+        </xs:choice>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:string"/>
     </xs:complexType>

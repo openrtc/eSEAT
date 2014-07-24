@@ -8,7 +8,7 @@
     <script execfile="rtc_handle_tool.py" />
 
       <script>
-def printText(msg, txt="in2"):
+def printText(msg, txt="main_mode:in2"):
   global seat
   seat.appendText(txt, msg+"\n")
 
@@ -62,7 +62,7 @@ for n in handle_list:
 
     <button label="showPort" >
       <script>
-vv = seat.getEntry("in1")
+vv = seat.getEntry("main_mode:in1")
 lst = get_port_info(vv.strip())
 
 printText(vv+":")
@@ -75,7 +75,7 @@ for x in lst:
     <label text="For connection:" />
     <button label="connect" >
       <script>
-vv = seat.getEntry("in1")
+vv = seat.getEntry("main_mode:in1")
 name1, name2 = vv.split(',')
 con=connect_ports(name1.strip(), name2.strip())
 if con :
@@ -87,7 +87,7 @@ else:
 
     <button label="disconnect" >
       <script>
-vv = seat.getEntry("in1")
+vv = seat.getEntry("main_mode:in1")
 name1, name2 = vv.split(',')
 con=disconnect_ports(name1.strip(), name2.strip())
 if con :
@@ -102,21 +102,21 @@ else:
 
     <button label="activate" >
       <script>
-res=activate_rtcs(seat.getEntry("in1"))
+res=activate_rtcs(seat.getEntry("main_mode:in1"))
 printText(res)
       </script>
     </button>
 
     <button label="deactivate" >
       <script>
-res=deactivate_rtcs(seat.getEntry("in1"))
+res=deactivate_rtcs(seat.getEntry("main_mode:in1"))
 printText(res)
       </script>
     </button>
 
     <button label="exit" >
       <script>
-res=exit_rtcs(seat.getEntry("in1"))
+res=exit_rtcs(seat.getEntry("main_mode:in1"))
 printText(res)
       </script>
     </button>
@@ -126,13 +126,13 @@ printText(res)
     <label text="Misc:" />
     <button label="println" >
       <script>
-printText(seat.getEntry("in1"))
+printText(seat.getEntry("main_mode:in1"))
       </script>
     </button>
 
     <button label="clear" >
       <script>
-seat.clearText("in2")
+seat.clearText("main_mode:in2")
       </script>
     </button>
 
@@ -152,14 +152,14 @@ seat.clearText("in2")
     <label text="exec:" />
     <button label="exec all" >
       <script>
-pycode = seat.getText("pyin")
+pycode = seat.getText("sub_mode:pyin")
 exec(pycode, globals())
       </script>
     </button>
 
     <button label="exec lastLine" >
       <script>
-pycode = seat.getLastLine("pyin")
+pycode = seat.getLastLine("sub_mode:pyin")
 exec(pycode, globals())
       </script>
     </button>

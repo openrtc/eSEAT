@@ -5,11 +5,13 @@
 import sys
 from omniORB import CORBA, URI
 # from omniORB import any
-from omniORB import any, cdrMarshal, cdrUnmarshal
+from omniORB import any, cdrMarshal, cdrUnmarshal, findType, findTypeCode
+#import omniORB 
 
 import OpenRTM_aist
 import RTC
 
+#import ssr
 
 from CorbaNaming import *
 import SDOPackage
@@ -307,10 +309,19 @@ class RtcInport(Port) :
 #        self.data_class = eval('RTC.' + self.prop['dataport.data_type'])
 #        self.data_tc = eval('RTC._tc_' + self.prop['dataport.data_type'])
         tmp=strip_data_class(self.prop['dataport.data_type'])
-        self.data_type=tmp
-#        print tmp
-        self.data_class = eval('RTC.' + tmp)
-        self.data_tc = eval('RTC._tc_' + tmp)
+        dtype = findType(self.prop['dataport.data_type'])
+	if isinstance(dtype, tuple):
+            self.data_type=tmp
+            self.data_class = dtype[1]
+            self.data_tc = findTypeCode(self.prop['dataport.data_type'])
+        else:
+            self.data_type=tmp
+            self.data_class = eval('RTC.' + tmp)
+            self.data_tc = eval('RTC._tc_' + tmp)
+
+#        self.data_type=tmp
+#        self.data_class = eval('RTC.' + tmp)
+#        self.data_tc = eval('RTC._tc_' + tmp)
        
     def write(self,data) :
 #        self.ref.put(CORBA.Any(self.data_tc,
@@ -346,9 +357,15 @@ class RtcOutport(Port) :
 #        self.data_tc = eval('RTC._tc_' + self.prop['dataport.data_type'])
 
         tmp=strip_data_class(self.prop['dataport.data_type'])
-        self.data_type=tmp
-        self.data_class = eval('RTC.' + tmp)
-        self.data_tc = eval('RTC._tc_' + tmp)
+        dtype = findType(self.prop['dataport.data_type'])
+	if isinstance(dtype, tuple):
+            self.data_type=tmp
+            self.data_class = dtype[1]
+            self.data_tc = findTypeCode(self.prop['dataport.data_type'])
+        else:
+            self.data_type=tmp
+            self.data_class = eval('RTC.' + tmp)
+            self.data_tc = eval('RTC._tc_' + tmp)
 
     def read(self) :
         if self.ref :

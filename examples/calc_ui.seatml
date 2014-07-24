@@ -44,7 +44,7 @@
 
     <rule source="in" >
 	    <script>
-seat.setEntry("disp", rtc_in_data.data)
+seat.setEntry("main_mode:disp", rtc_in_data.data)
 	    </script>
     </rule>
   </state>

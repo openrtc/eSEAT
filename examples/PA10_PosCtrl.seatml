@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="PA10_Command">
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="pos_in" type="rtcin" datatype="TimedDoubleSeq" />
+    <adaptor name="q_in" type="rtcin" datatype="TimedDoubleSeq" />
+    <adaptor name="q_out" type="rtcout" datatype="TimedDoubleSeq" />
+
+    <script execfile="textutil.py" />
+    <script execfile="rtc_handle_tool.py">
+get_handle_list()
+    </script>
+  </general>
+
+  <state name="Mode0">
+    <button label="Connect" >
+      <script>
+connect_ports("PA10:q", "PosCtrl:q_in")
+connect_ports("PA10PosControllerRTC0:q_out", "PosCtrl:pos_in")
+connect_ports("PA10PosControllerRTC0:command", "PosCtrl:str_out")
+connect_ports("PA10PosControllerRTC0:target_q", "PosCtrl:q_out")
+      </script>
+    </button> 
+    <button label="Disconnect" >
+      <script>
+disconnect_ports("PA10:q", "PosCtrl:q_in")
+disconnect_ports("PA10PosControllerRTC0:q_out", "PosCtrl:pos_in")
+disconnect_ports("PA10PosControllerRTC0:command", "PosCtrl:str_out")
+disconnect_ports("PA10PosControllerRTC0:target_q", "PosCtrl:q_out")
+      </script>
+    </button> 
+
+    <button label="Activate" >
+      <script>
+activate_rtc("PosCtrl")
+      </script>
+    </button> 
+    <button label="Deactivate" >
+      <script>
+deactivate_rtc("PosCtrl")
+      </script>
+    </button> 
+    <brk />
+
+    <label text="Input(Pos, Angle, Time):" />
+    <input id="lineIn" width="70" colspan="4">0.9, 0, 0.25, 180, 0, 0, 2.0</input>
+
+    <button label="Send" >
+      <script sendto="q_out">sendDoubleSeq("Mode0:lineIn")</script>
+    </button> 
+
+    <brk />
+    <label text="Hand:" />
+    <button label="Open" ><message sendto="str_out">Open</message></button>
+    <button label="Close" ><message sendto="str_out">Close</message></button>
+
+    <brk />
+    <label text="Pos, Aangle, cTime:" />
+    <input id="lineOut" width="70" colspan="5">0,0,0,0,0,0,1.0</input>
+    <rule source="pos_in"> <script>ouputDoubleSeq("Mode0:lineOut")</script> </rule>
+
+    <brk />
+    <label text="Joints:" />
+    <input id="JOut" width="70" colspan="5">0,0,0,0,0,0,1.0</input>
+    <rule source="q_in"> <script>ouputDoubleSeq("Mode0:JOut")</script> </rule>
+
+    <brk />
+    <label text="Mode:" />
+    <label text="Mode0" bg_color="blue" />
+    <button label="Mode1" >
+    	<message sendto="str_out">Mode1</message>
+        <statetransition>Mode1</statetransition>
+    </button>
+    <button label="Mode2" >
+    	<message sendto="str_out">Mode2</message>
+	<statetransition>Mode2</statetransition>
+    </button>
+
+  </state>
+
+  <state name="Mode1">
+    <label text="Pos, Aangle, cTime:" />
+    <input id="lineOut1" width="70" colspan="11">0,0,0,0,0,0,1.0</input>
+    <rule source="pos_in"> <script>ouputDoubleSeq("Mode1:lineOut1")</script> </rule>
+
+    <brk />
+    <label text="Pos:" />
+    <input id="valIn1" width="5">0.1</input>
+    <label text="Ang:" />
+    <input id="angIn1" width="5">10.0</input>
+
+    <label text="Time:" />
+    <input id="timeIn1" width="5">2.0</input>
+
+    <brk />
+    <label text="Pos, Aangle:" />
+    <button label="+X" >
+	    <script sendto="q_out">outPosAngle(0, "Mode1:valIn1", "Mode1:timeIn1", 1)</script>
+    </button> 
+    <button label="+Y" >
+	    <script sendto="q_out">outPosAngle(1, "Mode1:valIn1", "Mode1:timeIn1", 1)</script>
+    </button> 
+    <button label="+Z" >
+	    <script sendto="q_out">outPosAngle(2, "Mode1:valIn1", "Mode1:timeIn1", 1)</script>
+    </button> 
+    <button label="+r" >
+	    <script sendto="q_out">outPosAngle(3, "Mode1:angIn1", "Mode1:timeIn1", 1)</script>
+    </button> 
+    <button label="+p" >
+	    <script sendto="q_out">outPosAngle(4, "Mode1:angIn1", "Mode1:timeIn1", 1)</script>
+    </button> 
+    <button label="+y" >
+	    <script sendto="q_out">outPosAngle(5, "Mode1:angIn1", "Mode1:timeIn1", 1)</script>
+    </button> 
+
+    <brk />
+    <label text="Pos, Aangle:" />
+    <button label="-X" >
+	    <script sendto="q_out">outPosAngle(0, "Mode1:valIn1", "Mode1:timeIn1", -1)</script>
+    </button> 
+    <button label="-Y" >
+	    <script sendto="q_out">outPosAngle(1, "Mode1:valIn1", "Mode1:timeIn1", -1)</script>
+    </button> 
+    <button label="-Z" >
+	    <script sendto="q_out">outPosAngle(2, "Mode1:valIn1", "Mode1:timeIn1", -1)</script>
+    </button> 
+    <button label="-r" >
+	    <script sendto="q_out">outPosAngle(3, "Mode1:angIn1", "Mode1:timeIn1", -1)</script>
+    </button> 
+    <button label="-p" >
+	    <script sendto="q_out">outPosAngle(4, "Mode1:angIn1", "Mode1:timeIn1", -1)</script>
+    </button> 
+    <button label="-y" >
+	    <script sendto="q_out">outPosAngle(5, "Mode1:angIn1", "Mode1:timeIn1", -1)</script>
+    </button> 
+
+    <brk />
+    <label text="Hand:" />
+    <button label="Open" ><message sendto="str_out">Open</message></button>
+    <button label="Close" ><message sendto="str_out">Close</message></button>
+
+    <brk />
+    <label text="Mode:" />
+    <button label="Mode0" >
+    	<message sendto="str_out">Mode0</message>
+        <statetransition>Mode0</statetransition>
+    </button>
+    <label text="Mode1" bg_color="blue" />
+    <button label="Mode2" >
+    	<message sendto="str_out">Mode2</message>
+	<statetransition>Mode2</statetransition>
+    </button>
+
+  </state>
+  <state name="Mode2">
+    <label text="J_Ang:" />
+    <!--
+    <input id="lineOut1" width="70" colspan="11">0,0,0,0,0,0,1.0</input>
+-->
+    <input id="cJ0" width="7" >0.0</input>
+    <input id="cJ1" width="7" >0.0</input>
+    <input id="cJ2" width="7" >0.0</input>
+    <input id="cJ3" width="7" >0.0</input>
+    <input id="cJ4" width="7" >0.0</input>
+    <input id="cJ5" width="7" >0.0</input>
+    <input id="cJ6" width="7" >0.0</input>
+
+    <rule source="q_in"> <script>outputJoints("Mode2:cJ")</script> </rule>
+
+    <brk />
+    <label text="Target:" />
+    <input id="tJ0" width="7" >0.0</input>
+    <input id="tJ1" width="7" >0.0</input>
+    <input id="tJ2" width="7" >0.0</input>
+    <input id="tJ3" width="7" >0.0</input>
+    <input id="tJ4" width="7" >0.0</input>
+    <input id="tJ5" width="7" >0.0</input>
+    <input id="tJ6" width="7" >0.0</input>
+
+    <brk />
+    <input id="timeIn2" width="4" >2.0</input>
+    <button label="Send" >
+	    <script sendto="q_out">sendJoints("Mode2:tJ")</script>
+    </button>
+    <label text="" />
+    <button label="Copy" >
+	    <script>copyJoints("Mode2:cJ", "Mode2:tJ")</script>
+    </button>
+
+    <brk />
+    <label text="Hand:" />
+    <button label="Open" ><message sendto="str_out">Open</message></button>
+    <button label="Close" ><message sendto="str_out">Close</message></button>
+
+    <brk />
+    <label text="Mode:" />
+    <button label="Mode0" >
+    	<message sendto="str_out">Mode0</message>
+        <statetransition>Mode0</statetransition>
+    </button>
+    <button label="Mode1" >
+    	<message sendto="str_out">Mode1</message>
+	<statetransition>Mode1</statetransition>
+    </button>
+    <label text="Mode2" bg_color="blue"/>
+  </state>
+
+
+</seatml>
+

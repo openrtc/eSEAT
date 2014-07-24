@@ -26,7 +26,7 @@
  
     <rule source="str_in">
       <script>
-seat.appendText("textOut", rtc_in_data.data+"\n")
+seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
       </script>
     </rule>
 

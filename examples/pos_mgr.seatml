@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="PA10_Command">
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="q_out" type="rtcout" datatype="TimedDoubleSeq" />
+    <script execfile="textutil.py" />
+    <script>
+global currentIndex, reverse_flag
+currentIndex=1
+reverse_flag=False
+    </script>
+    <script execfile="rtc_handle_tool.py">
+get_handle_list()
+    </script>
+
+  </general>
+
+  <state name="Mode0">
+
+    <label text="Position Manager" colspan="6"/>
+    <brk />
+        <button label="Connect" >
+      <script>
+connect_ports("PA10PosControllerRTC0:command", "PosMgr:str_out")
+connect_ports("PA10PosControllerRTC0:target_q", "PosMgr:q_out")
+      </script>
+    </button> 
+    <button label="Disconnect" >
+      <script>
+disconnect_ports("PA10PosControllerRTC0:command", "PosMgr:str_out")
+disconnect_ports("PA10PosControllerRTC0:target_q", "PosMgr:q_out")
+      </script>
+    </button> 
+
+    <button label="Activate" >
+      <script>
+activate_rtc("PosMgr")
+      </script>
+    </button> 
+    <button label="Deactivate" >
+      <script>
+deactivate_rtc("PosMgr")
+      </script>
+    </button> 
+
+    <brk />
+
+    <input id="lineIn" width="70" colspan="5">0.9, 0, 0.25, 180, 0, 0, 2.0</input>
+
+    <button label="Move" >
+      <script sendto="q_out">
+sendDoubleSeq("Mode0:lineIn")
+if reverse_flag : currentIndex -= 1
+else : currentIndex += 1
+seat.setEntry("Mode0:lineIn",seat.getNthLine("Mode0:textIn", currentIndex))
+seat.setEntry("Mode0:Pos",currentIndex)
+      </script>
+    </button> 
+
+    <brk />
+    <text id="textIn" width="70" height="10" colspan="6">
+0.0, 0.025, 1.2, 0.0, 0.0, 0.0, 2.0
+0.9, 0.0, 0.25, 180, 0, 0, 2.0
+0.9, 0.0, 0.20, 180, 0, 0, 2.0
+0.6, 0.0, 0.60, 180, 0, 0, 2.0
+0.0, 0.65, 0.6, 180, 0, 90, 2.0
+0.0, 0.65, 0.5, 180, 0, 90, 2.0
+0.0, 0.65, 0.6, 180, 0, 90, 2.0
+0.0, 0.025, 1.2, 0.0, 0.0, 0.0, 2.0
+    </text>
+
+    <brk />
+    <label text="Hand:" />
+    <button label="Open" ><message sendto="str_out">Open</message></button>
+    <button label="Close" ><message sendto="str_out">Close</message></button>
+
+    <brk />
+    <input id="Pos" width="2">0
+     <script>
+currentIndex = int(seat.getEntry("Mode0:Pos"))
+     </script>
+    </input>
+    <button label="R/F" >
+     <script>
+if reverse_flag :
+    reverse_flag = False
+    seat.setButtonConfig("Mode0:R/F", bg="grey", fg="black")
+else:
+    reverse_flag = True
+    seat.setButtonConfig("Mode0:R/F", bg="blue", fg="white")
+     </script>
+    </button>
+
+
+  </state>
+
+</seatml>
+
