@@ -58,6 +58,39 @@ seat.setEntry("Mode0:Pos",currentIndex)
     </button> 
 
     <brk />
+    <button label="Next">
+      <script>
+cl=seat.getSelTextLine("Mode0:textIn")
+if cl == 0:
+  v=seat.setSelText("Mode0:textIn", 1)
+else:
+  v=seat.nextSelText("Mode0:textIn")
+  if v == 0:
+    lst= seat.getLastIndex("Mode0:textIn")
+    seat.setSelText("Mode0:textIn", lst)
+      </script>
+    </button>
+    <button label="Prev">
+      <script>
+cl=seat.getSelTextLine("Mode0:textIn")
+if cl == 0:
+  lst= seat.getLastIndex("Mode0:textIn")
+  seat.setSelText("Mode0:textIn", lst)
+else:
+  v=seat.prevSelText("Mode0:textIn")
+  if v == 0:
+    seat.setSelText("Mode0:textIn", 1)
+  
+      </script>
+    </button>
+    <button label="Clear">
+      <script>
+seat.unsetSelText("Mode0:textIn")
+  
+      </script>
+    </button>
+
+    <brk />
     <text id="textIn" width="70" height="10" colspan="6">
 0.0, 0.025, 1.2, 0.0, 0.0, 0.0, 2.0
 0.9, 0.0, 0.25, 180, 0, 0, 2.0
@@ -90,7 +123,6 @@ else:
     seat.setButtonConfig("Mode0:R/F", bg="blue", fg="white")
      </script>
     </button>
-
 
   </state>
 

@@ -4,66 +4,107 @@
     <script>
 import ssr
     </script>
-
     <adaptor name="gesture_out" type="rtcout" datatype="TimedString" />
     <adaptor name="str_out" type="rtcout" datatype="TimedString" />
-    <adaptor name="frame_in" type="rtcin" datatype="ssr.Frame" />
+    <adaptor name="frame" type="rtcin" datatype="ssr.Frame" />
 
     <script execfile="textutil.py" />
     <script execfile="rtc_handle_tool.py">
-get_handle_list()
+global rtclist
+rtclist=get_handle_list()
     </script>
+    <script execfile="leapGesture.py" />
   </general>
 
   <state name="Mode0">
-    <rule source="frame_in">
-     <script>
-ges=rtc_in_data.gestures
-if ges :
-  print "Gesture["
-  for g in ges:
-    print g.type
-  print "]"
-	    </script>
+
+    <rule source="frame">
+      <script>
+LeapGesture(rtc_in_data.gestures, "Mode0:InfoOut", "Mode0:SwipeOut",
+	     "Mode0:CircleOut", "Mode0:ScreenOut", "Mode0:KeyOut")
+      </script>
+      <script>
+LeapHands(rtc_in_data.hands,"Mode0:nHandOut", "Mode0:Hand")
+      </script>
     </rule>
+
+    <input id="RtcList" width="40" colspan="8"> --->Click [RTCs]</input>
+    <button label="RTCs" >
+      <script>
+rtclist=get_handle_list()
+rtcs=[]
+for x in rtclist:
+  if x.count("Leap") : rtcs.append(x)
+seat.setEntry("Mode0:RtcList", ",".join(rtcs))
+      </script>
+    </button> 
+    <brk />
 
     <button label="Connect" >
       <script>
-connect_ports("LeapMotion:frame_in", "LaviZ.host_cxt/LeapRTC0:frame")
+leaprtcs=seat.getEntry("Mode0:RtcList")
+x=leaprtcs.split(",")
+if len(x) == 2:
+  connect_ports(x[0]+":frame", x[1]+":frame")
       </script>
     </button> 
+
     <button label="Disconnect" >
       <script>
-disconnect_ports("LeapMotion:frame_in", "LaviZ.host_cxt/LeapRTC0:frame")
+leaprtcs=seat.getEntry("Mode0:RtcList")
+x=leaprtcs.split(",")
+if len(x) == 2:
+  disconnect_ports(x[0]+":frame", x[1]+":frame")
       </script>
     </button> 
 
     <button label="Activate" >
       <script>
-activate_rtc("LeapMotion")
+leaprtcs=seat.getEntry("Mode0:RtcList")
+activate_rtcs(leaprtcs)
       </script>
     </button> 
+
     <button label="Deactivate" >
       <script>
-deactivate_rtc("LeapMotion")
+leaprtcs=seat.getEntry("Mode0:RtcList")
+deactivate_rtcs(leaprtcs)
       </script>
     </button> 
-    <brk />
 
+    <brk />
+    <label text="Number of Hands:" />
+    <input id="nHandOut" width="10" ></input>
+
+    <brk />
+    <label text="Hand1:" />
+    <input id="Hand1Pos" width="20" colspan="4"></input>
+    <input id="Hand1Ori" width="20" colspan="4"></input>
+
+    <brk />
+    <label text="Hand2:" />
+    <input id="Hand2Pos" width="20" colspan="4"></input>
+    <input id="Hand2Ori" width="40" colspan="4"></input>
+
+    <brk />
     <label text="Geature:" />
     <input id="InfoOut" width="50" colspan="8"></input>
-    <brk />
 
-    <label text="Sample" />
-    <button label="Change" >
-	    <script>
-seat.setButtonConfig("Mode0:Change", text="red")
-	    </script>
-    </button>
-    <button label="Back" >
-	    <script>
-seat.setLabelConfig("Mode0:Sample", text="Sample")
-	    </script>
-    </button>
+    <brk />
+    <label text="Swipe:" />
+    <input id="SwipeOut" width="50" colspan="8"></input>
+
+    <brk />
+    <label text="Circle:" />
+    <input id="CircleOut" width="50" colspan="8"></input>
+
+    <brk />
+    <label text="Screen:" />
+    <input id="ScreenOut" width="50" colspan="8"></input>
+
+    <brk />
+    <label text="Key:" />
+    <input id="KeyOut" width="50" colspan="8"></input>
+
   </state>
 </seatml>
