@@ -1071,6 +1071,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def createTextItem(self, frame, sname, name, eid, w, h, cspan=1, rspan=1, txt=""):
         stxt = ScrolledText(frame, width=int(w), height=int(h))
         stxt.insert(END, txt.strip())
+        stxt.tag_config("sel", background="blue",foreground="white")
 	self.stext[sname+":"+eid] = stxt
 	key = name+":gui:"+eid
 
@@ -1081,6 +1082,53 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             return self.stext[eid].get(1.0,END)
 	except:
             return ""
+
+    def unsetSelText(self, eid):
+        try:
+	    txt=self.stext[eid]
+	    rng=txt.tag_ranges("sel")
+            txt.tag_remove("sel", rng[0], rng[1])
+	except:
+            pass
+
+    def getSelText(self, eid):
+        try:
+	    txt=self.stext[eid]
+	    rng=txt.tag_ranges("sel")
+            txt.get("sel", rng[0], rng[1])
+            return "" 
+	except:
+            return "" 
+
+    def nextSelText(self, eid):
+        try:
+	    txt=self.stext[eid]
+	    rng=txt.tag_ranges("sel")
+	    nl=int(txt.index(rng[0]).split(".")[0]) + 1
+            if nl > self.getLastIndex(eid) : return nl-1
+            self.setSelText(eid, nl)
+            return nl 
+	except:
+            return 0 
+
+    def prevSelText(self, eid):
+        try:
+	    txt=self.stext[eid]
+	    rng=txt.tag_ranges("sel")
+	    nl=int(txt.index(rng[0]).split(".")[0]) - 1
+            self.setSelText(eid, nl)
+            return nl 
+	except:
+            return 0 
+
+    def setSelText(self, eid, n=1):
+        try:
+            spos='%d.0' % (n)
+            epos='%d.0' % (n+1)
+            self.unsetSelText(eid)
+            self.stext[eid].tag_add("sel", spos, epos)
+	except:
+            pass
 
     def getNthLine(self, eid, n=1):
         try:
@@ -1097,6 +1145,12 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             return self.stext[eid].get(spos,epos)
 	except:
             return ""
+
+    def getLastIndex(self, eid):
+        try:
+            return int(self.stext[eid].index('end-1c').split('.')[0])
+	except:
+            return 1
 
     def appendText(self, eid, txt=""):
         try:
