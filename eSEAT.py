@@ -1071,7 +1071,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def createTextItem(self, frame, sname, name, eid, w, h, cspan=1, rspan=1, txt=""):
         stxt = ScrolledText(frame, width=int(w), height=int(h))
         stxt.insert(END, txt.strip())
-        stxt.tag_config("sel", background="blue",foreground="white")
+        stxt.tag_config("csel", background="blue",foreground="white")
 	self.stext[sname+":"+eid] = stxt
 	key = name+":gui:"+eid
 
@@ -1086,24 +1086,23 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def unsetSelText(self, eid):
         try:
 	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("sel")
-            txt.tag_remove("sel", rng[0], rng[1])
+	    rng=txt.tag_ranges("csel")
+            txt.tag_remove("csel", rng[0], rng[1])
 	except:
             pass
 
     def getSelText(self, eid):
         try:
 	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("sel")
-            txt.get("sel", rng[0], rng[1])
-            return "" 
+	    rng=txt.tag_ranges("csel")
+            return txt.get("csel", rng[0], rng[1])
 	except:
             return "" 
 
     def nextSelText(self, eid):
         try:
 	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("sel")
+	    rng=txt.tag_ranges("csel")
 	    nl=int(txt.index(rng[0]).split(".")[0]) + 1
             if nl > self.getLastIndex(eid) : return nl-1
             self.setSelText(eid, nl)
@@ -1114,9 +1113,18 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def prevSelText(self, eid):
         try:
 	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("sel")
+	    rng=txt.tag_ranges("csel")
 	    nl=int(txt.index(rng[0]).split(".")[0]) - 1
             self.setSelText(eid, nl)
+            return nl 
+	except:
+            return 0 
+
+    def getSelTextLine(self, eid):
+        try:
+	    txt=self.stext[eid]
+	    rng=txt.tag_ranges("csel")
+	    nl=int(txt.index(rng[0]).split(".")[0])
             return nl 
 	except:
             return 0 
@@ -1126,7 +1134,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             spos='%d.0' % (n)
             epos='%d.0' % (n+1)
             self.unsetSelText(eid)
-            self.stext[eid].tag_add("sel", spos, epos)
+            self.stext[eid].tag_add("csel", spos, epos)
 	except:
             pass
 
