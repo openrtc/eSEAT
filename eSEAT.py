@@ -250,6 +250,8 @@ class SEATML_Parser():
 	    if not func :
               func = c.get('host')
             data = c.text
+            for cx in c.getchildren():
+              data += cx.text
             commands.append(['s', func, data, fname])
 
         return commands
@@ -1095,7 +1097,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         try:
 	    txt=self.stext[eid]
 	    rng=txt.tag_ranges("csel")
-            return txt.get("csel", rng[0], rng[1])
+            return txt.get(rng[0], rng[1])
 	except:
             return "" 
 
@@ -1135,6 +1137,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             epos='%d.0' % (n+1)
             self.unsetSelText(eid)
             self.stext[eid].tag_add("csel", spos, epos)
+            self.setCurrentIndex(eid, n)
 	except:
             pass
 
@@ -1159,6 +1162,19 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             return int(self.stext[eid].index('end-1c').split('.')[0])
 	except:
             return 1
+
+    def getCurrentIndex(self, eid):
+        try:
+            return int(self.stext[eid].index('insert').split('.')[0])
+	except:
+            return 0
+
+    def setCurrentIndex(self, eid, n=1):
+        try:
+            self.stext[eid].mark_set('insert', "%d.0" % (n))
+            return n
+	except:
+            return 0
 
     def appendText(self, eid, txt=""):
         try:
