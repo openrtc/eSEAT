@@ -764,7 +764,16 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 self.activateCommand(c)
         except KeyError:
             pass
+  
+        try:
+            self.prev_state=self.currentstate
+            self.next_state=newstate
+            self.root.event_generate("<<state_transfer>>", when="tail")
+        except:
+            pass
+
         self.currentstate = newstate
+
         try:
             for c in self.keys[self.currentstate+":::entry"]:
                 self.activateCommand(c)
@@ -819,9 +828,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 #               self.hideFrame(self.currentstate)
 #           except:
 #               pass
-            self.prev_state=self.currentstate
-            self.next_state=data
-            self.root.event_generate("<<state_transfer>>", when="tail")
             self.stateTransfer(data)
 
 #           try:
@@ -1319,6 +1325,25 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
            self.showFrame(self.next_state)
         except:
            pass
+
+    def getSubprocessList(self):
+        res=[]
+        newlst=[]
+        for p in self.popen:
+            p.poll()
+            if p.returncode == None:
+                res.append(p.pid)
+                newlst.append(p)
+        self.popen = newlst
+        return res
+
+    def killSubprocess(self, pid=None):
+        for p in self.popen:
+            p.poll()
+            if pid == None or p.pid == pid :
+                p.terminate()
+        return 
+
 
 class eSEATManager:
     def __init__(self, mlfile=None):
