@@ -5,13 +5,24 @@
 import ssr
     </script>
     <adaptor name="gesture_out" type="rtcout" datatype="TimedString" />
-    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="hands_out" type="rtcout" datatype="TimedFloatSeq" />
     <adaptor name="frame" type="rtcin" datatype="ssr.Frame" />
 
     <script execfile="textutil.py" />
     <script execfile="rtc_handle_tool.py">
 global rtclist
+global touchflagR,startPosR
+global touchflagL,startPosL
+global prevId, lastSendTime
+
+lastSendTime=0
+
+prevId=0
 rtclist=get_handle_list()
+touchflagR=False
+startPosR=None
+touchflagL=False
+startPosL=None
     </script>
     <script execfile="leapGesture.py" />
   </general>
@@ -19,12 +30,99 @@ rtclist=get_handle_list()
   <state name="Mode0">
 
     <rule source="frame">
-      <script>
-LeapGesture(rtc_in_data.gestures, "Mode0:InfoOut", "Mode0:SwipeOut",
+      <script sendto="gesture_out">
+LeapGesture(rtc_in_data, "Mode0:InfoOut", "Mode0:SwipeOut",
 	     "Mode0:CircleOut", "Mode0:ScreenOut", "Mode0:KeyOut")
+
+Gesture = getLeapGesture(rtc_in_data.gestures)
+
+if Gesture :
+  cid, val = Gesture.split(":")
+#  if cid != prevId :
+#    prevId=cid
+  if rtc_in_data.timestamp - lastSendTime > 100000 :
+    lastSendTime = rtc_in_data.timestamp
+    print lastSendTime, Gesture
+    rtc_result = val
+
       </script>
-      <script>
+
+      <script sendto="hands_out">
 LeapHands(rtc_in_data.hands,"Mode0:nHandOut", "Mode0:Hand")
+hnds = getLeapHands(rtc_in_data.hands)
+posL = [0,0,0]
+posR = [0,0,0]
+
+if hnds[0]:
+  pos, ori,info = hnds[0]
+  posL = getPosDiff(center_l, pos)
+
+if hnds[1]:
+  pos,ori,info = hnds[1]
+  posR = getPosDiff(center_r, pos)
+
+if hnds[0] or hnds[1]:
+  rtc_result=TimedFloatSeq(Time(0,0), utils.array_flatten([posR,posL]))
+
+      </script>
+
+      <script>
+try:
+  from itertools import chain
+  global touchflagR, startPosR
+  global touchflagL, startPosL, center_r, center_l
+
+  hnds = getLeapHands(rtc_in_data.hands)
+
+  if hnds[0]:
+    pos,ori,info = hnds[0]
+
+    if getTouchFlag(touchflagL,info) == 1:
+      touchflagL = True 
+      startPosL = pos
+      center_l = pos
+
+    elif getTouchFlag(touchflagL,info) == 0:
+      touchflagL = False 
+      startPosL = None
+    else:
+      pass
+  else:
+    touchflagL = False 
+    startPosL = None
+
+  touchLabel( touchflagL, "Mode0:TouchingL")
+  printPosDiff(startPosL, pos, "Mode0:handPosL")
+  posL = getPosDiff(startPosL, pos)
+
+
+  if hnds[1]:
+    pos,ori,info = hnds[1]
+
+    if getTouchFlag(touchflagR,info) == 1:
+      touchflagR = True 
+      startPosR = pos
+      center_r = pos
+
+    elif getTouchFlag(touchflagR,info) == 0:
+      touchflagR = False 
+      startPosR = None
+
+    else:
+      pass
+  else:
+    touchflagR = False 
+    startPosR = None
+
+  touchLabel( touchflagR, "Mode0:TouchingR")
+  printPosDiff(startPosR, pos, "Mode0:handPosR")
+  posR = getPosDiff(startPosR, pos)
+
+#  if touchflagL == True or touchflagR  :
+#    rtc_result=TimedFloatSeq(Time(0,0), utils.array_flatten([posR,posL]))
+except: 
+  pass
+
       </script>
     </rule>
 
@@ -73,8 +171,14 @@ deactivate_rtcs(leaprtcs)
     </button> 
 
     <brk />
-    <label text="Number of Hands:" />
+    <label text="Num of Hands:" />
     <input id="nHandOut" width="10" ></input>
+
+    <label text="TouchingL" />
+    <input id="handPosL" width="20" ></input>
+
+    <label text="TouchingR" />
+    <input id="handPosR" width="20" ></input>
 
     <brk />
     <label text="Hand1:" />

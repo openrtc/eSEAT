@@ -722,6 +722,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #  Lookup Registered Commands
     #
     def lookupWithDefault(self, state, name, s):
+        s=s.split(",")[0]
         self._logger.RTC_INFO('looking up...%s: %s' % (name,s,))
         cmds = self.lookupCommand(state, name, s)
         if not cmds:
@@ -742,6 +743,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 regkeys = self.regkeys[state+":"+name]
             except KeyError:
                 return None
+
             for r in regkeys:
                 if r[0].match(s):
                     cmds = r[1]
@@ -1178,7 +1180,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
     def appendText(self, eid, txt=""):
         try:
-            return self.stext[eid].insert(END, txt)
+            val= self.stext[eid].insert(END, txt)
+            self.stext[eid].see(END)
+            return val
 	except:
             return ""
 

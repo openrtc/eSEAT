@@ -154,3 +154,14 @@ def genmanagerargs(opt):
     if opt.mastermode == True:
         args.append('-d')
 
+def maxmin(a, mx, mn):
+  if a > mx : return mx
+  if mn > a : return mn
+  return a
+
+def array_flatten(ar):
+  from itertools import chain
+  return list(chain.from_iterable(ar))
+
+
+

@@ -20,7 +20,15 @@
     <brk />
   
     <label text="Coming Text:" />
-    <text id="textOut" width="50" height="5" colspan="2" />
+    <text id="textOut" width="50" height="5" colspan="2" >
+	    INIT String...
+    </text>
+    <brk />
+    <button label="Clear">
+      <script>
+seat.clearText("main_mode:textOut")
+      </script>
+    </button>
  
     <rule source="str_in">
       <script>
