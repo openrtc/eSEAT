@@ -445,7 +445,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.labels = {}
         self.popen = []
         self.root = None
-	self.lock=threading.Lock()
 
     ##########################################################
     #  E v e n t   H a n d l e r
@@ -775,9 +774,12 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.currentstate = newstate
 
         try:
+            print "Call onentry"
             for c in self.keys[self.currentstate+":::entry"]:
+                print "calling ",c
                 self.activateCommand(c)
         except KeyError:
+            print "entry Key ERROR"
             pass
 
     #
@@ -890,13 +892,11 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #  Activate Lookuped Commands
     #
     def activateCommand(self, c, data=None):
-        self.lock.acquire()
         if c[0] == 'c': self.applyMessage(c)
         elif c[0] == 'l': self.applyLog(c)
         elif c[0] == 'x': self.applyShell(c)
         elif c[0] == 's': self.applyScript(c, data)
         elif c[0] == 't': self.applyTransition(c)
-        self.lock.release()
 
     def activateCommandEx(self, c, data):
         if c[0] == 'c': c[3] = None
