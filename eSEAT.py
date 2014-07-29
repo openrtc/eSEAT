@@ -25,6 +25,7 @@ import traceback
 import socket
 import optparse
 import threading
+import subprocess
 import OpenRTM_aist
 
 import omniORB
@@ -290,6 +291,8 @@ class SEATML_Parser():
                 elif a.tag == 'script':
                     filename = a.get('execfile')
                     txt = a.text
+                    for cx in a.getchildren():
+                        txt += cx.text
 		    if filename : execfile(filename, globals())
 		    if txt : exec(txt, globals())
 	     
@@ -440,6 +443,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 	self.stext = {}
         self.buttons = {}
         self.labels = {}
+        self.popen = []
         self.root = None
 	self.lock=threading.Lock()
 
@@ -837,7 +841,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def applyShell(self, c):
         name ,data = c[1:]
-        res = os.system(data)
+        #res = os.system(data)
+        res = subprocess.Popen(data, shell=True)
+        self.popen.append(res)
         try:
             ad = self.adaptors[name]
             ad.send(name, res)
@@ -1185,6 +1191,14 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         try:
             val= self.stext[eid].insert(END, txt)
             self.stext[eid].see(END)
+            return val
+	except:
+            return ""
+
+    def insertText(self, eid, pos, txt=""):
+        try:
+            val= self.stext[eid].insert(pos, txt)
+            self.stext[eid].see(pos)
             return val
 	except:
             return ""
