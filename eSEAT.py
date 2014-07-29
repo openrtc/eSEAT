@@ -774,12 +774,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.currentstate = newstate
 
         try:
-            print "Call onentry"
             for c in self.keys[self.currentstate+":::entry"]:
-                print "calling ",c
                 self.activateCommand(c)
         except KeyError:
-            print "entry Key ERROR"
             pass
 
     #
