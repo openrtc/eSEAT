@@ -810,17 +810,20 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
         else:
             self._logger.RTC_INFO("state transition from "+self.currentstate+" to "+data)
-            try:
-                self.hideFrame(self.currentstate)
-            except:
-                pass
 
+#            try:
+#               self.hideFrame(self.currentstate)
+#           except:
+#               pass
+            self.prev_state=self.currentstate
+            self.next_state=data
+            self.root.event_generate("<<state_transfer>>", when="tail")
             self.stateTransfer(data)
 
-            try:
-                self.showFrame(data)
-            except:
-                pass
+#           try:
+#               self.showFrame(data)
+#           except:
+#               pass
 
     #
     #  Execute <log>
@@ -877,10 +880,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def activateCommand(self, c, data=None):
         self.lock.acquire()
         if c[0] == 'c': self.applyMessage(c)
-        elif c[0] == 't': self.applyTransition(c)
         elif c[0] == 'l': self.applyLog(c)
         elif c[0] == 'x': self.applyShell(c)
         elif c[0] == 's': self.applyScript(c, data)
+        elif c[0] == 't': self.applyTransition(c)
         self.lock.release()
 
     def activateCommandEx(self, c, data):
@@ -1296,6 +1299,13 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
         return 0
 
+    def stateChanged(self, event=None, *args):
+        try:
+           self.hideFrame(self.prev_state)
+           self.showFrame(self.next_state)
+        except:
+           pass
+
 class eSEATManager:
     def __init__(self, mlfile=None):
 
@@ -1373,8 +1383,11 @@ class eSEATManager:
             for st in self.comp.states:
                 self.comp.newFrame(st)
                 self.comp.createGuiPanel(st)
+
             self.comp.showFrame(self.comp.init_state)
             self.comp.frames[self.comp.init_state].pack()
+
+            self.comp.root.bind("<<state_transfer>>", self.comp.stateChanged)
             self.comp.setTitle(self.comp.getInstanceName())
             self.comp.root.mainloop()
 
