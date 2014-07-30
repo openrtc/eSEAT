@@ -1,5 +1,7 @@
 #
 #
+#import ssr
+
 execfile("rtc_handle.py")
 
 def initNS(hostname="localhost"):
@@ -39,8 +41,7 @@ def get_handle(name, ns=None):
   try:
     return ns.rtc_handles[name]
   except:
-    get_handle_list()
-    print ns.rtc_handles
+    #get_handle_list()
     return None
 
 def get_port_info(name, ns=None):
@@ -66,8 +67,6 @@ def get_named_dataport(name, port, ns=None):
   if name.count(".rtc") == 0 : name = name+".rtc"
   hndl=get_handle(name, ns)
 
-  print "handle = ",hndl
-
   if hndl and port:
     if port in hndl.inports.keys():
       return hndl.inports[port]
@@ -83,16 +82,12 @@ def get_name_port(path1):
 
 def create_connection_name(path1, path2):
   global NS
-
   name1, port1 =  get_name_port(path1)
   name2, port2 =  get_name_port(path2)
-  print name1, port1, name2, port2 
 
   try:
     pp1 = get_named_dataport(name1, port1, NS)
-    print pp1
     pp2 = get_named_dataport(name2, port2, NS)
-    print pp2
     pn1 = string.join([name1,pp1.name, name2, pp2.name], '_')
     pn2 = string.join([name2,pp2.name, name1, pp1.name], '_')
     return [pn1, pn2]
@@ -114,14 +109,18 @@ def connect_ports(path1, path2):
   pp1 = None
   pp2 = None
   con = None
+  path1=str(path1.strip())
+  path2=str(path2.strip())
+
+  if check_connection(path1, path2):
+    print "Connection already exist."
+    return None
+
   cnames = create_connection_name(path1, path2)
   if not cnames:
     print "Invalid Path: %s, %s" % (path1, path2)
     return None
 
-  if check_connection_list(cnames, connections):
-    print "Connection already exist."
-    return None
     
   name1, port1 =  get_name_port(path1)
   name2, port2 =  get_name_port(path2)
@@ -143,6 +142,8 @@ def connect_ports(path1, path2):
 
 def find_connection(path1, path2):
   global NS, connections
+  path1=str(path1.strip())
+  path2=str(path2.strip())
   cnames = create_connection_name(path1, path2)
 
   if not cnames:
@@ -159,12 +160,19 @@ def find_connection(path1, path2):
 
 def disconnect_ports(path1, path2):
   global NS, connections
-  con = find_connection(path1, path2)
-  if con:
-    con[1].disconnect();
-    del(connections[con[0]])
-    return con[0]
-  return None
+  path1=str(path1.strip())
+  path2=str(path2.strip())
+  if not check_connection(path1, path2):
+    print "No connection exist."
+    return None
+
+  res=remove_connection(path1, path2)
+#  con = find_connection(path1, path2)
+#  if con:
+#    del(connections[con[0]])
+#    con[1].disconnect();
+#    return con[0]
+  return res
 
 def activate_rtc(path1):
   name, port =  get_name_port(path1)
@@ -224,10 +232,41 @@ def retrieve_connection_profiles(path1):
   except:
     return []
 
+def check_connection(path1, path2):
+  connectors1=retrieve_connection_profiles(path1)
+  connectors2=retrieve_connection_profiles(path2)
+  for con in connectors1:
+    cid = con.connector_id
+    for con2 in connectors2:
+      if cid == con2.connector_id : return con
+  return None
+ 
+def remove_connection(path1, path2):
+  con = check_connection(path1, path2)
+  if con :
+    con.ports[0].disconnect(con.connector_id)
+    return con
+  else:
+    print "No Connections"
+    return False
+
 def disconnect_all(path1):
   cprofs=retrieve_connection_profiles(path1)
   for x in cprofs:
      x.ports[0].disconnect(x.connector_id)
+
+def make_connection(paths, dim=","):
+  ports=paths.split(dim) 
+  if len(ports) == 2:
+    connect_ports(ports[0], ports[1])
+
+def delete_connection(paths, dim=","):
+  ports=paths.split(dim) 
+  if len(ports) == 2:
+    disconnect_ports(ports[0], ports[1])
+
+def clear_connection_list():
+    connections = []
 
 
 #### Global Variables
