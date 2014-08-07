@@ -672,7 +672,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         cmds = None
 
         if s.count('<?xml') > 0:
-            self.processJuliusResult(name, s)
+            cmds = self.processJuliusResult(name, s)
         else:
             cmds = self.lookupWithDefault(self.currentstate, name, s)
 
@@ -696,11 +696,12 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 continue
             cmds = self.lookupWithDefault(self.currentstate, host, text)
             if not cmds:
-                cmds = self.lookupWithDefault(self.currentstate, host, text)
+                cmds = self.lookupWithDefault(self.currentstate, "default", text)
             if cmds:
                 break
             else:
                 self._logger.RTC_INFO("[rejected] no matching phrases")
+        return cmds
 
     def processOnDataIn(self, name, data):
         self._logger.RTC_INFO("got input from %s" %  (name,))
