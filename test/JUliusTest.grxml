@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<grammar xmlns="http://www.w3.org/2001/06/grammar"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.w3.org/2001/06/grammar
+                             http://www.w3.org/TR/speech-grammar/grammar.xsd"
+         xml:lang="jp"
+         version="1.0" mode="voice" root="command">
+         
+  <rule id="command">
+    <one-of>
+      <item><ruleref uri="#command_simple" /></item>
+    </one-of>
+  </rule>
+  <rule id="command_simple">
+    <one-of>
+      <item>てすとです</item>
+      <item>ビデオ</item>
+      <item>ビデオプレーヤ</item>
+      <item>スライド</item>
+      <item>リスト</item>
+      <item>早送り</item>
+      <item>巻き戻し</item>
+      <item>全画面</item>
+    </one-of>
+  </rule>
+</grammar>
+

@@ -312,15 +312,23 @@ class SEATML_Parser():
               elif e.tag == 'rule':
                 commands = self.parseCommands(e)
                 adaptor = e.get('source')
+                keys = e.findall('key'):
                 if adaptor :
                     kond = [None, "True"]
                     kn = e.find('cond')
                     if kn is not None : kond = [kn.get("execfile"), kn.text]
 
-                    tag = name+":"+adaptor+":ondata"
-                    self.parent.registerCommandArray(tag, [kond, commands])
+                    if keys :
+                        for k in keys:
+                            word = decompString([k.text])
+                            for w in word:
+                                tag = name+":"+adaptor+":"+w
+                                self.parent.registerCommands(tag, commands)
+                    else :
+                        tag = name+":"+adaptor+":ondata"
+                        self.parent.registerCommandArray(tag, [kond, commands])
 
-                for k in e.findall('key'):
+                for k in keys:
                     source = k.get('source')
                     word = decompString([k.text])
 		    if source is None: source = "default" 
@@ -684,24 +692,25 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             self.activateCommand(c, s)
         return True
 
-    def processJuliusResult(self, host, s):
+    def processJuliusResult(self, name, s):
         doc = BeautifulSoup(s)
+
         for s in doc.findAll('data'):
             rank = int(s['rank'])
             score = float(s['score'])
             text = s['text']
             self._logger.RTC_INFO("#%i: %s (%f)" % (rank, text, score))
+
             if score < self._scorelimit[0]:
                 self._logger.RTC_INFO("[rejected] score under limit")
                 continue
-            cmds = self.lookupWithDefault(self.currentstate, host, text)
-            if not cmds:
-                cmds = self.lookupWithDefault(self.currentstate, "default", text)
+
+            cmds = self.lookupWithDefault(self.currentstate, name, text)
             if cmds:
-                break
+                return cmds
             else:
                 self._logger.RTC_INFO("[rejected] no matching phrases")
-        return cmds
+        return None
 
     def processOnDataIn(self, name, data):
         self._logger.RTC_INFO("got input from %s" %  (name,))
