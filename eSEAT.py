@@ -312,7 +312,7 @@ class SEATML_Parser():
               elif e.tag == 'rule':
                 commands = self.parseCommands(e)
                 adaptor = e.get('source')
-                keys = e.findall('key'):
+                keys = e.findall('key')
                 if adaptor :
                     kond = [None, "True"]
                     kn = e.find('cond')
