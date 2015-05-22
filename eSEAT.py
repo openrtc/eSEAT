@@ -39,6 +39,11 @@ from ScrolledText import *
 
 __version__ = "0.2"
 
+if os.getenv('SEAT_ROOT') :
+  rootdir=os.getenv('SEAT_ROOT')
+  sys.path.append(rootdir)
+  sys.path.append(os.path.join(rootdir,'3rd party'))
+
 #
 # Socket Adaptor: Communication Port for a raw socket connection
 #
