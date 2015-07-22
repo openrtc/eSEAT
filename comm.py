@@ -125,7 +125,7 @@ class SocketPort(threading.Thread):
   #
   # Receive
   #
-  def recieve_data(self, bufsize=8192, timeout=1.0):
+  def receive_data(self, bufsize=8192, timeout=1.0):
     data = None
     try:
       if self.wait_for_read(timeout) == 1  :
@@ -136,18 +136,18 @@ class SocketPort(threading.Thread):
           return  -1
 
     except socket.error:
-      print "socket.error in recieve_data"
+      print "socket.error in receive_data"
       self.terminate()
 
     except:
-      print "Error in recieve_data"
+#      print "Error in receive_data"
       self.terminate()
 
     return data
 
   def recv_data(self, bufsize=1024, timeout=1.0):
     while True:
-      data = self.recieve_data(bufsize, timeout)
+      data = self.receive_data(bufsize, timeout)
 
       if data is None or data == -1:
         self.reader.clearBuffer()
@@ -178,7 +178,7 @@ class SocketPort(threading.Thread):
 
   def run(self):
     if self.client_adaptor: 
-      self.message_reciever()
+      self.message_receiver()
     else:
       self.accept_service_loop()
 
@@ -222,11 +222,11 @@ class SocketPort(threading.Thread):
     return 
 
   #
-  #  Background job ( message reciever )
+  #  Background job ( message receiver )
   #
-  def message_reciever(self):
+  def message_receiver(self):
     while self.mainloop:
-      data = self.recieve_data() 
+      data = self.receive_data() 
 
       if data  == -1:
         self.terminate()
@@ -241,7 +241,7 @@ class SocketPort(threading.Thread):
         print "Umm...:",self.name
         print data
 
-    print "Read thread terminated:",self.name
+#    print "Read thread terminated:",self.name
 
   #
   #  close socket
@@ -312,8 +312,9 @@ class SocketServer(SocketPort):
       return newadaptor
 
     except:
-      print "ERROR in accept_service"
+#      print "ERROR in accept_service"
       pass
+
     return None
 
   def accept_service_loop(self, lno=5, timeout=1.0):
@@ -370,7 +371,7 @@ class SocketService(SocketPort):
   #
   #
   def run(self):
-    self.message_reciever()
+    self.message_receiver()
 
   def getServer(self):
     return self.server_adaptor
@@ -428,7 +429,7 @@ class CommReader:
     self.debug = False
 
   #
-  #  parse recieved data, called by SocketPort
+  #  parse received data, called by SocketPort
   #
   def parse(self, data):
     if self.debug:
