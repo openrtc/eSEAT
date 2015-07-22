@@ -37,7 +37,11 @@ import utils
 from Tkinter import * 
 from ScrolledText import * 
 
-__version__ = "0.2"
+#
+#
+from comm import * 
+
+__version__ = "0.3"
 
 #
 # Socket Adaptor: Communication Port for a raw socket connection
@@ -200,6 +204,9 @@ class SEATML_Parser():
                 self.parent.createDataPort(name, tag.get('datatype') ,'out')
             elif type == 'rtcin' :
                 self.parent.createDataPort(name, tag.get('datatype') ,'in')
+            elif type == 'web' :
+                self.parent.createWebServer(name, 
+                                   tag.get('host'), int(tag.get('port')))
             else:
                  self.parent.createSocketPort(name,
                                    tag.get('host'), int(tag.get('port')))
@@ -452,6 +459,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.buttons = {}
         self.labels = {}
         self.popen = []
+        self.webServer = None
         self.root = None
 
     ##########################################################
@@ -507,6 +515,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #  onShutdown
     #
     def onShutdown(self, ec_id):
+        if self.webServer :
+            self.webServer.terminate()
         return RTC_OK
     #
     # for RTC
@@ -584,6 +594,17 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def createSocketPort(self, name, host, port):
         self.adaptors[name] = SocketAdaptor(self, name, host, port)
+
+    #
+    # Create Web Server port
+    #
+    def createWebServer(self, name, host, port):
+        if self.webServer  is None:
+            self.adaptors[name] = SocketServer(CommReader(None, HttpCommand()), name, host, port)
+            self.adaptors[name].start()
+            self.webServer = self.adaptors[name]
+        else:
+            print "WebService is already created"
 
     #
     # Create Port

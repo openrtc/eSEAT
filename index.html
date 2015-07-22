@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html"; charset=utf-8" />
+    <title>Server TEST</title>
+
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+    <script type="text/javascript">
+    <!--
+ function changeColor(){
+   $(".hoge").css("color", "blue");
+ }
+
+ function requestHoge(){
+   $.ajax({
+     type: "POST",
+     url: "some.php",
+     data: "name=John&location=Boston",
+     success: function(msg){
+       alert( "Data Saved: " + msg );
+     }
+   });
+ }
+
+ function long_polling(){
+   $.ajax({
+     type: "POST",
+     url: "comet",
+     data: "id="+$("input[name='id']").val()+"&location=Somewhere",
+     dataType: "json",
+     success: function(event){
+        processEvents(event);
+	long_polling();
+     }
+   });
+ }
+
+ function processEvents(event){
+   $("#response").html(event.message + " on  " + event.date);
+ }
+
+ function sendEvent(){
+   $.ajax({
+     type: "POST",
+     url: "comet_event",
+     data: "id="+$("input[name='eid']").val()+"&location=Somewhere",
+     dataType: "json",
+     success: function(msg){
+   	$("#response2").html(msg.result+""+msg.date);
+     }
+   });
+ }
+    -->
+    </script>
+  </head>
+
+  <body>
+
+  <h1>TEST</h1>
+   Hello, world !!
+  <br>
+
+  <div class="hoge" name="d1">
+    ƒeƒXƒg
+  </div>
+
+  <button name="B1" onClick="requestHoge()">PUSH</button>
+  <form name="myform">
+     Call Back : <input type="text" name="id" value="1">
+    <input type="button" name="b2" value="Register" onClick="long_polling();">
+    <br>
+     Send Event : <input type="text" name="eid" value="1">
+    <input type="button"  value="Call" onClick="sendEvent();">
+  </form>
+  <hr>
+  <div id="response"></div>
+  <hr>
+  <div id="response2"></div>
+  </body>
+</html>
+
