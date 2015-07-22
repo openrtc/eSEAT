@@ -542,6 +542,15 @@ class CommReader:
     if self.parser:
       self.parser.printPacket(data)
 
+class eSEATReader:
+  def __init__(self, rtc=None):
+    CommReader.__init__(self, None, HttpCommand("html"))
+    self.rtc = rtc
+
+  def getParser(self):
+    return self.parser
+
+
 #
 # CommParser: parse the reveived message
 #
@@ -623,8 +632,6 @@ class HttpCommand(CommParser):
     fname = cmds[1].strip()
     proto = cmds[2].strip()
 
-    header.pop()
-    header.pop()
     header.remove( header[0] )
 
     if reader:
@@ -645,11 +652,11 @@ class HttpCommand(CommParser):
         reader.send(True)
 
       elif cmd == "POST":
-        if fname == "/comet" :
+        if fname == "/comet_request" :
 	  headerSet = self.parseHeader(header)
 	  try:
 	    Data = parseData(self.buffer[:int(headerSet["Content-Length"])])
-	    self.registerHandler(reader, Data['id'])
+	    self.registerHandler(reader, Data['id'], Data)
 	  except:
             self.response400(reader)
             reader.send(True)
@@ -657,12 +664,16 @@ class HttpCommand(CommParser):
         elif fname == "/comet_event" :
 	  headerSet = self.parseHeader(header)
 	  Data = parseData(self.buffer[:int(headerSet["Content-Length"])])
+	  res = {}
+
 	  try:
-	    self.callHandler(reader, Data['id'])
+	    self.callHandler(reader, Data['id'], Data)
+	    res["reult"] = "OK"
 	  except:
-            pass
-          date = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
-          self.response200("application/json", '{"result":"OK", "date": "'+date+'"}', reader)
+	    res["reult"] = "ERROR"
+
+	  res["date"] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
+          self.response200("application/json", json.dumps(res), reader)
           reader.send(True)
 
 	else:
@@ -681,18 +692,19 @@ class HttpCommand(CommParser):
   def parseHeader(self, header):
     res = {}
     for h in header:
-      key, val = h.split(':', 1)
-      res[key.strip()] = val.strip()
+      if h.find(":") > 0 :
+        key, val = h.split(':', 1)
+        res[key.strip()] = val.strip()
     return res
 
-  def registerHandler(self, reader, id):
+  def registerHandler(self, reader, id, data):
     server = reader.getServer()
-    server.cometManager.registerHandler(reader,id)
+    server.cometManager.registerHandler(reader,id, data)
     return
 
-  def callHandler(self, reader, id):
+  def callHandler(self, reader, id, data):
     server = reader.getServer()
-    server.cometManager.callHandler(id)
+    server.cometManager.callHandler(id, data)
     return
 
   def response200(self, ctype, contents, reader):
@@ -727,11 +739,11 @@ class CometManager:
   def resieter(self, reader, id):
     self.long_pollings[id] = reader
 
-  def registerHandler(self, reader, id):
+  def registerHandler(self, reader, id, data):
     self.long_pollings[id] = reader
     return
 
-  def callHandler(self, id):
+  def callHandler(self, id, data):
     date = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
     contents = '{"id":"'+id+'", "date":"'+date+'","message": "Push message"}'
     self.response(id, contents, "application/json")

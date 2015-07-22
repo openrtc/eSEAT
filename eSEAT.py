@@ -600,7 +600,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def createWebServer(self, name, host, port):
         if self.webServer  is None:
-            self.adaptors[name] = SocketServer(CommReader(None, HttpCommand()), name, host, port)
+            self.adaptors[name] = SocketServer(eSEATReader(self), name, host, port)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
         else:
