@@ -542,14 +542,29 @@ class CometReader(CommReader):
       elif fname == "/comet_event" :
         self.cometTrigger(Data)
 
-      elif fname == "/send_to_rtc" :
-#        self.rtc.processResult(self.getServer().name, data)
-        self.rtc.onData(self.getServer().name, data)
+      elif fname == "/rtc_onData" :
 	res={}
-        res["result"] = "OK"
+	if self.rtc:
+          self.rtc.onData(self.getServer().name, data)
+          res["result"] = "OK"
+        else:
+          res["result"] = "ERROR: no rtc"
         res["date"] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
         response = self.parser.response200("application/json", json.dumps(res))
         self.sendResponse(response)
+
+      elif fname == "/rtc_processResult" :
+	res={}
+	if self.rtc:
+          self.rtc.processResult(self.getServer().name, data)
+          res["result"] = "OK"
+        else:
+          res["result"] = "ERROR: no rtc"
+
+        res["date"] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
+        response = self.parser.response200("application/json", json.dumps(res))
+        self.sendResponse(response)
+
 
       else:
 	  contents = "Hello, No such action defined"

@@ -47,7 +47,7 @@
      function sendEventToRtc(){
        $.ajax({
          type: "POST",
-         url: "send_to_rtc",
+         url: "rtc_onData",
          data: $("input[name='msg']").val(),
          dataType: "json",
          success: function(data){
