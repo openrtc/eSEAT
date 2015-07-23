@@ -578,7 +578,10 @@ class CometReader(CommReader):
 
   def cometRequest(self, data):
     if data.has_key("id") :
-      self.registerHandler(data)
+      res = self.registerHandler(data)
+      if not res :
+        response = self.parser.response400()
+        self.sendResponse(response)
     else:
       response = self.parser.response400()
       self.sendResponse(response)
@@ -597,8 +600,7 @@ class CometReader(CommReader):
 
   def registerHandler(self, data):
     server = self.getServer()
-    server.cometManager.registerHandler(self, data['id'], data)
-    return
+    return server.cometManager.registerHandler(self, data['id'], data)
 
   def callHandler(self, data):
     server = self.getServer()
@@ -758,8 +760,10 @@ class CometManager:
     self.long_pollings[id] = reader
 
   def registerHandler(self, reader, id, data):
-    self.long_pollings[id] = reader
-    return
+    if not self.long_pollings.has_key(id) or self.long_pollings[id] is None:
+      self.long_pollings[id] = reader
+      return True
+    return False
 
   def callHandler(self, id, data):
     res = {}

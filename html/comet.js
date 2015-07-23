@@ -15,6 +15,9 @@ function long_polling(){
        }else{
           long_polling();
      }
+    },
+    error: function(XMLHttpRequest, textStatus, errorThrown){
+       $("#response").html("Error in long_polling:"+errorThrown);
     }
   });
 }
