@@ -833,7 +833,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         try:
             ad = self.adaptors[name]
             if input_id :
-                data = self.inputvar[input_id].get()
+                if self.inputvar.has_key(input_id) :
+                    data = self.inputvar[input_id].get()
+                elif self.stext.has_key(input_id) :
+                    data = self.getLastLine(input_id)
 
             if not encoding :
                 ad.send(name, data)
