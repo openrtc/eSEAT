@@ -235,6 +235,7 @@ class SocketPort(threading.Thread):
 
     except socket.error:
       print "Socket error in send"
+      print msg
       self.close()
 
 #
@@ -310,6 +311,18 @@ class SocketServer(SocketPort):
        self.service.remove(adaptor)
      except:
        pass
+
+  def getCometManager(self):
+    return self.cometManager
+
+  def pushMessage(self, msg):
+    json_data={}
+    json_data['date'] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
+    json_data['message'] = msg
+    self.cometManager.response_all(json_data, "application/json")
+
+  def send(self, name, msg, encoding=None):
+    self.pushMessage(msg)
 
 #
 #  Service Adaptor
@@ -529,6 +542,15 @@ class CometReader(CommReader):
       elif fname == "/comet_event" :
         self.cometTrigger(Data)
 
+      elif fname == "/send_to_rtc" :
+#        self.rtc.processResult(self.getServer().name, data)
+        self.rtc.onData(self.getServer().name, data)
+	res={}
+        res["result"] = "OK"
+        res["date"] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
+        response = self.parser.response200("application/json", json.dumps(res))
+        self.sendResponse(response)
+
       else:
 	  contents = "Hello, No such action defined"
           response = self.parser.response200("text/plain", contents)
@@ -735,12 +757,12 @@ class CometManager:
       self.response(id, res, "application/json")
     return
 
-  def response(self, id, json_data, ctype="text/plain"):
+  def response(self, id, json_data, ctype="application/json"):
     reader = self.long_pollings[id]
     if reader :
       json_data['id'] = id
       try :
-        json_data['result'] = reader.rtc.onComet()
+        json_data['result'] = reader.rtc.callComet()
       except:
 	json_data['result'] = ""
 
@@ -749,7 +771,7 @@ class CometManager:
       reader.sendResponse(responsemsg)
       self.long_pollings[id] = None
 
-  def response_all(self, json_data, ctype="text/plain"):
+  def response_all(self, json_data, ctype="application/json"):
     keys = self.long_pollings.keys()
     for k in  keys :
       self.response(k, json_data, ctype)
@@ -796,10 +818,13 @@ def get_content_type(fname):
 
 def parseData(data):
   res = {}
-  ar = data.split("&")
-  for a in ar:
-    key, val = a.split("=")
-    res[key.strip()] = val.strip()
+  try:
+    ar = data.split("&")
+    for a in ar:
+      key, val = a.split("=")
+      res[key.strip()] = val.strip()
+  except:
+    pass
   return res
 #
 #

@@ -17,6 +17,7 @@
     </input>
     <button label="Send">
         <message sendto="str_out" input="main_mode:textIn" />
+        <message sendto="web" input="main_mode:textIn" />
     </button>
     <brk />
   
@@ -36,6 +37,13 @@ seat.clearText("main_mode:textOut")
 seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
       </script>
     </rule>
+
+    <rule source="web">
+      <script>
+seat.appendText("main_mode:textOut", web_in_data+"\n")
+      </script>
+    </rule>
+
 
   </state>
 

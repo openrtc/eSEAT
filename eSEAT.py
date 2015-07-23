@@ -547,6 +547,14 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         else:
             pass
 
+    #
+    #  Callback function from WebAdaptor
+    #
+    def callComet(self):
+      res = ""
+
+      return res
+
     ##########################################################
     #
     # Create InPort
@@ -900,10 +908,15 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
         globals()['rtc_result'] = None
         globals()['rtc_in_data'] = indata
+        globals()['web_in_data'] = indata
 
 	if fname : execfile(fname,globals())
-	if data :
+	try:
+	  if data :
             exec(data,globals())
+	except:
+	  print data
+   
 	rtc_result = globals()['rtc_result'] 
 
         if rtc_result == None :

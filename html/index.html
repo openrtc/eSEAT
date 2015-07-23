@@ -44,11 +44,11 @@
        });
      }
 
-     function sendEvent2(){
+     function sendEventToRtc(){
        $.ajax({
          type: "POST",
-         url: "comet_event",
-         data: "id="+$("input[name='eid']").val()+"&action=terminate",
+         url: "send_to_rtc",
+         data: $("input[name='msg']").val(),
          dataType: "json",
          success: function(data){
            $("#response2").html(data.result+" on "+data.date);
@@ -64,11 +64,23 @@
   <h1>This is a test page of COMET server</h1>
 
   <form name="myform">
-     Register Callback : <input type="text" name="id" value="1">
-    <input type="button" name="b2" value="Register" onClick="long_polling();">
-    <br>
-     Send Event : <input type="text" name="eid" value="1">
-    <input type="button"  value="Call" onClick="sendEvent();">
+    <table>
+    <tr>
+	    <td>Register Callback : </td>
+	    <td> <input type="text" name="id" value="1"> </td>
+	    <td> <input type="button" name="b2" value="Register" onClick="long_polling();"> </td>
+    </tr>
+    <tr>
+	    <td>Send Event : </td>
+	    <td><input type="text" name="eid" value="1"> </td>
+	    <td><input type="button"  value="Call" onClick="sendEvent();"></td>
+    </tr>
+    <tr>
+	    <td>Send Message : </td>
+	    <td><input type="text" name="msg" value="TestMessage"> </td>
+	    <td><input type="button"  value="Send" onClick="sendEventToRtc();"></td>
+    </tr>
+    </table>
   </form>
 
   <h2> RESPONSE</h2>
