@@ -205,8 +205,7 @@ class SEATML_Parser():
             elif type == 'rtcin' :
                 self.parent.createDataPort(name, tag.get('datatype') ,'in')
             elif type == 'web' :
-                self.parent.createWebServer(name, 
-                                   tag.get('host'), int(tag.get('port')))
+                self.parent.createWebServer(name, int(tag.get('port')))
             else:
                  self.parent.createSocketPort(name,
                                    tag.get('host'), int(tag.get('port')))
@@ -598,9 +597,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     # Create Web Server port
     #
-    def createWebServer(self, name, host, port):
+    def createWebServer(self, name, port):
         if self.webServer  is None:
-            self.adaptors[name] = SocketServer(eSEATReader(self), name, host, port)
+            self.adaptors[name] = SocketServer(CometReader(self), name, "localhost", port)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
         else:
@@ -624,6 +623,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 self.adaptortype[name] = self.getDataType(tag.get('datatype'))
                 self.createInPort(name, self.adaptortype[name][0])
                 self.adaptors[name] = self
+
+            elif type == 'web':
+                port = int(tag.get('port'))
+                self.createWebServer(name, port)
 
             else:
                 host = tag.get('host')
