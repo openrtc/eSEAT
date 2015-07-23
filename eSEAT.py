@@ -43,8 +43,9 @@ from comm import *
 
 __version__ = "0.3"
 
+#########################################################################
 #
-# Socket Adaptor: Communication Port for a raw socket connection
+# SocketAdaptor: Communication Port for a raw socket connection
 #
 class SocketAdaptor(threading.Thread):
     def __init__(self, owner, name, host, port):
@@ -118,7 +119,7 @@ class SocketAdaptor(threading.Thread):
                 self.connected = False
 
 
-#
+#########################################################################
 #
 #  Sprcification of eSEAT
 #
@@ -138,6 +139,7 @@ eseat_spec = ["implementation_id", "eSEAT",
              "exec_cxt.periodic.rate", "1",
              ""]
 
+#########################################################################
 #
 # DataListener 
 #   This class connected with DataInPort
@@ -149,12 +151,11 @@ class eSEATDataListener(OpenRTM_aist.ConnectorDataListenerT):
         self._obj = obj
     
     def __call__(self, info, cdrdata):
-#        data = OpenRTM_aist.ConnectorDataListenerT.__call__(self,
-#		info, cdrdata, self._type(Time(0,0),None))
         data = OpenRTM_aist.ConnectorDataListenerT.__call__(self,
 			info, cdrdata, instantiateDataType(self._type))
         self._obj.onData(self._name, data)
 
+#########################################################################
 #
 #  Class eSEAT Parser
 #
@@ -205,10 +206,9 @@ class SEATML_Parser():
             elif type == 'rtcin' :
                 self.parent.createDataPort(name, tag.get('datatype') ,'in')
             elif type == 'web' :
-                self.parent.createWebServer(name, int(tag.get('port')))
+                self.parent.createWebAdaptor(name, int(tag.get('port')))
             else:
-                 self.parent.createSocketPort(name,
-                                   tag.get('host'), int(tag.get('port')))
+                 self.parent.createSocketPort(name, tag.get('host'), int(tag.get('port')))
 
         except:
             self.logError(u"invalid parameters: " + type + ": " + name)
@@ -422,6 +422,7 @@ class SEATML_Parser():
 
         return 0
 
+#########################################################################
 #
 #  Class eSEAT
 #
@@ -547,6 +548,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         else:
             pass
 
+    ##############################################
     #
     #  Callback function from WebAdaptor
     #
@@ -605,7 +607,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     # Create Web Server port
     #
-    def createWebServer(self, name, port):
+    def createWebAdaptor(self, name, port):
         if self.webServer  is None:
             self.adaptors[name] = SocketServer(CometReader(self), name, "localhost", port)
             self.adaptors[name].start()
@@ -634,7 +636,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
             elif type == 'web':
                 port = int(tag.get('port'))
-                self.createWebServer(name, port)
+                self.createWebAdaptor(name, port)
 
             else:
                 host = tag.get('host')
@@ -662,14 +664,12 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         else:
             self._logger.RTC_INFO("sending message to %s" % (name,))
 
-#        print self.adaptortype[name]
         dtype = self.adaptortype[name][1]
 
         if self.adaptortype[name][2]:
             ndata = []
 	    if type(data) == str :
               for d in data.split(","):
-#                ndata.append(dtype(d))
                 ndata.append( converDataType(dtype, d, code) )
               self._data[name].data = ndata
 	    else:
@@ -679,7 +679,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             self._data[name].data = data.encode(code)
 
         elif dtype == unicode:
-            #self._data[name].data = unicode(data.encode(code))
             self._logger.RTC_INFO("sending message to %s, %s" % (data,code))
             self._data[name].data = unicode(data)
 
@@ -867,17 +866,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
         else:
             self._logger.RTC_INFO("state transition from "+self.currentstate+" to "+data)
-
-#            try:
-#               self.hideFrame(self.currentstate)
-#           except:
-#               pass
             self.stateTransfer(data)
 
-#           try:
-#               self.showFrame(data)
-#           except:
-#               pass
 
     #
     #  Execute <log>
@@ -1313,13 +1303,11 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     ## Display/Hide GUI Window
     def showFrame(self, name):
         if self.frames[name] :
-#           self.frames[name].place(relx=0.0, rely=0, relwidth=1, relheight=1)
            self.frames[name].pack()
 
     def hideFrame(self, name):
         if self.frames[name] :
            self.frames[name].pack_forget()
-#           self.frames[name].place_forget()
 
     ## Create and layout GUI items
     def createGuiPanel(self, name):
@@ -1359,7 +1347,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                                            itm[1], itm[2], itm[3], int(itm[4]))
 		       )
              else:
-#               self.gui_items[name].append( itm[0] )
                pass
 
            self.packItems(name)
@@ -1392,6 +1379,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         return 
 
 
+#########################################################################
+#
+# eSEAT Manager
+#
 class eSEATManager:
     def __init__(self, mlfile=None):
 
@@ -1423,11 +1414,6 @@ class eSEATManager:
         parser = utils.MyParser(version=__version__, usage="%prog [seatmlfile]",
                                 description=__doc__)
 
-        #utils.addmanageropts(parser)
-        #parser.add_option('-g', '--gui', dest='guimode', action="store_true",
-        #                  default=False,
-        #                  help='show file open dialog in GUI')
-
         parser.add_option('-f', '--config-file', dest='config_file', type="string",
 			 help='apply configuration file')
 
@@ -1444,11 +1430,6 @@ class eSEATManager:
         if(len(args) > 0):
             self._scriptfile = args[0]
 
-#        if opts.guimode == True:
-#            sel = utils.askopenfilenames(title="select script files")
-#            if sel is not None:
-#                args.extend(sel)
-    
         if opts.naming_format:
            sys.argv.remove('-n')
            sys.argv.remove(opts.naming_format)
@@ -1499,6 +1480,8 @@ class eSEATManager:
         if self._scriptfile :
             ret = self.comp.loadSEATML(self._scriptfile)
 
+#########################################################################
+#   F U N C T I O N S
 #
 # Parse Key String
 #
@@ -1633,6 +1616,10 @@ def instantiateDataType(dtype):
      return desc[1](*arg)
    return None
 
+#########################################################################
+#
+#  M A I N 
+#
 def main(ssml_file=None):
     seatmgr = eSEATManager(ssml_file)
     seatmgr.start()

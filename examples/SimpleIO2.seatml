@@ -3,7 +3,7 @@
   <general name="SimpleIO">
     <adaptor name="str_out" type="rtcout" datatype="TimedString" />
     <adaptor name="str_in" type="rtcin" datatype="TimedString" />
-    <adaptor name="web" type="web" host="localhost" port="8080" />
+    <adaptor name="web" type="web"  port="8080" />
   </general>
 
   <state name="main_mode">

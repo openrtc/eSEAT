@@ -668,7 +668,7 @@ class HttpCommand(CommParser):
   #
   #
   def checkMessage(self, buffer, offset=0, reader=None):
-    pos = self.parseHttpdHeader( buffer, offset)
+    pos = self.parseHttpHeader( buffer, offset)
     if pos > 0 :
       reader.doProcess(self.header, self.data)
       return pos
@@ -677,7 +677,7 @@ class HttpCommand(CommParser):
   #
   #
   #
-  def parseHttpdHeader(self, buffer, offset=0):
+  def parseHttpHeader(self, buffer, offset=0):
     self.header = {}
     self.data = ""
 
