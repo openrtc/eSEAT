@@ -836,7 +836,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 if self.inputvar.has_key(input_id) :
                     data = self.inputvar[input_id].get()
                 elif self.stext.has_key(input_id) :
-                    data = self.getLastLine(input_id)
+                    data = self.getLastLine(input_id, 1)
 
             if not encoding :
                 ad.send(name, data)

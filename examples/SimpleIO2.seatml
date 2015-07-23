@@ -36,6 +36,9 @@ seat.clearText("main_mode:textOut")
       <script>
 seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
       </script>
+<!--
+      <message sendto="web" input="main_mode:textOut" />
+-->
       <script sendto="web">
 rtc_result = rtc_in_data.data
       </script>

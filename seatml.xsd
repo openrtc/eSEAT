@@ -154,13 +154,15 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="1" ref="cond"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="key"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="message"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="command"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="shell"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
-        <xs:element minOccurs="0" maxOccurs="1" ref="statetransition"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="log"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="key"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="message"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="command"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="shell"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
+          <xs:element minOccurs="0" maxOccurs="1" ref="statetransition"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="log"/>
+        </xs:choice>
       </xs:sequence>
       <xs:attribute name="source" use="optional" type="xs:string"/>
     </xs:complexType>
@@ -191,11 +193,13 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="1" ref="cond"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="message"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="command"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="shell"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="log"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="message"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="command"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="shell"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="log"/>
+        </xs:choice>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -204,11 +208,13 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="1" ref="cond"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="message"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="command"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="shell"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="log"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="message"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="command"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="shell"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="log"/>
+        </xs:choice>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
