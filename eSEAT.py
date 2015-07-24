@@ -6,13 +6,13 @@
 Copyright (C) 2009-2014
     Yosuke Matsusaka and Isao Hara
     Intelligent Systems Research Institute,
-    National Institute of Advanced Industrial Science and Technology (AIST),
-    Japan
+    National Institute of Advanced Industrial Science and Technology (AIST), Japan
     All rights reserved.
-Licensed under the MIT License (MIT)
-http://www.opensource.org/licenses/MIT
+  Licensed under the MIT License (MIT)
+  http://www.opensource.org/licenses/MIT
 '''
 
+############### import libraries
 import sys
 import os
 import getopt
@@ -26,21 +26,30 @@ import socket
 import optparse
 import threading
 import subprocess
-import OpenRTM_aist
 
+########
+#  for OpenRTM-aist
+import OpenRTM_aist
 import omniORB
 from RTC  import *
+
+#########
+#  XML parse
 from lxml import etree
 from bs4  import BeautifulSoup
 
+#########
+#  GUI etc.
 import utils
 from Tkinter import * 
 from ScrolledText import * 
 
-#
-#
+#########
+#  WebAdaptor
 from comm import * 
 
+###############################################################
+#
 __version__ = "0.3"
 
 #########################################################################
@@ -75,9 +84,10 @@ class SocketAdaptor(threading.Thread):
                     time.sleep(1)
                 except:
                     print traceback.format_exc()
+
             if self.connected == True:
                 try:
-                    data = self.socket.recv(1024)
+                    data = self.socket.recv(4096)   ## 4k
                     if len(data) != 0:
                         self.owner.processResult(self.name, data)
                 except socket.timeout:
@@ -169,6 +179,8 @@ class SEATML_Parser():
 		    
 	self.setXsd(xsd)
 
+    #
+    #  set schema-file for seatml
     def setXsd(self, xsd, _dir=None):
         if _dir :
             self._basedir = _dir
@@ -221,44 +233,51 @@ class SEATML_Parser():
     #
     def parseCommands(self, r):
         commands = []
-        for c in r.findall('message'): # get commands
-            name = c.get('sendto')
-            encode = c.get('encode')
+	#
+	# <message>
+        for c in r.findall('message'): # end message
+            name     = c.get('sendto')
+            encode   = c.get('encode')
             input_id = c.get('input')
-            data = c.text
+            data     = c.text
             commands.append(['c', name, data, encode, input_id])
-
+	#
+	# <command>
         for c in r.findall('command'): # get commands
-            name = c.get('host')
-            encode = c.get('encode')
+            name     = c.get('host')
+            encode   = c.get('encode')
             input_id = c.get('input')
-            data = c.text
+            data     = c.text
             commands.append(['c', name, data, encode, input_id])
-
+	#
+	# <statetransition>
         for c in r.findall('statetransition'): # get statetransition
             func = c.get('func')
             data = c.text
             commands.append(['t', func, data])
-
-        for c in r.findall('log'): # get statetransition
+	#
+	# <log>
+        for c in r.findall('log'): #  logging
             data = c.text
             commands.append(['l', data])
-
+	#
+	# <shell>
         for c in r.findall('shell'): # get shell
             func = c.get('sendto')
             data = c.text
 	    if not func :
-              func = c.get('host')
+                func = c.get('host')
             commands.append(['x', func, data])
-
+	#
+	# <script>
         for c in r.findall('script'): # get script
-            func = c.get('sendto')
+            func  = c.get('sendto')
 	    fname = c.get('execfile')
 	    if not func :
-              func = c.get('host')
+                func = c.get('host')
             data = c.text
             for cx in c.getchildren():
-              data += cx.text
+                data += cx.text
             commands.append(['s', func, data, fname])
 
         return commands
@@ -288,12 +307,22 @@ class SEATML_Parser():
 
         self.parent.items = {}
 
+        ####
+        # Top level tag
+	#
+	#  <general>
         for g in doc.findall('general'):
             for a in g.getchildren():
+	        #
+	        #  <adaptor>
                 if a.tag == 'adaptor':
                     self.createAdaptor(a)
+	        #
+	        #  <agent>
                 elif a.tag == 'agent':
                     self.createAdaptor(a)
+	        #
+	        #  <script>
                 elif a.tag == 'script':
                     filename = a.get('execfile')
                     txt = a.text
@@ -301,117 +330,151 @@ class SEATML_Parser():
                         txt += cx.text
 		    if filename : execfile(filename, globals())
 		    if txt : exec(txt, globals())
-	     
+	# 
+	#  <state>
         for s in doc.findall('state'):
             name = s.get('name')
             self.parent.create_state(name)
 
             for e in list(s):
-              if e.tag == 'onentry':
-                commands = self.parseCommands(e)
-		self.parent.registerCommands(name+":::entry" , commands)
+	        #
+	        #  <onentry>
+                if e.tag == 'onentry':
+	            #
+		    # <message><command><statetransition><log><shell><script>
+                    commands = self.parseCommands(e)
+		    self.parent.registerCommands(name+":::entry" , commands)
+	        #
+	        #  <onexit>
+                elif e.tag == 'onexit':
+	 	    #
+		    # <message><command><statetransition><log><shell><script>
+                    commands = self.parseCommands(e)
+		    self.parent.registerCommands(name+":::exit" , commands)
+	        #
+	        #  <rule>
+                elif e.tag == 'rule':
+		    #
+		    # <message><command><statetransition><log><shell><script>
+                    commands = self.parseCommands(e)
+                    adaptor = e.get('source')
 
-              elif e.tag == 'onexit':
-                commands = self.parseCommands(e)
-		self.parent.registerCommands(name+":::exit" , commands)
+	            #
+	            #  <key>
+                    keys = e.findall('key')
+                    if adaptor :
+                        kond = [None, "True"]
+	                #
+	                #  <cond>
+                        kn = e.find('cond')
+                        if kn is not None : kond = [kn.get("execfile"), kn.text]
 
-              elif e.tag == 'rule':
-                commands = self.parseCommands(e)
-                adaptor = e.get('source')
-                keys = e.findall('key')
-                if adaptor :
-                    kond = [None, "True"]
-                    kn = e.find('cond')
-                    if kn is not None : kond = [kn.get("execfile"), kn.text]
+                        if keys :
+                            for k in keys:
+                                word = decompString([k.text])
+                                for w in word:
+                                    tag = name+":"+adaptor+":"+w
+                                    self.parent.registerCommands(tag, commands)
+                        else :
+                            tag = name+":"+adaptor+":ondata"
+                            self.parent.registerCommandArray(tag, [kond, commands])
 
-                    if keys :
-                        for k in keys:
-                            word = decompString([k.text])
-                            for w in word:
-                                tag = name+":"+adaptor+":"+w
-                                self.parent.registerCommands(tag, commands)
-                    else :
-                        tag = name+":"+adaptor+":ondata"
-                        self.parent.registerCommandArray(tag, [kond, commands])
+                    for k in keys:
+                        source = k.get('source')
+                        word = decompString([k.text])
+		        if source is None: source = "default" 
+                        for w in word:
+                            tag = name+":"+source+":"+w
+                            self.parent.registerCommands(tag, commands)
 
-                for k in keys:
-                    source = k.get('source')
-                    word = decompString([k.text])
-		    if source is None: source = "default" 
-                    for w in word:
-                        tag = name+":"+source+":"+w
-                        self.parent.registerCommands(tag, commands)
+                ################ GUI ###############
+	        #
+	        #  <button>
+                elif e.tag == 'button':
+                  bg    = e.get('bg_color')
+                  fg    = e.get('color')
+                  txt   = e.get('label')
+                  cspan = e.get('colspan')
+		  if not cspan : cspan = 1
 
-              elif e.tag == 'button':
-                bg = e.get('bg_color')
-                fg = e.get('color')
-                txt = e.get('label')
+		  #
+		  # <message><command><statetransition><log><shell><script>
+                  commands = self.parseCommands(e)
+                  self.parent.registerCommands(name+":gui:"+txt, commands)
+                  self.parent.addButton(name, txt, fg, bg, cspan)
 
-                cspan = e.get('colspan')
-		if not cspan : cspan = 1
+	        #
+	        #  <input>
+                elif e.tag == 'input':
+                  txt = e.get('id')
+                  w   = e.get('width')
+		  if not w: w = '20'
 
-                commands = self.parseCommands(e)
-                self.parent.registerCommands(name+":gui:"+txt, commands)
-                self.parent.addButton(name, txt, fg, bg, cspan)
+                  val = e.text
+		  if not val: val = ''
 
-              elif e.tag == 'input':
-                txt = e.get('id')
+                  cspan = e.get('colspan')
+		  if not cspan : cspan = 1
 
-                w = e.get('width')
-		if not w: w = '20'
+		  #
+		  # <message><command><statetransition><log><shell><script>
+                  commands = self.parseCommands(e)
+                  self.parent.registerCommands(name+":gui:"+txt, commands)
+                  self.parent.addEntry(name, txt, w, cspan, val)
 
-                val = e.text
-		if not val: val = ''
+	        #
+	        #  <text>
+                elif e.tag == 'text':
+                  txt = e.get('id')
+                  w   = e.get('width')
+		  if not w: w = '20'
 
-                cspan = e.get('colspan')
-		if not cspan : cspan = 1
+                  h = e.get('height')
+		  if not h: h = '3'
 
-                commands = self.parseCommands(e)
-                self.parent.registerCommands(name+":gui:"+txt, commands)
-                self.parent.addEntry(name, txt, w, cspan, val)
+                  cspan = e.get('colspan')
+		  if not cspan : cspan = 1
 
-              elif e.tag == 'text':
-                txt = e.get('id')
+                  rspan = e.get('rowspan')
+		  if not rspan : rspan = 1
 
-                w = e.get('width')
-		if not w: w = '20'
+                  val = e.text
+		  if not val: val = ''
 
-                h = e.get('height')
-		if not h: h = '3'
+		  #
+		  # <message><command><statetransition><log><shell><script>
+                  commands = self.parseCommands(e)
+                  self.parent.registerCommands(name+":gui:"+txt, commands)
+                  self.parent.addText(name, txt, w, h, cspan, rspan, val)
 
-                cspan = e.get('colspan')
-		if not cspan : cspan = 1
+	        #
+	        #  <label>
+                elif e.tag == 'label':
+                  txt   = e.get('text')
+                  bg    = e.get('bg_color')
+                  fg    = e.get('color')
+                  cspan = e.get('colspan')
+		  if not cspan : cspan = 1
 
-                rspan = e.get('rowspan')
-		if not rspan : rspan = 1
+                  self.parent.addLabel(name, txt, fg, bg, cspan)
 
-                val = e.text
-		if not val: val = ''
+	        #
+	        #  <brk>
+                elif e.tag == 'brk':
+                  self.parent.addBreak(name)
 
-                commands = self.parseCommands(e)
-                self.parent.registerCommands(name+":gui:"+txt, commands)
-                self.parent.addText(name, txt, w, h, cspan, rspan, val)
-
-              elif e.tag == 'label':
-                txt = e.get('text')
-                bg = e.get('bg_color')
-                fg = e.get('color')
-
-                cspan = e.get('colspan')
-		if not cspan : cspan = 1
-
-                self.parent.addLabel(name, txt, fg, bg, cspan)
-
-              elif e.tag == 'brk':
-                self.parent.addBreak(name)
-
-              elif e.tag == 'space':
-                txt = e.get('length')
-                if not txt : txt = '1'
-                self.parent.addSpace(name, txt)
+	        #
+	        #  <space>
+                elif e.tag == 'space':
+                  txt = e.get('length')
+                  if not txt : txt = '1'
+                  self.parent.addSpace(name, txt)
 
             self.parent.appendState(name)
 
+        ############################################
+	#  initialize
+	#
         if self.parent.countStates() == 0:
             self.logError("no available state")
             return 1
@@ -463,8 +526,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.root = None
 
     ##########################################################
-    #  E v e n t   H a n d l e r
-    #  onActivated
+    #  E v e n t   H a n d l e r 
+    #  onInitialize
     #
     def onInitialize(self):
         OpenRTM_aist.DataFlowComponentBase.onInitialize(self)
@@ -549,8 +612,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             pass
 
     ##############################################
-    #
-    #  Callback function from WebAdaptor
+    #  Callback function for WebAdaptor
     #
     def callComet(self):
       res = ""
@@ -558,12 +620,12 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
       return res
 
     ##########################################################
+    # Create PORT
     #
-    # Create InPort
+    # Create the InPort of RTC
     #
     def createInPort(self, name, type=TimedString):
         self._logger.RTC_INFO("create inport: " + name)
-        #self._data[name] = type(Time(0,0), None)
         self._data[name] = instantiateDataType(type)
         self._port[name] = OpenRTM_aist.InPort(name, self._data[name])
         self._port[name].addConnectorDataListener(
@@ -572,18 +634,17 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.registerInPort(name, self._port[name])
 
     #
-    # Create OutPort
+    # Create the OutPort of RTC
     #
     def createOutPort(self, name, type=TimedString):
         self._logger.RTC_INFO("create outport: " + name)
-        #self._data[name] = type(Time(0,0), None)
         self._data[name] = instantiateDataType(type)
         self._port[name] = OpenRTM_aist.OutPort(name, self._data[name],
 			           OpenRTM_aist.RingBuffer(8))
         self.registerOutPort(name, self._port[name])
 
     #
-    # Create and Register DataPort
+    # Create and Register DataPort of RTC
     #
     def createDataPort(self, name, dtype, inout):
         if inout == 'out':
@@ -599,13 +660,13 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             pass
 
     #
-    # Create raw socket
+    # Create the Raw Socket
     #
     def createSocketPort(self, name, host, port):
         self.adaptors[name] = SocketAdaptor(self, name, host, port)
 
     #
-    # Create Web Server port
+    # Create the Web Server Port
     #
     def createWebAdaptor(self, name, port):
         if self.webServer  is None:
@@ -615,8 +676,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         else:
             print "WebService is already created"
 
-    #
-    # Create Port
+    #################
+    # Create Adaptor
     #
     def createAdaptor(self, tag):
         try:
@@ -655,8 +716,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 	  if isinstance(self._port[p], OpenRTM_aist.PortBase) :
               self._port[p].disconnect_all()
 
-    #
-    #   Send Data 
+    ###########################
+    # Send Data 
     #
     def send(self, name, data, code='utf-8'):
         if isinstance(data, str) :
@@ -670,7 +731,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             ndata = []
 	    if type(data) == str :
               for d in data.split(","):
-                ndata.append( converDataType(dtype, d, code) )
+                ndata.append( convertDataType(dtype, d, code) )
               self._data[name].data = ndata
 	    else:
               self._data[name] = data
@@ -697,7 +758,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         except:
             self._logger.RTC_ERROR("Fail to sending message to %s" % (name,))
 
-    #
+    ##################################
     #  Main event process 
     #
     def processResult(self, name, s):
@@ -719,10 +780,14 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             self._logger.RTC_INFO("no command found")
             return False
 
+        #
+	#
         for c in cmds:
             self.activateCommand(c, s)
         return True
 
+    #
+    # Event process for Julius
     def processJuliusResult(self, name, s):
         doc = BeautifulSoup(s)
 
@@ -743,6 +808,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 self._logger.RTC_INFO("[rejected] no matching phrases")
         return None
 
+    #
+    #  Event process for data-in-event
     def processOnDataIn(self, name, data):
         self._logger.RTC_INFO("got input from %s" %  (name,))
         cmds = self.lookupWithDefault(self.currentstate, name, "ondata")
@@ -769,14 +836,20 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         s=s.split(",")[0]
         self._logger.RTC_INFO('looking up...%s: %s' % (name,s,))
         cmds = self.lookupCommand(state, name, s)
+
         if not cmds:
             cmds = self.lookupCommand(state, 'default', s)
+
         if not cmds:
             cmds = self.lookupCommand('all', name, s)
+
         if not cmds:
             cmds = self.lookupCommand('all', 'default', s)
+
         return cmds
 
+    #
+    #
     def lookupCommand(self, state, name, s):
         cmds = []
         regkeys = []
@@ -795,7 +868,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             return None
         return cmds
         
-    #
+    ##########################
     # State Transition
     #
     def stateTransfer(self, newstate):
@@ -820,6 +893,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         except KeyError:
             pass
 
+    ############ T A G Operations
     #
     #  Execute <message>
     #
@@ -837,6 +911,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 elif self.stext.has_key(input_id) :
                     data = self.getLastLine(input_id, 1)
 
+            #
+	    #  Call 'send' method of Adaptor
+	    #
             if not encoding :
                 ad.send(name, data)
             else :
@@ -854,6 +931,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def applyTransition(self, c):
         func,data = c[1:]
+
         if (func == "push"):
             self.statestack.append(self.currentstate)
             self.stateTransfer(data)
@@ -868,7 +946,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             self._logger.RTC_INFO("state transition from "+self.currentstate+" to "+data)
             self.stateTransfer(data)
 
-
     #
     #  Execute <log>
     #
@@ -881,9 +958,13 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def applyShell(self, c):
         name ,data = c[1:]
-        #res = os.system(data)
+	#
+	# execute shell command with subprocess
         res = subprocess.Popen(data, shell=True)
         self.popen.append(res)
+
+	#
+	#  Call 'send' method of Adaptor
         try:
             ad = self.adaptors[name]
             ad.send(name, res)
@@ -903,6 +984,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         globals()['rtc_in_data'] = indata
         globals()['web_in_data'] = indata
 
+        #
+	#   execute script or script file
 	if fname : execfile(fname,globals())
 	try:
 	  if data :
@@ -910,10 +993,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 	except:
 	  print data
    
+        # 
+	#  Call 'send' method of Adaptor to send the result...
 	rtc_result = globals()['rtc_result'] 
-
         if rtc_result == None :
-#            self._logger.RTC_INFO("no result")
             pass
         else:
             try:
@@ -925,22 +1008,27 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 else:
                    self._logger.RTC_ERROR("no such adaptor: None")
 
+    ########################
     #
     #  Activate Lookuped Commands
     #
     def activateCommand(self, c, data=None):
-        if c[0] == 'c': self.applyMessage(c)
+        if   c[0] == 'c': self.applyMessage(c)
         elif c[0] == 'l': self.applyLog(c)
         elif c[0] == 'x': self.applyShell(c)
         elif c[0] == 's': self.applyScript(c, data)
         elif c[0] == 't': self.applyTransition(c)
 
+    #
+    #
     def activateCommandEx(self, c, data):
         if c[0] == 'c': c[3] = None
         self.activateCommand(c, data)
 
+    #########################
+    #  For STATE
     #
-    # Get state infomation
+    #  Get state infomation
     #
     def getStates(self):
         return self.states
@@ -967,42 +1055,38 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             self.startstate = self.states[0]
         self.stateTransfer(self.startstate)
         self._logger.RTC_INFO("current state " + self.currentstate)
-
     #
+    #
+    def create_state(self, name):
+        self.items[name] = []
+        if self.init_state == None:
+            self.init_state = name
+        return 
+
+    #######################
     #  Get DataType
     #
     def getDataType(self, s):
-        if len(s) == 0:
-            return (TimedString, 0)
+        if len(s) == 0         : return (TimedString, 0)
         seq = False
 
-        if s[-3:] == "Seq":
-            seq = True
+        if s[-3:] == "Seq"     : seq = True
+
         dtype = str
-        if s.count("WString"):
-            dtype = unicode
-        elif s.count("String"):
-            dtype = str
-        elif s.count("Float"):
-            dtype = float
-        elif s.count("Double"):
-            dtype = float
-        elif s.count("Short"):
-            dtype = int
-        elif s.count("Long"):
-            dtype = int
-        elif s.count("Octet"):
-            dtype = int
-        elif s.count("Char"):
-            dtype = str
-        elif s.count("Boolean"):
-            dtype = int
-        else:
-            dtype = eval("%s" % s)
+        if s.count("WString")  : dtype = unicode
+        elif s.count("String") : dtype = str
+        elif s.count("Float")  : dtype = float
+        elif s.count("Double") : dtype = float
+        elif s.count("Short")  : dtype = int
+        elif s.count("Long")   : dtype = int
+        elif s.count("Octet")  : dtype = int
+        elif s.count("Char")   : dtype = str
+        elif s.count("Boolean"): dtype = int
+        else                   : dtype = eval("%s" % s)
 
         return (eval("%s" % s), dtype, seq)
 
-    #
+    ##############################
     #  main SEATML loader
     #
     def loadSEATML(self, f):
@@ -1036,7 +1120,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         else :
             self.appendCommands(tag, cmds)
 
-    #
+    #########################################
     #  Callback function
     #
     def mkcallback(self, name):
@@ -1049,18 +1133,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
            self.processResult("gui", name)
         return callback
 
-    #
-    #
-    #
-    def create_state(self, name):
-        self.items[name] = []
-        if self.init_state == None:
-            self.init_state = name
-
-        return 
-    #
+    #############################
     #  Create GUI items
     #
+    #  Create Frame
     def newFrame(self, name):
         self.frames[name] = Frame(self.root)
         return self.frames[name]
@@ -1087,11 +1163,19 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def addSpace(self, name,n):
         self.items[name].append(['space', n])
 
+    #############  CREATE GUI ITEMS ##############
     ## Create Button Item
     def createButtonItem(self, frame, sname, name, fg="#000000", bg="#cccccc", cspan=1):
         btn = Button(frame, text=name, command=self.mkcallback(name) , bg=bg, fg=fg)
 	self.buttons[sname+":"+name] = btn
         return [btn, cspan]
+    
+    def setButtonConfig(self, eid, **cfg):
+        try:
+            self.buttons[eid].config(**cfg)
+	except:
+	    print "ERROR"
+            pass
 
     ## Create Entry Item
     def createEntryItem(self, frame, sname, name, eid, w, cspan=1, val=''):
@@ -1121,7 +1205,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             return self.inputvar[eid].set(txt)
 	except:
             return ""
-
 
     ## Create Text Item
     def createTextItem(self, frame, sname, name, eid, w, h, cspan=1, rspan=1, txt=""):
@@ -1252,20 +1335,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 	except:
             return ""
    
-    def setButtonConfig(self, eid, **cfg):
-        try:
-            self.buttons[eid].config(**cfg)
-	except:
-	    print "ERROR"
-            pass
-
-    def setLabelConfig(self, eid, **cfg):
-        try:
-            self.labels[eid].configure(**cfg)
-	except:
-	    print "ERROR"
-            pass
-
     ## Create Label Item
     def createLabelItem(self, frame, sname, name, fg="#ffffff", bg="#444444", cspan=1):
         if not fg: fg="#ffffff"
@@ -1274,31 +1343,90 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 	self.labels[sname+":"+name] = lbl
         return [lbl, cspan]
 
+    def setLabelConfig(self, eid, **cfg):
+        try:
+            self.labels[eid].configure(**cfg)
+	except:
+	    print "ERROR"
+            pass
+
+    #########  LAYOUT ITEMS ON A FRAME ############
     ## Layout GUI items
     def packItems(self, name):
         n=self.max_columns
         if self.gui_items[name] :
-           i=0
-           j=1
-           for itm in self.gui_items[name] :
-             if ( i % self.max_columns ) == 0:
-               j += 1
+            i=0
+            j=1
+            for itm in self.gui_items[name] :
+                if ( i % self.max_columns ) == 0:
+                    j += 1
 
-             if itm == "BR":
-               j += 1
-               i = 0
+                if itm == "BR":
+                    j += 1
+                    i = 0
+                elif itm == "SP":
+                    i += 1
+                else :
+                   if type(itm) == list:
+	               itm[0].grid(row=j, column=i, columnspan=itm[1], sticky=W+E)
+	 	       i = i+itm[1] 
+                   else :
+                       itm.grid(row=j, column=i, sticky=W + E)
+                       i = i+1
+                   i = i % self.max_columns
 
-             elif itm == "SP":
-               i += 1
+    ## Create and layout GUI items
+    def createGuiPanel(self, name):
+        if name:
+           items = self.items[name]
+           self.gui_items[name] = []
 
-             else :
-               if type(itm) == list:
-	          itm[0].grid(row=j, column=i, columnspan=itm[1], sticky=W+E)
-		  i = i+itm[1] 
-               else :
-                  itm.grid(row=j, column=i, sticky=W + E)
-                  i = i+1
-               i = i % self.max_columns
+           for itm in items:
+               if itm[0] == 'br':
+                   self.gui_items[name].append( "BR" )
+
+               elif itm[0] == 'space':
+                   for i in range( int(itm[1] )):
+                       self.gui_items[name].append( "SP" )
+
+               elif itm[0] == 'button':
+                   self.gui_items[name].append(
+		       self.createButtonItem(self.frames[name], name,
+                                itm[1], itm[2], itm[3], int(itm[4]))
+		       )
+
+               elif itm[0] == 'entry':
+                   self.gui_items[name].append(
+		       self.createEntryItem(self.frames[name], name, name,
+		       		itm[1], itm[2], int(itm[3]), itm[4])
+		       )
+
+               elif itm[0] == 'text':
+                   self.gui_items[name].append(
+		       self.createTextItem(self.frames[name],name, name,
+			        itm[1], itm[2], itm[3], int(itm[4]), int(itm[5]), itm[6])
+		       )
+
+               elif itm[0] == 'label':
+                   self.gui_items[name].append(
+		       self.createLabelItem(self.frames[name], name,
+                                itm[1], itm[2], itm[3], int(itm[4]))
+		       )
+               else:
+                   pass
+
+           self.packItems(name)
+
+        return 0
+
+    ##
+    ## Change the view of GUI with state transition
+    def stateChanged(self, event=None, *args):
+        try:
+           self.hideFrame(self.prev_state)
+           self.showFrame(self.next_state)
+        except:
+           pass
 
     ## Display/Hide GUI Window
     def showFrame(self, name):
@@ -1309,57 +1437,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         if self.frames[name] :
            self.frames[name].pack_forget()
 
-    ## Create and layout GUI items
-    def createGuiPanel(self, name):
-        if name:
-           items = self.items[name]
-           self.gui_items[name] = []
-
-           for itm in items:
-             if itm[0] == 'br':
-               self.gui_items[name].append( "BR" )
-
-             elif itm[0] == 'space':
-               for i in range( int(itm[1] )):
-                 self.gui_items[name].append( "SP" )
-
-             elif itm[0] == 'button':
-               self.gui_items[name].append(
-		       self.createButtonItem(self.frames[name], name,
-                                   itm[1], itm[2], itm[3], int(itm[4]))
-		       )
-
-             elif itm[0] == 'entry':
-               self.gui_items[name].append(
-		       self.createEntryItem(self.frames[name], name,
-		       		name, itm[1], itm[2], int(itm[3]), itm[4])
-		       )
-
-             elif itm[0] == 'text':
-               self.gui_items[name].append(
-		       self.createTextItem(self.frames[name],name,
-			       name, itm[1], itm[2], itm[3], int(itm[4]), int(itm[5]), itm[6])
-		       )
-
-             elif itm[0] == 'label':
-               self.gui_items[name].append(
-		       self.createLabelItem(self.frames[name], name,
-                                           itm[1], itm[2], itm[3], int(itm[4]))
-		       )
-             else:
-               pass
-
-           self.packItems(name)
-
-        return 0
-
-    def stateChanged(self, event=None, *args):
-        try:
-           self.hideFrame(self.prev_state)
-           self.showFrame(self.next_state)
-        except:
-           pass
-
+    #
+    #  Sub-process
+    #
     def getSubprocessList(self):
         res=[]
         newlst=[]
@@ -1381,7 +1461,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
 #########################################################################
 #
-# eSEAT Manager
+# eSEAT Manager ( RTC manager )
 #
 class eSEATManager:
     def __init__(self, mlfile=None):
@@ -1405,6 +1485,8 @@ class eSEATManager:
 
         self.comp.setInstanceName(instance_name)
 
+    #
+    #  Parse command line option...
     def parseArgs(self):
         global opts
         encoding = locale.getpreferredencoding()
@@ -1415,10 +1497,10 @@ class eSEATManager:
                                 description=__doc__)
 
         parser.add_option('-f', '--config-file', dest='config_file', type="string",
-			 help='apply configuration file')
+			    help='apply configuration file')
 
         parser.add_option('-n', '--name', dest='naming_format', type="string",
-                          help='set naming format' )
+                            help='set naming format' )
 
         try:
             opts, args = parser.parse_args()
@@ -1440,7 +1522,21 @@ class eSEATManager:
 	
 	return sys.argv
 
+    #
+    #  Initialize the eSEAT-RTC
+    #
+    def moduleInit(self, manager):
+        profile = OpenRTM_aist.Properties(defaults_str=eseat_spec)
+        manager.registerFactory(profile, eSEAT, OpenRTM_aist.Delete)
+        self.comp = manager.createComponent("eSEAT")
+        self.comp.manager = manager
 
+        if self._scriptfile :
+            ret = self.comp.loadSEATML(self._scriptfile)
+
+    #
+    #  Start Manager
+    #
     def start(self):
         if self.comp.hasGUI() :
             self.manager.runManager(True)
@@ -1470,20 +1566,11 @@ class eSEATManager:
         else:
             self.manager.runManager()
 
-
-    def moduleInit(self, manager):
-        profile = OpenRTM_aist.Properties(defaults_str=eseat_spec)
-        manager.registerFactory(profile, eSEAT, OpenRTM_aist.Delete)
-        self.comp = manager.createComponent("eSEAT")
-        self.comp.manager = manager
-
-        if self._scriptfile :
-            ret = self.comp.loadSEATML(self._scriptfile)
-
 #########################################################################
 #   F U N C T I O N S
 #
 # Parse Key String
+# 
 #
 def decompString(strs):
     ret = []
@@ -1554,7 +1641,9 @@ def decompStringSub(str):
         ret.extend([str])
     return ret
 
-def converDataType(dtype, data, code='utf-8'):
+#
+#
+def convertDataType(dtype, data, code='utf-8'):
   if dtype == str:
      return data.encode(code)
 
@@ -1568,53 +1657,58 @@ def converDataType(dtype, data, code='utf-8'):
        return eval(data)
      return data
 
+#
+# Component Name
 def formatInstanceName(name):
    fullname=name.split('/')
    rtcname = fullname[len(fullname) -1 ]
    return rtcname.split('.')[0]
 
+#
+#  DataType for CORBA
+#
 def instantiateDataType(dtype):
-   if isinstance(dtype, int) : desc = [dtype]
-   elif isinstance(dtype, tuple) : desc = dtype
-   else : 
-     desc=omniORB.findType(dtype._NP_RepositoryId) 
+    if isinstance(dtype, int) : desc = [dtype]
+    elif isinstance(dtype, tuple) : desc = dtype
+    else : 
+        desc=omniORB.findType(dtype._NP_RepositoryId) 
 
-   if desc[0] in [omniORB.tcInternal.tv_alias ]: return instantiateDataType(desc[2])
+    if desc[0] in [omniORB.tcInternal.tv_alias ]: return instantiateDataType(desc[2])
 
-   if desc[0] in [omniORB.tcInternal.tv_short, 
-                  omniORB.tcInternal.tv_long, 
-                  omniORB.tcInternal.tv_ushort, 
-                  omniORB.tcInternal.tv_ulong,
-                  omniORB.tcInternal.tv_boolean,
-                  omniORB.tcInternal.tv_char,
-                  omniORB.tcInternal.tv_octet,
-                  omniORB.tcInternal.tv_longlong,
-                  omniORB.tcInternal.tv_enum
-		 ]: return 0
+    if desc[0] in [omniORB.tcInternal.tv_short, 
+                   omniORB.tcInternal.tv_long, 
+                   omniORB.tcInternal.tv_ushort, 
+                   omniORB.tcInternal.tv_ulong,
+                   omniORB.tcInternal.tv_boolean,
+                   omniORB.tcInternal.tv_char,
+                   omniORB.tcInternal.tv_octet,
+                   omniORB.tcInternal.tv_longlong,
+                   omniORB.tcInternal.tv_enum
+		  ]: return 0
 
-   if desc[0] in [omniORB.tcInternal.tv_float, 
-                  omniORB.tcInternal.tv_double,
-                  omniORB.tcInternal.tv_longdouble
-                 ]: return 0.0
+    if desc[0] in [omniORB.tcInternal.tv_float, 
+                   omniORB.tcInternal.tv_double,
+                   omniORB.tcInternal.tv_longdouble
+                  ]: return 0.0
 
-   if desc[0] in [omniORB.tcInternal.tv_sequence, 
-                  omniORB.tcInternal.tv_array,
-                 ]: return []
+    if desc[0] in [omniORB.tcInternal.tv_sequence, 
+                   omniORB.tcInternal.tv_array,
+                  ]: return []
 
 
-   if desc[0] in [omniORB.tcInternal.tv_string ]: return ""
-   if desc[0] in [omniORB.tcInternal.tv_wstring,
-                  omniORB.tcInternal.tv_wchar
-		   ]: return u""
+    if desc[0] in [omniORB.tcInternal.tv_string ]: return ""
+    if desc[0] in [omniORB.tcInternal.tv_wstring,
+                   omniORB.tcInternal.tv_wchar
+		  ]: return u""
 
-   if desc[0] == omniORB.tcInternal.tv_struct:
-     arg=[]
-     for i in  range(4, len(desc), 2):
-       attr=desc[i]
-       attr_type=desc[i+1]
-       arg.append(instantiateDataType(attr_type))
-     return desc[1](*arg)
-   return None
+    if desc[0] == omniORB.tcInternal.tv_struct:
+        arg = []
+        for i in  range(4, len(desc), 2):
+            attr = desc[i]
+            attr_type = desc[i+1]
+            arg.append(instantiateDataType(attr_type))
+        return desc[1](*arg)
+    return None
 
 #########################################################################
 #
