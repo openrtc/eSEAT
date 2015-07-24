@@ -16,6 +16,7 @@ import threading
 import struct
 import copy
 import json
+import types
 
 #
 # Raw Socket Adaptor
@@ -318,7 +319,12 @@ class SocketServer(SocketPort):
   def pushMessage(self, msg):
     json_data={}
     json_data['date'] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
-    json_data['message'] = msg
+    msgtype = type(msg)
+    if msgtype == types.StringType or msgtype == types.UnicodeType:
+      json_data['message'] = msg
+    else:
+      json_data['message'] = jsonDump(msg)
+
     self.cometManager.response_all(json_data, "application/json")
 
   def send(self, name, msg, encoding=None):
@@ -845,6 +851,21 @@ def parseData(data):
   except:
     pass
   return res
+
+#
+#
+def convertVars(data):
+  if type(data) == types.InstanceType:
+    res = vars(data)
+    for x in res.keys():
+      res[x] = convertVars(res[x])
+    return res
+  else:
+    return data
+
+def jsonDump(data):
+  return json.dumps(convertVars(data))
+
 #
 #
 #

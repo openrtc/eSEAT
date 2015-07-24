@@ -41,6 +41,7 @@ seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
 -->
       <script sendto="web">
 rtc_result = rtc_in_data.data
+#rtc_result = rtc_in_data
       </script>
     </rule>
 
