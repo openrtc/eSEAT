@@ -476,6 +476,11 @@ class CommReader:
     self.response = res
     self.send(flag)
 
+  def close(self, flag=False):
+    if self.owner :
+      self.owner.close()
+      self.owner = None
+
   #
   # Append response message
   #
@@ -528,6 +533,8 @@ class CometReader(CommReader):
     cmd = header["Http-Command"]
     fname = header["Http-FileName"]
 
+    #
+    # return HTML files
     if cmd == "GET":
       contents = get_file_contents(fname, self.dirname)
       ctype = get_content_type(fname)
@@ -539,6 +546,8 @@ class CometReader(CommReader):
 
       self.sendResponse(response)
 
+    #
+    # COMET Operations
     elif cmd == "POST":
       Data = parseData(data)
 
@@ -582,12 +591,16 @@ class CometReader(CommReader):
 
     return
 
-  def cometRequest(self, data):
+  def cometRequest(self, data, force=False):
     if data.has_key("id") :
-      res = self.registerHandler(data)
+      if data.has_key("force") : force = True
+
+      res = self.registerHandler(data, force)
+
       if not res :
         response = self.parser.response400()
         self.sendResponse(response)
+
     else:
       response = self.parser.response400()
       self.sendResponse(response)
@@ -604,9 +617,9 @@ class CometReader(CommReader):
      response = self.parser.response200("application/json", json.dumps(res))
      self.sendResponse(response)
 
-  def registerHandler(self, data):
+  def registerHandler(self, data, force=False):
     server = self.getServer()
-    return server.cometManager.registerHandler(self, data['id'], data)
+    return server.cometManager.registerHandler(self, data['id'], data, fore)
 
   def callHandler(self, data):
     server = self.getServer()
@@ -745,6 +758,7 @@ class HttpCommand(CommParser):
     res  = "HTTP/1.0 404 Not Found\r\n"
     res += "Date: "+date+"\r\n"
     res += "\r\n"
+    res  = "ERROR 404\r\n"
     return res
 
   def response400(self):
@@ -765,11 +779,16 @@ class CometManager:
   def resieter(self, reader, id):
     self.long_pollings[id] = reader
 
-  def registerHandler(self, reader, id, data):
-    if not self.long_pollings.has_key(id) or self.long_pollings[id] is None:
+  def registerHandler(self, reader, id, data, force=False):
+    if force or not self.long_pollings.has_key(id) or self.long_pollings[id] is None:
       self.long_pollings[id] = reader
       return True
     return False
+
+  def closeHandler(self, id):
+    if self.long_pollings.has_key(id) :
+      self.long_pollings[id].close()
+      self.long_pollings[id] = None
 
   def callHandler(self, id, data):
     res = {}

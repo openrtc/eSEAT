@@ -22,6 +22,27 @@ function long_polling(){
   });
 }
 
+function long_polling_id(id){
+  $.ajax({
+    type: "POST",
+    url: "comet_request",
+    data: "force=True&id="+id,
+    dataType: "json",
+    success: function(event){
+       processEvents(event);
+       if (event.terminate){
+          alert("Tarminate Long_polling..");
+       }else{
+          long_polling_id(id);
+     }
+    },
+    error: function(XMLHttpRequest, textStatus, errorThrown){
+       $("#response").html("Error in long_polling:"+errorThrown);
+    }
+  });
+}
+
+
 function processEvents(event){
   $("#response").html(event.message + " on  " + event.date);
 }
@@ -38,6 +59,7 @@ function sendEvent(){
   });
 }
 
+
 function sendEventToRtc(){
   $.ajax({
     type: "POST",
@@ -49,3 +71,17 @@ function sendEventToRtc(){
     }
   });
 }
+
+function sendValueToRtc(val){
+  $.ajax({
+    type: "POST",
+    url: "rtc_onData",
+    data: val,
+    dataType: "json",
+    success: function(data){
+      $("#response2").html(data.result+" on "+data.date);
+    }
+  });
+}
+
+

@@ -670,7 +670,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def createWebAdaptor(self, name, port):
         if self.webServer  is None:
-            self.adaptors[name] = SocketServer(CometReader(self), name, "localhost", port)
+            self.adaptors[name] = SocketServer(CometReader(self), name, "", port)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
         else:
@@ -748,8 +748,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
         else:
             try:
-                ndata = apply(dtype, eval(data))
-                self._data[name] = ndata
+	        if type(data) == str :
+                  self._data[name] = apply(dtype, eval(data))
+                else:
+                  self._data[name] = data
             except:
                 self._logger.RTC_ERROR( "ERROR in send: %s %s" % (name , data))
 
