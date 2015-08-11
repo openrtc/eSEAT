@@ -57,6 +57,20 @@ function sendValueToRtc(val, func){
     success: mfunc
   });
 }
+/*
+ *
+ */
+function sendMessageToRtc(msg, func){
+  var mfunc  = func || showReply;
+
+  $.ajax({
+    type: "POST",
+    url: "rtc_processResult",
+    data: msg,
+    dataType: "json",
+    success: mfunc
+  });
+}
 
 /*
  * send event to registered  comet_request

@@ -41,6 +41,15 @@
       </script>
     </rule>
 
+    <rule>
+	    <key>activate</key>
+	    <script>seat.activate()</script>
+    </rule>
+    <rule>
+	    <key>deactivate</key>
+	    <script>seat.deactivate()</script>
+    </rule>
+
     <rule source="web">
       <script>
         seat.appendText("main_mode:textOut", web_in_data+"\n")
@@ -48,10 +57,11 @@
 
       <script sendto="vel_out">
         data = web_in_data.split(',')
-        v = max(min(float(data[1].strip())/1000,1), -1)
-        vth = max(min(float(data[2].strip())/100,1), -1)
-        #print TimedVelocity2D(Time(0,0), Velocity2D(v, 0, vth))
-        rtc_result = TimedVelocity2D(Time(0,0), Velocity2D(-v, 0, -vth))
+        if len(data) == 3:
+          v = max(min(float(data[1].strip())/1000,1), -1)
+          vth = max(min(float(data[2].strip())/100,1), -1)
+          #print TimedVelocity2D(Time(0,0), Velocity2D(v, 0, vth))
+          rtc_result = TimedVelocity2D(Time(0,0), Velocity2D(-v, 0, -vth))
       </script>
 
       <script sendto="str_out">

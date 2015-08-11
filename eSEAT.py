@@ -614,6 +614,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 		    if data2 :
                         self.processOnDataIn(name, data2)
 		    else :
+		        print data
 		        if not self.processResult(name, data) :
                             self.processOnDataIn(name, data)
                 else:
