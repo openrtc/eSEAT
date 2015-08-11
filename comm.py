@@ -790,10 +790,13 @@ class CometManager:
     self.server = server
     self.long_pollings = {}
 
-  def resieter(self, reader, id):
+  def regieter(self, reader, id):
     self.long_pollings[id] = reader
 
   def registerHandler(self, reader, id, data, force=False):
+    if force and self.long_pollings.has_key(id) and self.long_pollings[id] :
+      self.long_pollings[id].close()
+
     if force or not self.long_pollings.has_key(id) or self.long_pollings[id] is None:
       self.long_pollings[id] = reader
       return True
@@ -816,6 +819,8 @@ class CometManager:
     return
 
   def response(self, id, json_data, ctype="application/json"):
+    if not self.long_pollings.has_key(id) :
+      return
     reader = self.long_pollings[id]
     if reader :
       json_data['id'] = id
