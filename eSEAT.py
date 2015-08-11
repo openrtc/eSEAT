@@ -276,9 +276,10 @@ class SEATML_Parser():
 	    fname = c.get('execfile')
 	    if not func :
                 func = c.get('host')
-            data = c.text
+            data = skipSps(c.text)
             for cx in c.getchildren():
-                data += cx.text
+              data += cx.text
+
             commands.append(['s', func, data, fname])
 
         return commands
@@ -621,6 +622,15 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 self._logger.RTC_ERROR(traceback.format_exc())
         else:
             pass
+
+    ##############################################
+    def activate(self):
+      execContexts = self.get_owned_contexts()
+      execContexts[0].activate_component(self.getObjRef())
+
+    def deactivate(self):
+      execContexts = self.get_owned_contexts()
+      execContexts[0].deactivate_component(self.getObjRef())
 
     ##############################################
     #  Callback function for WebAdaptor
@@ -1723,6 +1733,28 @@ def instantiateDataType(dtype):
             arg.append(instantiateDataType(attr_type))
         return desc[1](*arg)
     return None
+
+
+def countSp(s):
+  c=0
+  for x in s:
+    if x != " " and x != "\n":
+      return c
+    c=c+1
+  return c
+
+def skipSps(txt):
+  lines = txt.split("\n")
+  c=0
+  for x in lines :
+    if x : break
+    c=c+1
+  skip = countSp(lines[c])
+  res = ""
+  for x in lines :
+    if len( x ) >= skip : 
+      res += x[skip:]+"\n"
+  return res
 
 #########################################################################
 #
