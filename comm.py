@@ -2,7 +2,7 @@
 #  PyWebScok Library
 #  Communication Adaptor for WebSocket
 #
-#   Copyright(C) 2015, Isao Hara, AIST
+#   Copyright(C) 2015, Isao Hara, AIST  All rights reserved.
 #   Release under the MIT License.
 #
 
@@ -240,10 +240,10 @@ class SocketPort(threading.Thread):
       self.close()
 
 #
-#  Server Adaptor
+#  WebServer Adaptor
 #
-class SocketServer(SocketPort):
-  def __init__(self, reader, name, host, port):
+class WebSocketServer(SocketPort):
+  def __init__(self, reader, name, host, port, index=None):
     SocketPort.__init__(self, reader, name, host, port)
     self.socket = None
     self.service = []
@@ -252,6 +252,10 @@ class SocketServer(SocketPort):
     self.debug = False
     self.server_adaptor = None
     self.setServerMode()
+    if index :
+      self.indexfile = index
+    else:
+      self.indexfile = "index"
     self.cometManager = CometManager(self)
     self.bind()
 
@@ -415,6 +419,8 @@ class CommReader:
   def getServer(self):
     return  self.owner.getServer()
 
+  def getIndexName(self):
+    return  self.getServer().indexfile
   #
   #  Buffer
   #
@@ -521,7 +527,7 @@ class CommReader:
 #
 class CometReader(CommReader):
   def __init__(self, rtc=None, dirname="html"):
-    CommReader.__init__(self, None, HttpCommand(dirname))
+    CommReader.__init__(self, None, HttpCommand(dirname, '', self))
     self.rtc = rtc
     self.dirname = dirname
 
@@ -557,13 +563,14 @@ class CometReader(CommReader):
       elif fname == "/comet_event" :
         self.cometTrigger(Data)
 
-      elif fname == "/rtc_onData" :
+      elif fname == "/rtc_onData" :  # Process request from Web adaptor
 	res={}
 	if self.rtc:
           self.rtc.onData(self.getServer().name, data)
           res["result"] = "OK"
         else:
           res["result"] = "ERROR: no rtc"
+	  
         res["date"] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
         response = self.parser.response200("application/json", json.dumps(res))
         self.sendResponse(response)
@@ -580,7 +587,6 @@ class CometReader(CommReader):
         response = self.parser.response200("application/json", json.dumps(res))
         self.sendResponse(response)
 
-
       else:
 	  contents = "Hello, No such action defined"
           response = self.parser.response200("text/plain", contents)
@@ -591,11 +597,14 @@ class CometReader(CommReader):
 
     return
 
-  def cometRequest(self, data, force=False):
+  def cometRequest(self, data, force=-1):
     if data.has_key("id") :
-      if data.has_key("force") : force = True
+      if data.has_key("force") : force=int(data['force'])
 
-      res = self.registerHandler(data, force)
+      if force < 0: fflag=False
+      else: fflag=True
+
+      res = self.registerHandler(data, fflag)
 
       if not res :
         response = self.parser.response400()
@@ -619,7 +628,7 @@ class CometReader(CommReader):
 
   def registerHandler(self, data, force=False):
     server = self.getServer()
-    return server.cometManager.registerHandler(self, data['id'], data, fore)
+    return server.cometManager.registerHandler(self, data['id'], data, force)
 
   def callHandler(self, data):
     server = self.getServer()
@@ -675,10 +684,11 @@ class CommParser:
 #     CommParser <--- HttpCommand
 #
 class HttpCommand(CommParser):
-  def __init__(self, dirname=".", buffer=''):
-    CommParser.__init__(self, buffer)
+  def __init__(self, dirname=".", buffer='', rdr=None):
+    CommParser.__init__(self, buffer, rdr)
     self.dirname=dirname
     self.buffer = buffer
+    self.default_filename = "index.html"
 
   def setRootDir(self, dirname):
     self.dirname=dirname
@@ -711,7 +721,11 @@ class HttpCommand(CommParser):
       cmds = header[0].split(' ')
       cmd = cmds[0].strip()
       fname = cmds[1].strip()
-      if fname == "/" : fname = "/index.html"
+      if fname[-1] == "/" :
+        if self.reader :
+          fname = fname+self.reader.getIndexName()+".html"
+        else:
+          fname = fname + "index.html"
       proto = cmds[2].strip()
 
       header.remove( header[0] )
@@ -889,4 +903,4 @@ def jsonDump(data):
 #
 #
 def create_httpd(num=80, top="html"):
-  return SocketServer(CometReader(None), "Web", "localhost", num)
+  return WebSocketServer(CometReader(None), "Web", "", num)

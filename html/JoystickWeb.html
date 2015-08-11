@@ -2,37 +2,28 @@
 
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html"; charset=utf-8" />
-    <title>TEST: WebAdaptor for SimpleIO2</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TEST: WebAdaptor for VertualJoystick</title>
 
+    <link rel="stylesheet" href="style.css" type="text/css">
     <script src="jquery-1.11.3.min.js"></script>
     <script src="jquery-migrate-1.2.1.min.js"></script>
     <script src="comet.js"></script>
     <script src="virtualjoystick.js"></script>
-    <style>
-	    div#topbar{
-		    background-color:gray;
-		    vertical-align: middle;
-	    }    
-	    span#title{
-		    color:white;
-		    font-size:18pt;
-		    vertical-align: middle;
-	    }    
-    </style>
- 
   
   </head>
-  <body onLoad="long_polling_id('joystick');">
-<!--
+
+  <body onLoad="requestComet('joystick');">
+
   <div id="topbar">
   <table><tr>
    <td> <img src="rtm_logo.png" /> </td>
-   <td><span id="title">Test for Joystick</span></td>
+   <td><span id="title">Test for VirtualJoystick</span></td>
    </tr>
   </table>
- </div>
--->
+  <br>
+  <br>
+  </div>
   <div id="result"></div>
   <div id="container" style="width:600px;height:600px;background-color:#aaaaaa"></div>
   <div>
@@ -40,8 +31,6 @@
 	var joystick	= new VirtualJoystick({
 		container	: document.getElementById('container'),
 		mouseSupport	: true,
-		baseX		: 200,
-		baseY		: 200,
 	});
 
 	var status = 0;

@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="Sensors">
+    <adaptor name="vel_out" type="rtcout" datatype="TimedVelocity2D" />
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="str_in" type="rtcin" datatype="TimedString" />
+    <adaptor name="web" type="web"  port="8080" />
+  </general>
+
+  <state name="main_mode">
+
+    <label text="SimpleIO" colspan="3" bg_color="blue" />
+
+    <brk />
+    <label text="Input:" />
+    <input id="textIn" width="50" >
+        <message sendto="str_out" input="main_mode:textIn" />
+    </input>
+    <button label="Send">
+        <message sendto="str_out" input="main_mode:textIn" />
+        <message sendto="web" input="main_mode:textIn" />
+    </button>
+    <brk />
+  
+    <label text="Coming Text:" />
+    <text id="textOut" width="50" height="5" colspan="2" >
+	    INIT String...
+    </text>
+    <brk />
+    <button label="Clear">
+      <script>
+seat.clearText("main_mode:textOut")
+      </script>
+    </button>
+ 
+    <rule source="str_in">
+      <script>
+seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
+      </script>
+<!--
+      <message sendto="web" input="main_mode:textOut" />
+-->
+      <script sendto="web">
+rtc_result = rtc_in_data.data
+#rtc_result = rtc_in_data
+      </script>
+    </rule>
+
+    <rule source="web">
+      <script>
+seat.appendText("main_mode:textOut", web_in_data+"\n")
+      </script>
+
+      <script sendto="vel_out">
+data = web_in_data.split(',')
+v = max(min(float(data[1].strip())/1000,1), -1)
+vth = max(min(float(data[2].strip())/100,1), -1)
+
+print TimedVelocity2D(Time(0,0), Velocity2D(v, 0, vth))
+
+rtc_result = TimedVelocity2D(Time(0,0), Velocity2D(-v, 0, -vth))
+
+      </script>
+
+      <script sendto="str_out">
+rtc_result = web_in_data
+      </script>
+    </rule>
+
+
+  </state>
+
+</seatml>

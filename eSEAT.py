@@ -172,6 +172,7 @@ class eSEATDataListener(OpenRTM_aist.ConnectorDataListenerT):
 class SEATML_Parser():
     def __init__(self, parent, xsd='seatml.xsd', logger=None):
         self.parent = parent
+	self.componentName = "eSEAT"
         if logger:	
             self._logger = parent._logger
         else:
@@ -218,7 +219,7 @@ class SEATML_Parser():
             elif type == 'rtcin' :
                 self.parent.createDataPort(name, tag.get('datatype') ,'in')
             elif type == 'web' :
-                self.parent.createWebAdaptor(name, int(tag.get('port')))
+                self.parent.createWebAdaptor(name, int(tag.get('port')), self.componentName)
             else:
                  self.parent.createSocketPort(name, tag.get('host'), int(tag.get('port')))
 
@@ -312,6 +313,8 @@ class SEATML_Parser():
 	#
 	#  <general>
         for g in doc.findall('general'):
+            if g.get('name') : self.componentName = g.get('name')
+
             for a in g.getchildren():
 	        #
 	        #  <adaptor>
@@ -604,6 +607,14 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                     data.data = data.data
 		    if not self.processResult(name, data.data) :
                         self.processOnDataIn(name, data)
+                elif isinstance(data, str):
+                    data = data.decode('utf-8')
+		    data2 = parseData(data)
+		    if data2 :
+                        self.processOnDataIn(name, data2)
+		    else :
+		        if not self.processResult(name, data) :
+                            self.processOnDataIn(name, data)
                 else:
                     self.processOnDataIn(name, data)
             except:
@@ -668,22 +679,23 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     # Create the Web Server Port
     #
-    def createWebAdaptor(self, name, port):
+    def createWebAdaptor(self, name, port, index):
+
         if self.webServer  is None:
-            self.adaptors[name] = SocketServer(CometReader(self), name, "", port)
+            self.adaptors[name] = WebSocketServer(CometReader(self), name, "", port, index)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
         else:
-            print "WebService is already created"
+            self._logger.RTC_INFO(u"Failed to create Webadaptor:" + name + " already exists")
 
     #################
     # Create Adaptor
     #
-    def createAdaptor(self, tag):
+    def createAdaptor(self, tag, componentName=""):
         try:
             name = str(tag.get('name'))
             type = tag.get('type')
-            self._logger.RTC_INFO(u"create adaptor: " + type + ": " + name)
+            self._logger.RTC_INFO(u"create adaptor1: " + type + ": " + name)
 
             if type == 'rtcout':
                 self.adaptortype[name] = self.getDataType(tag.get('datatype'))
@@ -697,7 +709,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
             elif type == 'web':
                 port = int(tag.get('port'))
-                self.createWebAdaptor(name, port)
+                self.createWebAdaptor(name, port, componentName)
 
             else:
                 host = tag.get('host')

@@ -1,0 +1,13 @@
+/*
+ *
+ */
+div#topbar{
+    background-color:gray;
+    vertical-align: middle;
+}    
+
+span#title{
+    color:white;
+    font-size:18pt;
+    vertical-align: middle;
+}    

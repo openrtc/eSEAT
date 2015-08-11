@@ -185,7 +185,7 @@ VirtualJoystick.prototype._onDown	= function(x, y)
 	}
 	
 	this._stickEl.style.display	= "";
-	this._move(this._stickEl.style, (this._stickX - this._stickEl.width /2), (this._stickY - this._stickEl.height/2));	
+	this._move(this._stickEl.style, (this._stickX - this._stickEl.width/2), (this._stickY - this._stickEl.height/2 ));	
 }
 
 VirtualJoystick.prototype._onMove	= function(x, y)
