@@ -18,6 +18,7 @@ import copy
 import json
 import types
 import gc
+import time
 
 #
 # Raw Socket Adaptor
@@ -198,6 +199,8 @@ class SocketPort(threading.Thread):
         print "Umm...:",self.name
         print data
 
+      time.sleep(0.01) 
+
 #    print "Read thread terminated:",self.name
 
   #
@@ -291,6 +294,7 @@ class WebSocketServer(SocketPort):
         self.terminate()
       else:
         pass
+      time.sleep(0.01) 
     
     print "Terminate all service %s(%s:%d)" % (self.name, self.host, self.port)
     self.close_service()
@@ -308,6 +312,7 @@ class WebSocketServer(SocketPort):
   #
   def run(self):
     self.accept_service_loop()
+    del self.reader
 
   #
   #
@@ -353,6 +358,8 @@ class SocketService(SocketPort):
   #
   def run(self):
     self.message_receiver()
+    del self.reader.buffer
+    del self.reader
 
   def getServer(self):
     return self.server_adaptor
@@ -439,13 +446,17 @@ class CommReader:
   def skipBuffer(self, n=4, flag=1):
     self.current += n
     if flag :
-      self.buffer = self.buffer[self.current:]
+      buffer = self.buffer[self.current:]
+      del self.buffer
+      self.buffer = buffer
       self.current = 0
     return 
 
   def clearBuffer(self, n=0):
     if n > 0 :
-      self.buffer = self.buffer[n:]
+      buffer = self.buffer[n:]
+      del self.buffer
+      self.buffer = buffer
       self.current = 0
     else:
       if self.buffer : del self.buffer
@@ -458,7 +469,9 @@ class CommReader:
         res = self.parser.checkMessage(self.buffer, self.current, self)
         if res == 0:
           return False
-        self.buffer = self.buffer[res:]
+        buffer = self.buffer[res:]
+        del self.buffer
+        self.buffer = buffer
         self.current = 0
     except:
       print "ERR in checkBuffer"
@@ -517,7 +530,9 @@ class CommReader:
     self.current = end
 
     if  delFlag :
-      self.buffer =  self.buffer[end:]
+      buffer =  self.buffer[end:]
+      del self.buffer
+      self.buffer =  buffer
       self.current =  0
     return data
 

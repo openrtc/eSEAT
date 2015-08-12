@@ -600,8 +600,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def onData(self, name, data):
         if self.activated :
-#            gc.collect()
-#            del gc.garbage[:]
+            #gc.collect()
+            #del gc.garbage[:]
             try:
                 if isinstance(data, TimedString):
                     data.data = data.data.decode('utf-8')
@@ -1748,16 +1748,19 @@ def countSp(s):
   return c
 
 def skipSps(txt):
-  lines = txt.split("\n")
-  c=0
-  for x in lines :
-    if x : break
-    c=c+1
-  skip = countSp(lines[c])
-  res = ""
-  for x in lines :
-    if len( x ) >= skip : 
-      res += x[skip:]+"\n"
+  try:
+    lines = txt.split("\n")
+    c=0
+    for x in lines :
+      if x : break
+      c=c+1
+    skip = countSp(lines[c])
+    res = ""
+    for x in lines :
+      if len( x ) >= skip : 
+        res += x[skip:]+"\n"
+  except:
+    return txt
   return res
 
 #########################################################################
@@ -1770,6 +1773,7 @@ def main(ssml_file=None):
     return 0
 
 if __name__=='__main__':
+    #gc.disable()
     seatmgr = eSEATManager()
     seat = seatmgr.comp
     seatmgr.start()
