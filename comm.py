@@ -17,6 +17,7 @@ import struct
 import copy
 import json
 import types
+import gc
 
 #
 # Raw Socket Adaptor
@@ -131,7 +132,7 @@ class SocketPort(threading.Thread):
   #
   # Receive
   #
-  def receive_data(self, bufsize=8192, timeout=1.0):
+  def receive_data(self, bufsize=4096, timeout=1.0):
     data = None
     try:
       if self.wait_for_read(timeout) == 1  :
@@ -341,6 +342,7 @@ class SocketService(SocketPort):
   def __init__(self, server, reader, name, sock, addr):
     SocketPort.__init__(self, reader, name, addr[0], addr[1])
     self.socket = sock
+    self.client = addr
     self.mainloop = False
     self.server_adaptor = server
     self.debug = False
@@ -555,12 +557,13 @@ class CometReader(CommReader):
     #
     # COMET Operations
     elif cmd == "POST":
-      Data = parseData(data)
 
       if fname == "/comet_request" :
+        Data = parseData(data)
         self.cometRequest(Data)
 
       elif fname == "/comet_event" :
+        Data = parseData(data)
         self.cometTrigger(Data)
 
       elif fname == "/rtc_onData" :  # Process request from Web adaptor
@@ -715,6 +718,7 @@ class HttpCommand(CommParser):
     if pos > 0:
       pos += offset + 4
       self.headerMsg = buffer[offset:pos]
+
       self.buffer = buffer[pos:]
 
       header = self.headerMsg.split("\r\n")
@@ -737,6 +741,9 @@ class HttpCommand(CommParser):
       if self.header.has_key("Content-Length") :
         contentLen = int(self.header["Content-Length"])
 	pos += contentLen
+        if len(self.buffer) < contentLen:
+           #print "ERROR to read message: %s, %d" % (self.buffer, contentLen)
+	   return 0
         self.data = self.buffer[:contentLen]
 
       return pos

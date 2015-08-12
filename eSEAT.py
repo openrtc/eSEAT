@@ -26,6 +26,7 @@ import socket
 import optparse
 import threading
 import subprocess
+import gc
 
 ########
 #  for OpenRTM-aist
@@ -599,6 +600,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def onData(self, name, data):
         if self.activated :
+#            gc.collect()
+#            del gc.garbage[:]
             try:
                 if isinstance(data, TimedString):
                     data.data = data.data.decode('utf-8')
@@ -609,14 +612,13 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 		    if not self.processResult(name, data.data) :
                         self.processOnDataIn(name, data)
                 elif isinstance(data, str):
-                    data = data.decode('utf-8')
-		    data2 = parseData(data)
-		    if data2 :
-                        self.processOnDataIn(name, data2)
-		    else :
-		        print data
-		        if not self.processResult(name, data) :
-                            self.processOnDataIn(name, data)
+                    if data :
+		        data2 = parseData(data)
+                        if data2 :
+                            self.processOnDataIn(name, data2)
+		        else :
+                            if not self.processResult(name, data) :
+                                self.processOnDataIn(name, data)
                 else:
                     self.processOnDataIn(name, data)
             except:
@@ -1014,8 +1016,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 	if fname : execfile(fname,globals())
 	try:
 	  if data :
-            exec(data,globals())
+            exec(data, globals())
 	except:
+          self._logger.RTC_ERROR("Fail to execute script:" + name)
 	  print data
    
         # 

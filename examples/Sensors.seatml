@@ -11,6 +11,11 @@
 
     <label text="Sensors" colspan="3" bg_color="blue" />
     <brk />
+    <button label="Exit">       <script> seat.exit() </script> </button>
+    <button label="Activate">   <script> seat.activate() </script> </button>
+    <button label="Deactivate"> <script> seat.deactivate() </script> </button>
+
+    <brk />
   
     <label text="Info:" />
     <text id="textOut" width="50" height="5" colspan="2" >
@@ -37,13 +42,17 @@
 
 <!--  Input from Web Adaptor -->
     <rule source="web">
+<!--
       <script>
-        seat.appendText("main_mode:textOut", web_in_data+"\n")
+        seat.appendText("main_mode:textOut", jsonDump(web_in_data)+"\n")
       </script>
-
+-->
       <script sendto="vel_out">
-       data = web_in_data.split(',')
-       print data
+        x=float(web_in_data["X"])/2
+        y=float(web_in_data["Y"])/10
+        if 0.05 > x and x > -0.05: x=0
+        if 0.05 > y and y > -0.05: y=0
+        rtc_result = TimedVelocity2D( Time(0, 0), Velocity2D(y, 0, x) )
       </script>
 
     </rule>

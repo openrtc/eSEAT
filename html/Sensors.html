@@ -12,6 +12,18 @@
     <script src="comet.js"></script>
 
     <script>
+    // Direction
+    function findNorth(evt) {
+        if (evt.alpha < 5 || evt.alpha > 355) {
+            $("#directions").html("North!");
+        } else if (evt.alpha < 180) {
+            $("#directions").html("Turn Left");
+        } else {
+            $("#directions").html("Turn Right");
+        }
+    }
+
+    // GPS
     function getLocation(position){
       var lat = position.coords.latitude;
       var lng = position.coords.longitude;
@@ -29,76 +41,67 @@
           html += "高度誤差:" + alc + "<br>";
           html += "方角:" + hed + "<br>";
           html += "速度:" + spe + "<br>";
-      document.getElementById("geolocation").innerHTML = html;
+      $("#geolocation").html( html );
     }
  
     //
     window.addEventListener("deviceorientation", function(evt){
+      // Compass
       var ch = evt.webkitCompassHeading;
       var chAcc = evt.webkitCompassAccuracy;
-      var html ="";
-          html += "方角："+ch
-          html += "　誤差："+chAcc;
-      document.getElementById("compass").innerHTML = html;
+
+      $("#compass_heading").val(ch);
+      $("#compass_accuracy").val(chAcc);
     
-      //ジャイロセンサー情報取得
+      // Gyro Sensor
       var alpha = evt.alpha;   // z-axis
       var beta = evt.beta;     // x-axis
       var gamma = evt.gamma;   // y-axis
-      var html ="";
-          html += 'Z回転(alpha):' + alpha + "<br>";
-          html += "X回転(beta):" + beta + "<br>";
-          html += "Y回転(gumma):" + gamma;
-      document.getElementById("gyroscope").innerHTML = html;
+
+      $("#gyro_Z").val(alpha);
+      $("#gyro_X").val(beta);
+      $("#gyro_Y").val(gamma);
       
     }, false);
 
-    function findNorth(evt) {
-        var directions = document.getElementById("directions");
-        if (evt.alpha < 5 || evt.alpha > 355) {
-            directions.innerHTML = "North!";
-        } else if (evt.alpha < 180) {
-            directions.innerHTML = "Turn Left";
-        } else {
-            directions.innerHTML = "Turn Right";
-        }
-    }
-
-
-    //加速度センサー情報取得
+    //Accel sensor
     window.addEventListener("devicemotion", function(evt){
    
-     //加速度
+     //Accle
      var x = evt.acceleration.x;
      var y = evt.acceleration.y;
      var z = evt.acceleration.z;
+
+     $("#accl_X").val(x);
+     $("#accl_Y").val(y);
+     $("#accl_Z").val(z);
    
    
-     //傾き
-     var xg = evt.accelerationIncludingGravity.x; //左右
-     var yg = evt.accelerationIncludingGravity.y; //上下
-     var zg = evt.accelerationIncludingGravity.z; //前後
+     //Rot
+     var xg = evt.accelerationIncludingGravity.x; //  right/left
+     var yg = evt.accelerationIncludingGravity.y; //  up/down
+     var zg = evt.accelerationIncludingGravity.z; //  fornt/back
+
+     $("#rot_X").val(xg);
+     $("#rot_Y").val(yg);
+     $("#rot_Z").val(zg);
    
-     //回転値
-     var a = evt.rotationRate.alpha; //z方向
-     var b = evt.rotationRate.beta; //x方向
-     var g = evt.rotationRate.gamma; // y方向
-   
-      var html ="";
-          html += "x:"+x+"<br>";
-          html += "y:"+y+"<br>";
-          html += "z:"+z+"<br>";
-          
-          html += "傾きx:"+xg+"<br>";
-          html += "傾きy:"+yg+"<br>";
-          html += "傾きz:"+zg+"<br>";
-        
-          html += "alpha(z):"+a+"<br>";
-          html += "beta(x):"+b+"<br>";
-          html += "gamma(y):"+g+"<br>";
-     document.getElementById("rotation").innerHTML = html;
+     // Rotation Value
+     var a = evt.rotationRate.alpha;
+     var b = evt.rotationRate.beta;
+     var g = evt.rotationRate.gamma;
+
+     $("#rot_alpha").val(a);
+     $("#rot_beta").val(b);
+     $("#rot_gamma").val(g);
     } , true); 
 
+     setInterval(function(){
+	     var val= {"X": $("#rot_X").val(), "Y": $("#rot_Y").val(), "Z": $("#rot_Z").val()};
+	     sendValueToRtc(val, function(data){
+		     $("#response").html(data.result + " on "+data.date);
+	     });
+    }, 100);
   </script>
   
   </head>
@@ -115,14 +118,36 @@
   <hr>
   Compass:
   <div id="compass"></div>
-
+  <form>
+	  Heading: <input id="compass_heading" type="text" value=""><br>
+	  Accuracy: <input id="compass_accuracy" type="text" value="">
+  </form>
   <hr>
   Gyroscope:
   <div id="gyroscope"></div>
+  <form>
+	  Z-Axis: <input id="gyro_Z" type="text" value=""><br>
+	  X-Axis: <input id="gyro_X" type="text" value=""><br>
+	  Y-Axis: <input id="gyro_Y" type="text" value=""><br>
+  </form>
 
   <hr>
   Rotation:
    <div id="rotation"></div>
+       Acceleration:<br>
+	  X-Axis: <input id="accl_X" type="text" value=""><br>
+	  Y-Axis: <input id="accl_Y" type="text" value=""><br>
+	  Z-Axis: <input id="accl_Z" type="text" value=""><br>
+       <br>
+       Rotation:<br>
+	  Right/Left: <input id="rot_X" type="text" value=""><br>
+	  Up/Down: <input id="rot_Y" type="text" value=""><br>
+	  Front/Back: <input id="rot_Z" type="text" value=""><br>
+       <br>
+       RotationValue:<br>
+	  alpha(z): <input id="rot_alpha" type="text" value=""><br>
+	  beta(x): <input id="rot_beta" type="text" value=""><br>
+	  gamma(y): <input id="rot_gamma" type="text" value=""><br>
 
   <hr>
 
