@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Send Message</title>
+    <script src="jquery-1.11.3.min.js"></script>
+    <script src="jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src="comet.js"></script>
+    <script>
+	    function processEvents(evt){
+		    $("#result").html($("#result").html() + "<br>"+evt.message+" on "+evt.date);
+	    }
+    </script>
+  </head>
+  <body onLoad="requestComet('test');">
+    <div id="result"></div>
+  </body>
+</html>
+
