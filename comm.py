@@ -265,7 +265,7 @@ class WebSocketServer(SocketPort):
     self.bind()
     self.service_keys=[]
     self.host_list=["localhost"]
-    self.appendWhiteList("127.0.0.1")
+#    self.appendWhiteList("127.0.0.1")
 
   #
   # 

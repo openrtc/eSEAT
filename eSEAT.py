@@ -221,7 +221,7 @@ class SEATML_Parser():
             elif type == 'rtcin' :
                 self.parent.createDataPort(name, tag.get('datatype') ,'in')
             elif type == 'web' :
-                self.parent.createWebAdaptor(name, int(tag.get('port')), self.componentName)
+                self.parent.createWebAdaptor(name, int(tag.get('port')), self.componentName, tag.get('host'))
             else:
                  self.parent.createSocketPort(name, tag.get('host'), int(tag.get('port')))
 
@@ -653,11 +653,15 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     # Create the Web Server Port
     #
-    def createWebAdaptor(self, name, port, index):
+    def createWebAdaptor(self, name, port, index, whost=""):
         if self.webServer  is None:
             self.adaptors[name] = WebSocketServer(CometReader(self), name, "", port, index)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
+	    whosts = whost.split(',')
+	    for x in whosts:
+	      if x :
+                self.webServer.appendWhiteList(x)
         else:
             self._logger.RTC_INFO(u"Failed to create Webadaptor:" + name + " already exists")
 
