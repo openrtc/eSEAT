@@ -5,7 +5,7 @@
     <adaptor name="str_in" type="rtcin" datatype="TimedString" />
 
     <script execfile="rtc_handle/rtc_handle.py" />
-    <script execfile="rtc_handle_tool.py" />
+    <script execfile="rtc_handle/rtc_handle_tool.py" />
 
       <script>
 def printText(msg, txt="main_mode:in2"):

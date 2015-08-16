@@ -165,6 +165,7 @@
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="source" use="optional" type="xs:string"/>
+      <xs:attribute name="file" use="optional" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

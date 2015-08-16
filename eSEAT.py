@@ -54,7 +54,7 @@ from comm import *
 #
 __version__ = "0.3"
 
-#########################################################################
+###############################################################
 #
 # SocketAdaptor: Communication Port for a raw socket connection
 #
@@ -164,7 +164,7 @@ class eSEATDataListener(OpenRTM_aist.ConnectorDataListenerT):
     
     def __call__(self, info, cdrdata):
         data = OpenRTM_aist.ConnectorDataListenerT.__call__(self,
-			info, cdrdata, instantiateDataType(self._type))
+                        info, cdrdata, instantiateDataType(self._type))
         self._obj.onData(self._name, data)
 
 #########################################################################
@@ -174,13 +174,15 @@ class eSEATDataListener(OpenRTM_aist.ConnectorDataListenerT):
 class SEATML_Parser():
     def __init__(self, parent, xsd='seatml.xsd', logger=None):
         self.parent = parent
-	self.componentName = "eSEAT"
-        if logger:	
+        self.componentName = "eSEAT"
+        if logger:
             self._logger = parent._logger
         else:
             self._logger = None
-		    
-	self.setXsd(xsd)
+
+        self.setXsd(xsd)
+        self.include_rules = []
+        self.seatml_base_dir = ""
 
     #
     #  set schema-file for seatml
@@ -236,48 +238,48 @@ class SEATML_Parser():
     #
     def parseCommands(self, r):
         commands = []
-	#
-	# <message>
+        #
+        # <message>
         for c in r.findall('message'): # end message
             name     = c.get('sendto')
-	    if not name : name = c.get('host')
+            if not name : name = c.get('host')
             encode   = c.get('encode')
             input_id = c.get('input')
             data     = c.text
             commands.append(['c', name, data, encode, input_id])
-	#
-	# <command>
+        #
+        # <command>
         for c in r.findall('command'): # get commands
             name     = c.get('sendto')
-	    if not name : name = c.get('host')
+            if not name : name = c.get('host')
             encode   = c.get('encode')
             input_id = c.get('input')
             data     = c.text
             commands.append(['c', name, data, encode, input_id])
-	#
-	# <statetransition>
+        #
+        # <statetransition>
         for c in r.findall('statetransition'): # get statetransition
             func = c.get('func')
             data = c.text
             commands.append(['t', func, data])
-	#
-	# <log>
+        #
+        # <log>
         for c in r.findall('log'): #  logging
             data = c.text
             commands.append(['l', data])
-	#
-	# <shell>
+        #
+        # <shell>
         for c in r.findall('shell'): # get shell
             sendto = c.get('sendto')
-	    if not sendto : sendto = c.get('host')
+            if not sendto : sendto = c.get('host')
             data = c.text
             commands.append(['x', sendto, data])
-	#
-	# <script>
+        #
+        # <script>
         for c in r.findall('script'): # get script
             sendto  = c.get('sendto')
-	    if not sendto : sendto = c.get('host')
-	    fname = c.get('execfile')
+            if not sendto : sendto = c.get('host')
+            fname = c.get('execfile')
             data = self.getScripts(c)
             commands.append(['s', sendto, data, fname])
         return commands
@@ -296,16 +298,18 @@ class SEATML_Parser():
 
     def getAttribute(self, e, name, def_val=None):
         val = e.get(name)
-	if def_val is None: return val
+        if def_val is None: return val
         if not val : val = def_val
-	return val
+        return val
 
     def getText(self, e):
         val = e.text
         if not val: val = ''
-	return val
+        return val
 
-    def parseGui(self, name, e, commands):
+    def parseGui(self, name, e):
+        commands = self.parseCommands(e)
+
         ################ GUI ###############
         #
         #  <label>
@@ -343,6 +347,87 @@ class SEATML_Parser():
             self.parent.addText(name, key, self.getAttribute(e, 'width', '20'),
                  self.getAttribute(e, 'height', '3'), self.getAttribute(e, 'colspan', 1),
                  self.getAttribute(e, 'rowspan', 1), self.getText(e))
+        else:
+           self.logError(u"Invalid tag found: " + e.tag)
+
+    def loadRuleFile(self, name, f, sname=None):
+        f = f.replace("\\", "\\\\")
+        self.logInfo(u"load script file(loadRuleFile): " + f)
+
+        try:
+            doc = etree.parse(f)
+        except etree.XMLSyntaxError, e:
+            self.logError(u"invalid xml syntax(loadRuleFile): " + unicode(e))
+            return 1
+        except IOError, e:
+            self.logError(u"unable to open file " + f + " (loadRuleFile): " + unicode(e))
+            return 1
+
+        try:
+            self._xmlschema.assert_(doc)
+        except AssertionError, b:
+            self.logError(u"invalid script file: " + f + " (loadRuleFile): " + unicode(b))
+            return 1
+
+        for s in doc.findall('state'):
+            if not sname or sname == s.get('name'):
+                for e in list(s):
+                    if e.tag == 'rule':
+                        self.parseRule(name, e)
+                return
+
+        self.logError(u"no rule foud: " + f +":"+sname)
+
+    #
+    #   Parse <rule>tag 
+    #
+    def parseRule(self, name, e):
+        if e.get('file'):
+            loadfile = os.path.join(self.seatml_base_dir, e.get('file'))
+            if loadfile in self.include_rules :
+                self.logError(u"already included: " + e.get('file'))
+                return
+            self.include_rules.append(loadfile)
+            try:
+              fname, sname = e.get('file').split(':')
+            except:
+               fname = e.get('file')
+               sname = None
+
+            self.loadRuleFile(name, os.path.join(self.seatml_base_dir, fname), sname)
+        else:
+            commands = self.parseCommands(e)
+            adaptor = e.get('source')
+            #
+            #  <key>
+            keys = e.findall('key')
+            if adaptor :
+                kond = [None, "True"]
+                #
+                #  <cond>
+                kn = e.find('cond')
+                if kn is not None : kond = [kn.get("execfile"), kn.text]
+
+                if keys :
+                    for k in keys:
+                        word = decompString([k.text])
+                        #
+                        #
+                        for w in word:
+                            self.parent.registerCommands(name+":"+adaptor+":"+w, commands)
+                else :
+                   #
+                   #
+                    self.parent.registerCommandArray(name+":"+adaptor+":ondata", [kond, commands])
+
+            for k in keys:
+                source = k.get('source')
+                if source is None: source = "default" 
+                word = decompString([k.text])
+                #
+                #
+                for w in word:
+                    self.parent.registerCommands(name+":"+source+":"+w, commands)
 
     #
     #   eSEAT Markup Language File loader
@@ -350,6 +435,8 @@ class SEATML_Parser():
     def load(self, f):
         self.setParentLogger()
         f = f.replace("\\", "\\\\")
+        self.seatml_base_dir = os.path.dirname(f)
+        
         self.logInfo(u"load script file: " + f)
 
         try:
@@ -371,78 +458,47 @@ class SEATML_Parser():
 
         ####
         # Top level tag
-	#
-	#  <general>
+        #
+        #  <general>
         for g in doc.findall('general'):
             if g.get('name') : self.componentName = g.get('name')
 
             for a in g.getchildren():
-	        #
-	        #  <adaptor><agent>
+                #
+                #  <adaptor><agent>
                 if a.tag == 'adaptor' or a.tag == 'agent':
                     self.createAdaptor(a)
-	        #
-	        #  <script>
+                #
+                #  <script>
                 elif a.tag == 'script':
                     self.procScript(a, a.get('execfile'))
-	# 
-	#  <state>
+        # 
+        #  <state>
         for s in doc.findall('state'):
             name = s.get('name')
             self.parent.create_state(name)
 
             for e in list(s):
-                commands = self.parseCommands(e)
-	        #
-	        #  <onentry>
+                #
+                #  <onentry><onexit>
                 if e.tag == 'onentry' or e.tag == 'onexit':
-	            #
-		    # <message><command><statetransition><log><shell><script>
-		    self.parent.registerCommands(name+":::"+e.tag , commands)
-	        #
-	        #  <rule>
+                    commands = self.parseCommands(e)
+                    self.parent.registerCommands(name+":::"+e.tag , commands)
+                #
+                #  <rule>
                 elif e.tag == 'rule':
-                    adaptor = e.get('source')
-	            #
-	            #  <key>
-                    keys = e.findall('key')
-                    if adaptor :
-                        kond = [None, "True"]
-	                #
-	                #  <cond>
-                        kn = e.find('cond')
-                        if kn is not None : kond = [kn.get("execfile"), kn.text]
-
-                        if keys :
-                            for k in keys:
-                                word = decompString([k.text])
-				#
-				#
-                                for w in word:
-                                    self.parent.registerCommands(name+":"+adaptor+":"+w, commands)
-                        else :
-			   #
-			   #
-                            self.parent.registerCommandArray(name+":"+adaptor+":ondata", [kond, commands])
-
-                    for k in keys:
-                        source = k.get('source')
-		        if source is None: source = "default" 
-                        word = decompString([k.text])
-			#
-			#
-                        for w in word:
-                            self.parent.registerCommands(name+":"+source+":"+w, commands)
-
+                    self.include_rules = [ f.replace("\\\\", "\\")] 
+                    self.parseRule(name, e)
                 else:
-                    ################ GUI ###############
-                    self.parseGui(name, e, commands)
+                #
+                # GUI tags
+                    self.parseGui(name, e)
 
             self.parent.appendState(name)
 
         ############################################
-	#  initialize
-	#
+        #  initialize
+        #
         if self.parent.countStates() == 0:
             self.logError("no available state")
             return 1
@@ -468,9 +524,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.parser = SEATML_Parser(self)
         self.manager = None
         self.states = []
-	self.activated=False
+        self.activated=False
         self.currentstate = "start"
-	self.stext = {}
+        self.stext = {}
         self.keys = {}
         self.regkeys = {}
         self.adaptors = {}
@@ -485,8 +541,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.frames = {}
         self.max_columns = 20
         self.items = {}
-	self.inputvar = {}
-	self.stext = {}
+        self.inputvar = {}
+        self.stext = {}
         self.buttons = {}
         self.labels = {}
         self.popen = []
@@ -538,7 +594,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         except:
             self._logger.RTC_ERROR(traceback.format_exc())
 
-	if self.root : self.root.quit()
+        if self.root : self.root.quit()
         return RTC_OK
 
     #
@@ -566,18 +622,18 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             try:
                 if isinstance(data, TimedString):
                     data.data = data.data.decode('utf-8')
-		    if not self.processResult(name, data.data) :
+                    if not self.processResult(name, data.data) :
                         self.processOnDataIn(name, data)
                 elif isinstance(data, TimedWString):
                     data.data = data.data
-		    if not self.processResult(name, data.data) :
+                    if not self.processResult(name, data.data) :
                         self.processOnDataIn(name, data)
                 elif isinstance(data, str):
                     if data :
-		        data2 = parseData(data)
+                        data2 = parseData(data)
                         if data2 :
                             self.processOnDataIn(name, data2)
-		        else :
+                        else :
                             if not self.processResult(name, data) :
                                 self.processOnDataIn(name, data)
                 else:
@@ -614,7 +670,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self._data[name] = instantiateDataType(type)
         self._port[name] = OpenRTM_aist.InPort(name, self._data[name])
         self._port[name].addConnectorDataListener(
-		   	       OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
+                                  OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
                                eSEATDataListener(name, type, self))
         self.registerInPort(name, self._port[name])
 
@@ -625,7 +681,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self._logger.RTC_INFO("create outport: " + name)
         self._data[name] = instantiateDataType(type)
         self._port[name] = OpenRTM_aist.OutPort(name, self._data[name],
-			           OpenRTM_aist.RingBuffer(8))
+                                   OpenRTM_aist.RingBuffer(8))
         self.registerOutPort(name, self._port[name])
 
     #
@@ -658,9 +714,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             self.adaptors[name] = WebSocketServer(CometReader(self), name, "", port, index)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
-	    whosts = whost.split(',')
-	    for x in whosts:
-	      if x :
+            whosts = whost.split(',')
+            for x in whosts:
+              if x :
                 self.webServer.appendWhiteList(x.strip())
         else:
             self._logger.RTC_INFO(u"Failed to create Webadaptor:" + name + " already exists")
@@ -670,7 +726,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def disconnectAll(self):
       for p in self._port.keys():
-	  if isinstance(self._port[p], OpenRTM_aist.PortBase) :
+          if isinstance(self._port[p], OpenRTM_aist.PortBase) :
               self._port[p].disconnect_all()
 
     ###########################
@@ -686,11 +742,11 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
         if self.adaptortype[name][2]:
             ndata = []
-	    if type(data) == str :
+            if type(data) == str :
               for d in data.split(","):
                 ndata.append( convertDataType(dtype, d, code) )
               self._data[name].data = ndata
-	    else:
+            else:
               self._data[name] = data
 
         elif dtype == str:
@@ -705,7 +761,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
         else:
             try:
-	        if type(data) == str :
+                if type(data) == str :
                   self._data[name] = apply(dtype, eval(data))
                 else:
                   self._data[name] = data
@@ -740,7 +796,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             return False
 
         #
-	#
+        #
         for c in cmds:
             self.activateCommand(c, s)
         return True
@@ -778,9 +834,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             return False
 
         for c in cmds:
-	    kond = c[0]
-	    globals()['rtc_in_data'] = data
-	    if kond[0] :
+            kond = c[0]
+            globals()['rtc_in_data'] = data
+            if kond[0] :
                 execfile(kond[0], globals())
 
             if eval(kond[1], globals()):
@@ -871,8 +927,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                     data = self.getLastLine(input_id, 1)
 
             #
-	    #  Call 'send' method of Adaptor
-	    #
+            #  Call 'send' method of Adaptor
+            #
             if not encoding :
                 ad.send(name, data)
             else :
@@ -917,13 +973,13 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def applyShell(self, c):
         name ,data = c[1:]
-	#
-	# execute shell command with subprocess
+        #
+        # execute shell command with subprocess
         res = subprocess.Popen(data, shell=True)
         self.popen.append(res)
 
-	#
-	#  Call 'send' method of Adaptor
+        #
+        #  Call 'send' method of Adaptor
         try:
             ad = self.adaptors[name]
             ad.send(name, res)
@@ -937,25 +993,25 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #  Execute <script>
     #
     def applyScript(self, c, indata=None):
-	name,data,fname = c[1:]
+        name,data,fname = c[1:]
 
         globals()['rtc_result'] = None
         globals()['rtc_in_data'] = indata
         globals()['web_in_data'] = indata
 
         #
-	#   execute script or script file
-	if fname : execfile(fname,globals())
-	try:
-	  if data :
+        #   execute script or script file
+        if fname : execfile(fname,globals())
+        try:
+          if data :
             exec(data, globals())
-	except:
+        except:
           self._logger.RTC_ERROR("Fail to execute script:" + name)
-	  print data
+          print data
    
         # 
-	#  Call 'send' method of Adaptor to send the result...
-	rtc_result = globals()['rtc_result'] 
+        #  Call 'send' method of Adaptor to send the result...
+        rtc_result = globals()['rtc_result'] 
         if rtc_result == None :
             pass
         else:
@@ -1009,7 +1065,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
     def initStartState(self, name):
         self.startstate = None
-	if self.states.count(name) > 0 :
+        if self.states.count(name) > 0 :
             self.startstate = name
         else:
             self.startstate = self.states[0]
@@ -1052,9 +1108,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def loadSEATML(self, f):
         self._logger.RTC_INFO("Start loadSEATML:"+f)
         res = self.parser.load(f)
-	if res == 1 : 
+        if res == 1 : 
             self._logger.RTC_ERROR("===> SEATML Parser error")
-	    if self.manager : self.manager.shutdown()
+            if self.manager : self.manager.shutdown()
             sys.exit(1)
 
     #
@@ -1102,7 +1158,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         return self.frames[name]
 
     def setTitle(self, name):
-	if self.root : self.root.title(name)
+        if self.root : self.root.title(name)
 
     #  Called by SEATML Parser
     def addButton(self, name, txt, fg, bg, cspan):
@@ -1127,29 +1183,29 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     ## Create Button Item
     def createButtonItem(self, frame, sname, name, fg="#000000", bg="#cccccc", cspan=1):
         btn = Button(frame, text=name, command=self.mkcallback(name) , bg=bg, fg=fg)
-	self.buttons[sname+":"+name] = btn
+        self.buttons[sname+":"+name] = btn
         return [btn, cspan]
     
     def setButtonConfig(self, eid, **cfg):
         try:
             self.buttons[eid].config(**cfg)
-	except:
-	    print "ERROR"
+        except:
+            print "ERROR"
             pass
 
     ## Create Entry Item
     def createEntryItem(self, frame, sname, name, eid, w, cspan=1, val=''):
         var=StringVar()
-	var.set(val.strip())
-	self.inputvar[sname+":"+eid] = var
+        var.set(val.strip())
+        self.inputvar[sname+":"+eid] = var
         enty = Entry(frame, textvariable=var, width=int(w))
         self.bind_commands_to_entry(enty, name, eid)
 
         return [enty, cspan]
 
     def bind_commands_to_entry(self, enty, name, eid):
-	key = name+":gui:"+eid
-	if self.keys[key] :
+        key = name+":gui:"+eid
+        if self.keys[key] :
             self._logger.RTC_INFO("Register Entry callback")
             enty.bind('<Return>', self.mkinputcallback(eid))
         return 
@@ -1157,13 +1213,13 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def getEntry(self, eid):
         try:
             return self.inputvar[eid].get()
-	except:
+        except:
             return ""
 
     def setEntry(self, eid, txt=""):
         try:
             return self.inputvar[eid].set(txt)
-	except:
+        except:
             return ""
 
     ## Create Text Item
@@ -1171,61 +1227,61 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         stxt = ScrolledText(frame, width=int(w), height=int(h))
         stxt.insert(END, txt.strip())
         stxt.tag_config("csel", background="blue",foreground="white")
-	self.stext[sname+":"+eid] = stxt
-	key = name+":gui:"+eid
+        self.stext[sname+":"+eid] = stxt
+        key = name+":gui:"+eid
 
-	return [stxt, cspan, rspan]
+        return [stxt, cspan, rspan]
 
     def getText(self, eid):
         try:
             return self.stext[eid].get(1.0,END)
-	except:
+        except:
             return ""
 
     def unsetSelText(self, eid):
         try:
-	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("csel")
+            txt=self.stext[eid]
+            rng=txt.tag_ranges("csel")
             txt.tag_remove("csel", rng[0], rng[1])
-	except:
+        except:
             pass
 
     def getSelText(self, eid):
         try:
-	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("csel")
+            txt=self.stext[eid]
+            rng=txt.tag_ranges("csel")
             return txt.get(rng[0], rng[1])
-	except:
+        except:
             return "" 
 
     def nextSelText(self, eid):
         try:
-	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("csel")
-	    nl=int(txt.index(rng[0]).split(".")[0]) + 1
+            txt=self.stext[eid]
+            rng=txt.tag_ranges("csel")
+            nl=int(txt.index(rng[0]).split(".")[0]) + 1
             if nl > self.getLastIndex(eid) : return nl-1
             self.setSelText(eid, nl)
             return nl 
-	except:
+        except:
             return 0 
 
     def prevSelText(self, eid):
         try:
-	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("csel")
-	    nl=int(txt.index(rng[0]).split(".")[0]) - 1
+            txt=self.stext[eid]
+            rng=txt.tag_ranges("csel")
+            nl=int(txt.index(rng[0]).split(".")[0]) - 1
             self.setSelText(eid, nl)
             return nl 
-	except:
+        except:
             return 0 
 
     def getSelTextLine(self, eid):
         try:
-	    txt=self.stext[eid]
-	    rng=txt.tag_ranges("csel")
-	    nl=int(txt.index(rng[0]).split(".")[0])
+            txt=self.stext[eid]
+            rng=txt.tag_ranges("csel")
+            nl=int(txt.index(rng[0]).split(".")[0])
             return nl 
-	except:
+        except:
             return 0 
 
     def setSelText(self, eid, n=1):
@@ -1235,7 +1291,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             self.unsetSelText(eid)
             self.stext[eid].tag_add("csel", spos, epos)
             self.setCurrentIndex(eid, n)
-	except:
+        except:
             pass
 
     def getNthLine(self, eid, n=1):
@@ -1243,7 +1299,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             spos='%d.0' % (n)
             epos='%d.0' % (n+1)
             return self.stext[eid].get(spos,epos)
-	except:
+        except:
             return ""
 
     def getLastLine(self, eid, n=1):
@@ -1251,26 +1307,26 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             spos=self.stext[eid].index('end-%dl' % (n))
             epos=self.stext[eid].index('end-%dl' % (n-1))
             return self.stext[eid].get(spos,epos)
-	except:
+        except:
             return ""
 
     def getLastIndex(self, eid):
         try:
             return int(self.stext[eid].index('end-1c').split('.')[0])
-	except:
+        except:
             return 1
 
     def getCurrentIndex(self, eid):
         try:
             return int(self.stext[eid].index('insert').split('.')[0])
-	except:
+        except:
             return 0
 
     def setCurrentIndex(self, eid, n=1):
         try:
             self.stext[eid].mark_set('insert', "%d.0" % (n))
             return n
-	except:
+        except:
             return 0
 
     def appendText(self, eid, txt=""):
@@ -1278,7 +1334,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             val= self.stext[eid].insert(END, txt)
             self.stext[eid].see(END)
             return val
-	except:
+        except:
             return ""
 
     def insertText(self, eid, pos, txt=""):
@@ -1286,13 +1342,13 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             val= self.stext[eid].insert(pos, txt)
             self.stext[eid].see(pos)
             return val
-	except:
+        except:
             return ""
 
     def clearText(self, eid):
         try:
             return self.stext[eid].delete(1.0,END)
-	except:
+        except:
             return ""
    
     ## Create Label Item
@@ -1300,14 +1356,14 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         if not fg: fg="#ffffff"
         if not bg: bg="#444444"
         lbl = Label(frame, text=name, bg=bg, fg=fg )
-	self.labels[sname+":"+name] = lbl
+        self.labels[sname+":"+name] = lbl
         return [lbl, cspan]
 
     def setLabelConfig(self, eid, **cfg):
         try:
             self.labels[eid].configure(**cfg)
-	except:
-	    print "ERROR"
+        except:
+            print "ERROR"
             pass
 
     #########  LAYOUT ITEMS ON A FRAME ############
@@ -1328,8 +1384,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                     i += 1
                 else :
                    if type(itm) == list:
-	               itm[0].grid(row=j, column=i, columnspan=itm[1], sticky=W+E)
-	 	       i = i+itm[1] 
+                       itm[0].grid(row=j, column=i, columnspan=itm[1], sticky=W+E)
+                       i = i+itm[1] 
                    else :
                        itm.grid(row=j, column=i, sticky=W + E)
                        i = i+1
@@ -1351,27 +1407,27 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 
                elif itm[0] == 'button':
                    self.gui_items[name].append(
-		       self.createButtonItem(self.frames[name], name,
+                       self.createButtonItem(self.frames[name], name,
                                 itm[1], itm[2], itm[3], int(itm[4]))
-		       )
+                       )
 
                elif itm[0] == 'entry':
                    self.gui_items[name].append(
-		       self.createEntryItem(self.frames[name], name, name,
-		       		itm[1], itm[2], int(itm[3]), itm[4])
-		       )
+                       self.createEntryItem(self.frames[name], name, name,
+                                       itm[1], itm[2], int(itm[3]), itm[4])
+                       )
 
                elif itm[0] == 'text':
                    self.gui_items[name].append(
-		       self.createTextItem(self.frames[name],name, name,
-			        itm[1], itm[2], itm[3], int(itm[4]), int(itm[5]), itm[6])
-		       )
+                       self.createTextItem(self.frames[name],name, name,
+                                itm[1], itm[2], itm[3], int(itm[4]), int(itm[5]), itm[6])
+                       )
 
                elif itm[0] == 'label':
                    self.gui_items[name].append(
-		       self.createLabelItem(self.frames[name], name,
+                       self.createLabelItem(self.frames[name], name,
                                 itm[1], itm[2], itm[3], int(itm[4]))
-		       )
+                       )
                else:
                    pass
 
@@ -1431,7 +1487,7 @@ class eSEATManager:
 
         if mlfile is None:
            argv = self.parseArgs()
-	else:
+        else:
            argv = [mlfile]
 
         self.comp = None
@@ -1444,7 +1500,7 @@ class eSEATManager:
         self.manager.activateManager()
 
         instance_name = self.comp.getProperties().getProperty("naming.names")
-	instance_name = formatInstanceName(instance_name)
+        instance_name = formatInstanceName(instance_name)
 
         self.comp.setInstanceName(instance_name)
 
@@ -1460,7 +1516,7 @@ class eSEATManager:
                                 description=__doc__)
 
         parser.add_option('-f', '--config-file', dest='config_file', type="string",
-			    help='apply configuration file')
+                            help='apply configuration file')
 
         parser.add_option('-n', '--name', dest='naming_format', type="string",
                             help='set naming format' )
@@ -1482,8 +1538,8 @@ class eSEATManager:
         if len(args) == 0:
             parser.error("wrong number of arguments")
             sys.exit(1)
-	
-	return sys.argv
+        
+        return sys.argv
 
     #
     #  Initialize the eSEAT-RTC
@@ -1520,10 +1576,10 @@ class eSEATManager:
             self.comp.disconnectAll()
 
             # Shutdown Component
-	    try:
+            try:
                self.manager.shutdown()
-	    except:
-	       pass 
+            except:
+               pass 
 
             sys.exit(1)
         else:
@@ -1647,7 +1703,7 @@ def instantiateDataType(dtype):
                    omniORB.tcInternal.tv_octet,
                    omniORB.tcInternal.tv_longlong,
                    omniORB.tcInternal.tv_enum
-		  ]: return 0
+                  ]: return 0
 
     if desc[0] in [omniORB.tcInternal.tv_float, 
                    omniORB.tcInternal.tv_double,
@@ -1662,7 +1718,7 @@ def instantiateDataType(dtype):
     if desc[0] in [omniORB.tcInternal.tv_string ]: return ""
     if desc[0] in [omniORB.tcInternal.tv_wstring,
                    omniORB.tcInternal.tv_wchar
-		  ]: return u""
+                  ]: return u""
 
     if desc[0] == omniORB.tcInternal.tv_struct:
         arg = []

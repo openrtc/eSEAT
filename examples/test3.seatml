@@ -8,13 +8,12 @@
     <input id="textOut" width="50" ></input>
  
     <rule>
-      <key>Hello</key>
+      <key>Bye</key>
       <script>
         seat.setEntry("main_mode:textOut", rtc_in_data+" World")
       </script>
     </rule>
-
-    <rule file="test3.seatml" />
+    <rule file="test1.seatml:test" />
 
   </state>
 </seatml>
