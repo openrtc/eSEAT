@@ -26,7 +26,8 @@ import socket
 import optparse
 import threading
 import subprocess
-import gc
+
+sys.path.append(os.path.abspath('./libs'))
 
 ########
 #  for OpenRTM-aist
@@ -239,6 +240,7 @@ class SEATML_Parser():
 	# <message>
         for c in r.findall('message'): # end message
             name     = c.get('sendto')
+	    if not name : name = c.get('host')
             encode   = c.get('encode')
             input_id = c.get('input')
             data     = c.text
@@ -246,7 +248,8 @@ class SEATML_Parser():
 	#
 	# <command>
         for c in r.findall('command'): # get commands
-            name     = c.get('host')
+            name     = c.get('sendto')
+	    if not name : name = c.get('host')
             encode   = c.get('encode')
             input_id = c.get('input')
             data     = c.text
@@ -265,25 +268,81 @@ class SEATML_Parser():
 	#
 	# <shell>
         for c in r.findall('shell'): # get shell
-            func = c.get('sendto')
+            sendto = c.get('sendto')
+	    if not sendto : sendto = c.get('host')
             data = c.text
-	    if not func :
-                func = c.get('host')
-            commands.append(['x', func, data])
+            commands.append(['x', sendto, data])
 	#
 	# <script>
         for c in r.findall('script'): # get script
-            func  = c.get('sendto')
+            sendto  = c.get('sendto')
+	    if not sendto : sendto = c.get('host')
 	    fname = c.get('execfile')
-	    if not func :
-                func = c.get('host')
-            data = skipSps(c.text)
-            for cx in c.getchildren():
-              data += cx.text
-
-            commands.append(['s', func, data, fname])
-
+            data = self.getScripts(c)
+            commands.append(['s', sendto, data, fname])
         return commands
+
+    def getScripts(self, tag):
+        data = skipSps(tag.text)
+        for ctag in tag.getchildren():
+            data += skipSps(ctag.text)
+        return data
+
+    def procScript(self, tag, fname):
+        txt = self.getScripts(tag)
+
+        if fname : execfile(fname, globals())
+        if txt : exec(txt, globals())
+
+    def getAttribute(self, e, name, def_val=None):
+        val = e.get(name)
+	if def_val is None: return val
+        if not val : val = def_val
+	return val
+
+    def getText(self, e):
+        val = e.text
+        if not val: val = ''
+	return val
+
+    def parseGui(self, name, e, commands):
+        ################ GUI ###############
+        #
+        #  <label>
+        if e.tag == 'label':
+            self.parent.addLabel(name, self.getAttribute(e, 'text'), self.getAttribute(e, 'color'),
+                    self.getAttribute(e, 'bg_color'), self.getAttribute(e, 'colspan', 1))
+        #
+        #  <brk>
+        elif e.tag == 'brk':
+            self.parent.addBreak(name)
+        #
+        #  <space>
+        elif e.tag == 'space':
+            self.parent.addSpace(name, self.getAttribute(e, 'length', 1))
+        #
+        #  <button>
+        elif e.tag == 'button':
+            key = self.getAttribute(e, 'label')
+            self.parent.registerCommands(name+":gui:"+key, commands)
+            self.parent.addButton(name, key, self.getAttribute(e, 'color'),
+                 self.getAttribute(e, 'bg_color'), self.getAttribute(e, 'colspan', 1))
+
+        #
+        #  <input>
+        elif e.tag == 'input':
+            key = self.getAttribute(e, 'id')
+            self.parent.registerCommands(name+":gui:"+key, commands)
+            self.parent.addEntry(name, key, self.getAttribute(e, 'width', '20'),
+                 self.getAttribute(e, 'colspan', 1), self.getText(e))
+        #
+        #  <text>
+        elif e.tag == 'text':
+            key = self.getAttribute(e, 'id')
+            self.parent.registerCommands(name+":gui:"+key, commands)
+            self.parent.addText(name, key, self.getAttribute(e, 'width', '20'),
+                 self.getAttribute(e, 'height', '3'), self.getAttribute(e, 'colspan', 1),
+                 self.getAttribute(e, 'rowspan', 1), self.getText(e))
 
     #
     #   eSEAT Markup Language File loader
@@ -319,22 +378,13 @@ class SEATML_Parser():
 
             for a in g.getchildren():
 	        #
-	        #  <adaptor>
-                if a.tag == 'adaptor':
-                    self.createAdaptor(a)
-	        #
-	        #  <agent>
-                elif a.tag == 'agent':
+	        #  <adaptor><agent>
+                if a.tag == 'adaptor' or a.tag == 'agent':
                     self.createAdaptor(a)
 	        #
 	        #  <script>
                 elif a.tag == 'script':
-                    filename = a.get('execfile')
-                    txt = a.text
-                    for cx in a.getchildren():
-                        txt += cx.text
-		    if filename : execfile(filename, globals())
-		    if txt : exec(txt, globals())
+                    self.procScript(a, a.get('execfile'))
 	# 
 	#  <state>
         for s in doc.findall('state'):
@@ -342,28 +392,17 @@ class SEATML_Parser():
             self.parent.create_state(name)
 
             for e in list(s):
+                commands = self.parseCommands(e)
 	        #
 	        #  <onentry>
-                if e.tag == 'onentry':
+                if e.tag == 'onentry' or e.tag == 'onexit':
 	            #
 		    # <message><command><statetransition><log><shell><script>
-                    commands = self.parseCommands(e)
-		    self.parent.registerCommands(name+":::entry" , commands)
-	        #
-	        #  <onexit>
-                elif e.tag == 'onexit':
-	 	    #
-		    # <message><command><statetransition><log><shell><script>
-                    commands = self.parseCommands(e)
-		    self.parent.registerCommands(name+":::exit" , commands)
+		    self.parent.registerCommands(name+":::"+e.tag , commands)
 	        #
 	        #  <rule>
                 elif e.tag == 'rule':
-		    #
-		    # <message><command><statetransition><log><shell><script>
-                    commands = self.parseCommands(e)
                     adaptor = e.get('source')
-
 	            #
 	            #  <key>
                     keys = e.findall('key')
@@ -377,103 +416,27 @@ class SEATML_Parser():
                         if keys :
                             for k in keys:
                                 word = decompString([k.text])
+				#
+				#
                                 for w in word:
-                                    tag = name+":"+adaptor+":"+w
-                                    self.parent.registerCommands(tag, commands)
+                                    self.parent.registerCommands(name+":"+adaptor+":"+w, commands)
                         else :
-                            tag = name+":"+adaptor+":ondata"
-                            self.parent.registerCommandArray(tag, [kond, commands])
+			   #
+			   #
+                            self.parent.registerCommandArray(name+":"+adaptor+":ondata", [kond, commands])
 
                     for k in keys:
                         source = k.get('source')
-                        word = decompString([k.text])
 		        if source is None: source = "default" 
+                        word = decompString([k.text])
+			#
+			#
                         for w in word:
-                            tag = name+":"+source+":"+w
-                            self.parent.registerCommands(tag, commands)
+                            self.parent.registerCommands(name+":"+source+":"+w, commands)
 
-                ################ GUI ###############
-	        #
-	        #  <button>
-                elif e.tag == 'button':
-                  bg    = e.get('bg_color')
-                  fg    = e.get('color')
-                  txt   = e.get('label')
-                  cspan = e.get('colspan')
-		  if not cspan : cspan = 1
-
-		  #
-		  # <message><command><statetransition><log><shell><script>
-                  commands = self.parseCommands(e)
-                  self.parent.registerCommands(name+":gui:"+txt, commands)
-                  self.parent.addButton(name, txt, fg, bg, cspan)
-
-	        #
-	        #  <input>
-                elif e.tag == 'input':
-                  txt = e.get('id')
-                  w   = e.get('width')
-		  if not w: w = '20'
-
-                  val = e.text
-		  if not val: val = ''
-
-                  cspan = e.get('colspan')
-		  if not cspan : cspan = 1
-
-		  #
-		  # <message><command><statetransition><log><shell><script>
-                  commands = self.parseCommands(e)
-                  self.parent.registerCommands(name+":gui:"+txt, commands)
-                  self.parent.addEntry(name, txt, w, cspan, val)
-
-	        #
-	        #  <text>
-                elif e.tag == 'text':
-                  txt = e.get('id')
-                  w   = e.get('width')
-		  if not w: w = '20'
-
-                  h = e.get('height')
-		  if not h: h = '3'
-
-                  cspan = e.get('colspan')
-		  if not cspan : cspan = 1
-
-                  rspan = e.get('rowspan')
-		  if not rspan : rspan = 1
-
-                  val = e.text
-		  if not val: val = ''
-
-		  #
-		  # <message><command><statetransition><log><shell><script>
-                  commands = self.parseCommands(e)
-                  self.parent.registerCommands(name+":gui:"+txt, commands)
-                  self.parent.addText(name, txt, w, h, cspan, rspan, val)
-
-	        #
-	        #  <label>
-                elif e.tag == 'label':
-                  txt   = e.get('text')
-                  bg    = e.get('bg_color')
-                  fg    = e.get('color')
-                  cspan = e.get('colspan')
-		  if not cspan : cspan = 1
-
-                  self.parent.addLabel(name, txt, fg, bg, cspan)
-
-	        #
-	        #  <brk>
-                elif e.tag == 'brk':
-                  self.parent.addBreak(name)
-
-	        #
-	        #  <space>
-                elif e.tag == 'space':
-                  txt = e.get('length')
-                  if not txt : txt = '1'
-                  self.parent.addSpace(name, txt)
+                else:
+                    ################ GUI ###############
+                    self.parseGui(name, e, commands)
 
             self.parent.appendState(name)
 
@@ -600,8 +563,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def onData(self, name, data):
         if self.activated :
-            #gc.collect()
-            #del gc.garbage[:]
             try:
                 if isinstance(data, TimedString):
                     data.data = data.data.decode('utf-8')
@@ -693,45 +654,12 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     # Create the Web Server Port
     #
     def createWebAdaptor(self, name, port, index):
-
         if self.webServer  is None:
             self.adaptors[name] = WebSocketServer(CometReader(self), name, "", port, index)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
         else:
             self._logger.RTC_INFO(u"Failed to create Webadaptor:" + name + " already exists")
-
-    #################
-    # Create Adaptor
-    #
-    def createAdaptor(self, tag, componentName=""):
-        try:
-            name = str(tag.get('name'))
-            type = tag.get('type')
-            self._logger.RTC_INFO(u"create adaptor1: " + type + ": " + name)
-
-            if type == 'rtcout':
-                self.adaptortype[name] = self.getDataType(tag.get('datatype'))
-                self.createOutPort(name, self.adaptortype[name][0])
-                self.adaptors[name] = self
-
-            elif type == 'rtcin':
-                self.adaptortype[name] = self.getDataType(tag.get('datatype'))
-                self.createInPort(name, self.adaptortype[name][0])
-                self.adaptors[name] = self
-
-            elif type == 'web':
-                port = int(tag.get('port'))
-                self.createWebAdaptor(name, port, componentName)
-
-            else:
-                host = tag.get('host')
-                port = int(tag.get('port'))
-                self.adaptors[name] = SocketAdaptor(self, name, host, port)
-
-        except:
-            self._logger.RTC_ERROR(u"invalid parameters: " + type + ": " + name)
-
 
     #
     # Disconnect all connections
@@ -900,7 +828,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     def stateTransfer(self, newstate):
         try:
-            for c in self.keys[self.currentstate+":::exit"]:
+            for c in self.keys[self.currentstate+":::onexit"]:
                 self.activateCommand(c)
         except KeyError:
             pass
@@ -915,7 +843,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         self.currentstate = newstate
 
         try:
-            for c in self.keys[self.currentstate+":::entry"]:
+            for c in self.keys[self.currentstate+":::onentry"]:
                 self.activateCommand(c)
         except KeyError:
             pass
@@ -1125,12 +1053,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 	    if self.manager : self.manager.shutdown()
             sys.exit(1)
 
-
-    def hasGUI(self):
-        for x in self.items.keys():
-            if len(self.items[x]) : return True
-        return False
-
     #
     #  register commands into self.keys
     #
@@ -1147,6 +1069,12 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             self.registerCommands(tag, [cmds])
         else :
             self.appendCommands(tag, cmds)
+
+    ###################### GUI part ################
+    def hasGUI(self):
+        for x in self.items.keys():
+            if len(self.items[x]) : return True
+        return False
 
     #########################################
     #  Callback function
@@ -1464,7 +1392,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def hideFrame(self, name):
         if self.frames[name] :
            self.frames[name].pack_forget()
+    #
+    ############### End of GUI part ################
 
+    ################################################ 
     #
     #  Sub-process
     #
@@ -1737,8 +1668,9 @@ def instantiateDataType(dtype):
             arg.append(instantiateDataType(attr_type))
         return desc[1](*arg)
     return None
-
-
+#
+#
+#
 def countSp(s):
   c=0
   for x in s:
@@ -1747,6 +1679,9 @@ def countSp(s):
     c=c+1
   return c
 
+#
+#
+#
 def skipSps(txt):
   try:
     lines = txt.split("\n")
@@ -1773,7 +1708,6 @@ def main(ssml_file=None):
     return 0
 
 if __name__=='__main__':
-    #gc.disable()
     seatmgr = eSEATManager()
     seat = seatmgr.comp
     seatmgr.start()

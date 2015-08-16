@@ -42,6 +42,9 @@ function showReply(data){
     $("#response").html(data.result+" on "+data.date);
 }
 
+function getMySeatKey(){
+   return "My_eSEAT_Key";
+}
 
 /*
  * send data to eSEAT
@@ -54,6 +57,7 @@ function sendValueToRtc(val, func){
     url: "rtc_onData",
     data: val,
     dataType: "json",
+    headers: {'eSEAT-Key' : getMySeatKey()},
     success: mfunc
   });
 }
@@ -68,6 +72,7 @@ function sendMessageToRtc(msg, func){
     url: "rtc_processResult",
     data: msg,
     dataType: "json",
+    headers: {'eSEAT-Key' : getMySeatKey()},
     success: mfunc
   });
 }

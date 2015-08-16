@@ -19,6 +19,7 @@ import json
 import types
 import gc
 import time
+import uuid
 
 #
 # Raw Socket Adaptor
@@ -262,6 +263,9 @@ class WebSocketServer(SocketPort):
       self.indexfile = "index"
     self.cometManager = CometManager(self)
     self.bind()
+    self.service_keys=[]
+    self.host_list=["localhost"]
+    self.appendWhiteList("127.0.0.1")
 
   #
   # 
@@ -307,6 +311,23 @@ class WebSocketServer(SocketPort):
   def getServer(self):
     return self
 
+  def addKey(self, key):
+    self.service_keys.append(key)
+    return self
+
+  def isInKey(self, key):
+    return key in self.service_keys
+
+  def appendWhiteList(self, addr):
+    if not self.isInWhiteList(addr):
+      self.host_list.append(addr)
+
+  def removeWhiteList(self, addr):
+    if not self.isInWhiteList(addr):
+      self.host_list.remove(addr)
+
+  def isInWhiteList(self, addr):
+    return addr in self.host_list
   #
   #
   #
@@ -555,6 +576,10 @@ class CometReader(CommReader):
     self.clearResponse()
     cmd = header["Http-Command"]
     fname = header["Http-FileName"]
+    try:
+      key = header["eSEAT-Key"]
+    except:
+      key = None
 
     #
     # return HTML files
@@ -565,6 +590,13 @@ class CometReader(CommReader):
       if contents is None:
         response = self.parser.response404()
       else:
+        if fname == "/comet.js":
+          eseatkey = str(uuid.uuid1())
+          try:
+            self.getServer().addKey(eseatkey)
+          except:
+            print "ERROR in add"
+          contents=contents.replace("My_eSEAT_Key", eseatkey)
         response = self.parser.response200(ctype, contents)
 
       self.sendResponse(response)
@@ -572,6 +604,12 @@ class CometReader(CommReader):
     #
     # COMET Operations
     elif cmd == "POST":
+      if not self.getServer().isInKey(key):
+        print "ERROR : invalid key = "+key
+        response = self.parser.response400()
+        self.sendResponse(response)
+        return
+
 
       if fname == "/comet_request" :
         Data = parseData(data)
@@ -600,6 +638,19 @@ class CometReader(CommReader):
           res["result"] = "OK"
         else:
           res["result"] = "ERROR: no rtc"
+
+        res["date"] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
+        response = self.parser.response200("application/json", json.dumps(res))
+        self.sendResponse(response)
+
+      elif fname == "/evalCommand" :
+	res={}
+        try:
+          if self.getServer().isInWhiteList(self.owner.host) :
+            exec(data)
+          res["result"] = "OK"
+	except:
+          res["result"] = "ERROR: in exec"
 
         res["date"] = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S JST")
         response = self.parser.response200("application/json", json.dumps(res))
