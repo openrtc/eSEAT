@@ -661,7 +661,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
 	    whosts = whost.split(',')
 	    for x in whosts:
 	      if x :
-                self.webServer.appendWhiteList(x)
+                self.webServer.appendWhiteList(x.strip())
         else:
             self._logger.RTC_INFO(u"Failed to create Webadaptor:" + name + " already exists")
 
