@@ -2,3 +2,4 @@
 *.swp
 dist/
 build/
+seatsat.egg-info/
