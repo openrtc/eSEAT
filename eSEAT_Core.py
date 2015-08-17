@@ -134,6 +134,24 @@ class eSEAT_Core:
         else:
             self._logger.info(u"Failed to create Webadaptor:" + name + " already exists")
 
+    #
+    #
+    #
+    def createAdaptor(self, compname, tag):
+        try:
+            name = str(tag.get('name'))
+            type = tag.get('type')
+
+            if type == 'web' :
+                self.createWebAdaptor(name, int(tag.get('port')), compname, tag.get('host'))
+            else:
+                 self.createSocketPort(name, tag.get('host'), int(tag.get('port')))
+        except:
+            self._logger.error(u"invalid parameters: " + type + ": " + name)
+            return -1
+
+        return 1
+
     ###########################
     # Send Data 
     #

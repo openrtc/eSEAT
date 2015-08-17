@@ -244,18 +244,37 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
     # Create and Register DataPort of RTC
     #
     def createDataPort(self, name, dtype, inout):
-        if inout == 'out':
+        if inout == 'rtcout':
             self.adaptortype[name] = self.getDataType(dtype)
             self.createOutPort(name, self.adaptortype[name][0])
             self.adaptors[name] = self
 
-        elif inout == 'in':
+        elif inout == 'rtcin':
             self.adaptortype[name] = self.getDataType(dtype)
             self.createInPort(name, self.adaptortype[name][0])
             self.adaptors[name] = self
         else:
-            pass
+            return False
 
+        return True
+
+    #
+    #    Create communication adaptor
+    #
+    def createAdaptor(self, compname, tag):
+        try:
+            name = str(tag.get('name'))
+            type = tag.get('type')
+
+            if self.createDataPort(name, tag.get('datatype') ,type):
+                 return 1
+            else:
+                 return eSEAT_Core.createAdaptor(self, compname, tag)
+        except:
+            self._logger.error(u"invalid parameters: " + type + ": " + name)
+            return -1
+
+        return 1
     #
     # Disconnect all connections
     #

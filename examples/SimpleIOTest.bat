@@ -1,3 +1,5 @@
+call \Python27\PyEnv.bat
+
 cd ..
 
 start python eSEAT.py -n SimpleIO.rtc examples\SimpleIO.seatml

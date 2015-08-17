@@ -93,16 +93,7 @@ class SEATML_Parser():
         try:
             name = str(tag.get('name'))
             type = tag.get('type')
-            self.logInfo(u"create adaptor: " + type + ": " + name)
-
-            if type == 'rtcout' and 'createDataPort' in dir(self.parent) :
-                self.parent.createDataPort(name, tag.get('datatype') ,'out')
-            elif type == 'rtcin' and 'createDataPort' in dir(self.parent) :
-                self.parent.createDataPort(name, tag.get('datatype') ,'in')
-            elif type == 'web' :
-                self.parent.createWebAdaptor(name, int(tag.get('port')), self.componentName, tag.get('host'))
-            else:
-                 self.parent.createSocketPort(name, tag.get('host'), int(tag.get('port')))
+            return self.parent.createAdaptor(self.componentName, tag)
         except:
             self.logError(u"invalid parameters: " + type + ": " + name)
             return -1
