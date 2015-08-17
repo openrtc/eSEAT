@@ -8,8 +8,9 @@ import ssr
     <adaptor name="hands_out" type="rtcout" datatype="TimedFloatSeq" />
     <adaptor name="frame" type="rtcin" datatype="ssr.Frame" />
 
-    <script execfile="textutil.py" />
-    <script execfile="rtc_handle_tool.py">
+    <script execfile="libs/textutil.py" />
+    <script execfile="libs/rtc_handle.py" />
+    <script execfile="libs/rtc_handle_tool.py">
 global rtclist
 global touchflagR,startPosR
 global touchflagL,startPosL
@@ -24,7 +25,7 @@ startPosR=None
 touchflagL=False
 startPosL=None
     </script>
-    <script execfile="leapGesture.py" />
+    <script execfile="libs/leapGesture.py" />
   </general>
 
   <state name="Mode0">
