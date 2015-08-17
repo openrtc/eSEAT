@@ -233,6 +233,9 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             pass
 
     ##############################################
+    #
+    #  RTC state control funtion
+    #
     def activate(self):
       execContexts = self.get_owned_contexts()
       execContexts[0].activate_component(self.getObjRef())
@@ -282,6 +285,40 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
             pass
 
     #
+    # Disconnect all connections
+    #
+    def disconnectAll(self):
+      for p in self._port.keys():
+          if isinstance(self._port[p], OpenRTM_aist.PortBase) :
+              self._port[p].disconnect_all()
+
+    #######################
+    #  Get DataType
+    #
+    def getDataType(self, s):
+        if len(s) == 0         : return (TimedString, 0)
+        seq = False
+
+        if s[-3:] == "Seq"     : seq = True
+
+        dtype = str
+        if s.count("WString")  : dtype = unicode
+        elif s.count("String") : dtype = str
+        elif s.count("Float")  : dtype = float
+        elif s.count("Double") : dtype = float
+        elif s.count("Short")  : dtype = int
+        elif s.count("Long")   : dtype = int
+        elif s.count("Octet")  : dtype = int
+        elif s.count("Char")   : dtype = str
+        elif s.count("Boolean"): dtype = int
+        else                   : dtype = eval("%s" % s)
+
+        return (eval("%s" % s), dtype, seq)
+
+    ############ End of RTC functions
+
+    ##### Other Adaptors
+    #
     # Create the Raw Socket
     #
     def createSocketPort(self, name, host, port):
@@ -301,14 +338,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                 self.webServer.appendWhiteList(x.strip())
         else:
             self._logger.RTC_INFO(u"Failed to create Webadaptor:" + name + " already exists")
-
-    #
-    # Disconnect all connections
-    #
-    def disconnectAll(self):
-      for p in self._port.keys():
-          if isinstance(self._port[p], OpenRTM_aist.PortBase) :
-              self._port[p].disconnect_all()
 
     ###########################
     # Send Data 
@@ -463,9 +492,47 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
                     break
             return None
         return cmds
-        
-    ##########################
-    # State Transition
+
+    #############################
+    #  For STATE of eSEAT
+    #
+    #  Get state infomation
+    #
+    def getStates(self):
+        return self.states
+
+    def setStartState(self, name):
+        self.startstate = name
+        return
+
+    def countStates(self):
+        return len(self.states)
+
+    def inStates(self, name):
+        return ( self.states.count(name) > 0 )
+
+    def appendState(self, name):
+        self.states.extend([name])
+        return
+
+    def initStartState(self, name):
+        self.startstate = None
+        if self.states.count(name) > 0 :
+            self.startstate = name
+        else:
+            self.startstate = self.states[0]
+        self.stateTransfer(self.startstate)
+        self._logger.RTC_INFO("current state " + self.currentstate)
+    #
+    #
+    def create_state(self, name):
+        self.items[name] = []
+        if self.init_state == None:
+            self.init_state = name
+        return 
+
+    ###############################################
+    # State Transition for eSEAT
     #
     def stateTransfer(self, newstate):
         try:
@@ -622,66 +689,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
         if c[0] == 'c': c[3] = None
         self.activateCommand(c, data)
 
-    #########################
-    #  For STATE
-    #
-    #  Get state infomation
-    #
-    def getStates(self):
-        return self.states
-
-    def setStartState(self, name):
-        self.startstate = name
-        return
-
-    def countStates(self):
-        return len(self.states)
-
-    def inStates(self, name):
-        return ( self.states.count(name) > 0 )
-
-    def appendState(self, name):
-        self.states.extend([name])
-        return
-
-    def initStartState(self, name):
-        self.startstate = None
-        if self.states.count(name) > 0 :
-            self.startstate = name
-        else:
-            self.startstate = self.states[0]
-        self.stateTransfer(self.startstate)
-        self._logger.RTC_INFO("current state " + self.currentstate)
-    #
-    #
-    def create_state(self, name):
-        self.items[name] = []
-        if self.init_state == None:
-            self.init_state = name
-        return 
-
-    #######################
-    #  Get DataType
-    #
-    def getDataType(self, s):
-        if len(s) == 0         : return (TimedString, 0)
-        seq = False
-
-        if s[-3:] == "Seq"     : seq = True
-
-        dtype = str
-        if s.count("WString")  : dtype = unicode
-        elif s.count("String") : dtype = str
-        elif s.count("Float")  : dtype = float
-        elif s.count("Double") : dtype = float
-        elif s.count("Short")  : dtype = int
-        elif s.count("Long")   : dtype = int
-        elif s.count("Octet")  : dtype = int
-        elif s.count("Char")   : dtype = str
-        elif s.count("Boolean"): dtype = int
-        else                   : dtype = eval("%s" % s)
-
-        return (eval("%s" % s), dtype, seq)
 
     ##############################
     #  main SEATML loader
