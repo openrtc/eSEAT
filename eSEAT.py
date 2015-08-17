@@ -81,6 +81,23 @@ class eSEATDataListener(OpenRTM_aist.ConnectorDataListenerT):
 
 #########################################################################
 #
+#
+class RtcLogger:
+    def __init__(self, name):
+        self._logger = OpenRTM_aist.Manager.instance().getLogbuf(name)
+
+    def info(self, msg):
+        self._logger.RTC_INFO(msg)
+
+    def error(self, msg):
+        self._logger.RTC_ERROR(msg)
+
+    def warn(self, msg):
+        self._logger.RTC_WARN(msg)
+
+
+#########################################################################
+#
 #  Class eSEAT (RTC)
 #
 #
@@ -99,9 +116,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
     #
     def onInitialize(self):
         OpenRTM_aist.DataFlowComponentBase.onInitialize(self)
-        self._logger = OpenRTM_aist.Manager.instance().getLogbuf(self._properties.getProperty("instance_name"))
-        self._logger.RTC_INFO("eSEAT (Extended Simple Event Action Transfer) version " + __version__)
-        self._logger.RTC_INFO("Copyright (C) 2009-2014 Yosuke Matsusaka and Isao Hara")
+        #self._logger = OpenRTM_aist.Manager.instance().getLogbuf(self._properties.getProperty("instance_name"))
+        self._logger = RtcLogger(self._properties.getProperty("instance_name"))
+        self._logger.info("eSEAT (Extended Simple Event Action Transfer) version " + __version__)
+        self._logger.info("Copyright (C) 2009-2014 Yosuke Matsusaka and Isao Hara")
         self.bindParameter("scriptfile", self._scriptfile, "None")
         self.bindParameter("scorelimit", self._scorelimit, "0.0")
 
@@ -135,7 +153,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
                     a.terminate()
                     a.join()
         except:
-            self._logger.RTC_ERROR(traceback.format_exc())
+            self._logger.error(traceback.format_exc())
 
         if self.root : self.root.quit()
         return RTC_OK
@@ -182,7 +200,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
                 else:
                     self.processOnDataIn(name, data)
             except:
-                self._logger.RTC_ERROR(traceback.format_exc())
+                self._logger.error(traceback.format_exc())
         else:
             pass
 
@@ -204,7 +222,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
     # Create the InPort of RTC
     #
     def createInPort(self, name, type=TimedString):
-        self._logger.RTC_INFO("create inport: " + name)
+        self._logger.info("create inport: " + name)
         self._data[name] = instantiateDataType(type)
         self._port[name] = OpenRTM_aist.InPort(name, self._data[name])
         self._port[name].addConnectorDataListener(
@@ -216,7 +234,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
     # Create the OutPort of RTC
     #
     def createOutPort(self, name, type=TimedString):
-        self._logger.RTC_INFO("create outport: " + name)
+        self._logger.info("create outport: " + name)
         self._data[name] = instantiateDataType(type)
         self._port[name] = OpenRTM_aist.OutPort(name, self._data[name],
                                    OpenRTM_aist.RingBuffer(8))

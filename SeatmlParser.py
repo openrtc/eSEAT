@@ -80,11 +80,11 @@ class SEATML_Parser():
 
     def logInfo(self, msg):
         if self._logger :
-            self._logger.RTC_INFO(msg)
+            self._logger.info(msg)
 
     def logError(self, msg):
         if self._logger :
-            self._logger.RTC_ERROR(msg)
+            self._logger.error(msg)
 
     #
     #    Create communication adaptor

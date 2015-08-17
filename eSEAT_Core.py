@@ -61,6 +61,28 @@ execfile('SeatmlParser.py', globals())
 
 #########################################################################
 #
+#
+class SeatLogger:
+    def __init__(self, name):
+        self._name = name
+        self._flag = True
+
+    def setFlag(self, b):
+        self._flag = b
+
+    def info(self, msg):
+        if self._flag :
+            print "INFO:"+self._name+" "+msg
+
+    def error(self, msg):
+        print "ERROR:"+self._name+" "+msg >> sys.stderr
+
+    def warn(self, msg):
+        print "WARN:"+self._name+" "+msg >> sys.stderr
+
+
+#########################################################################
+#
 #  Class eSEAT_Core
 #
 class eSEAT_Core:
@@ -88,6 +110,8 @@ class eSEAT_Core:
         self.webServer = None
         self.root = None
 
+	self._logger = SeatLogger("eSEAT")
+
     ##### Other Adaptors
     #
     # Create the Raw Socket
@@ -108,16 +132,16 @@ class eSEAT_Core:
               if x :
                 self.webServer.appendWhiteList(x.strip())
         else:
-            self._logger.RTC_INFO(u"Failed to create Webadaptor:" + name + " already exists")
+            self._logger.info(u"Failed to create Webadaptor:" + name + " already exists")
 
     ###########################
     # Send Data 
     #
     def send(self, name, data, code='utf-8'):
         if isinstance(data, str) :
-            self._logger.RTC_INFO("sending message %s (to %s)" % (data, name))
+            self._logger.info("sending message %s (to %s)" % (data, name))
         else:
-            self._logger.RTC_INFO("sending message to %s" % (name,))
+            self._logger.info("sending message to %s" % (name,))
 
         dtype = self.adaptortype[name][1]
 
@@ -134,7 +158,7 @@ class eSEAT_Core:
             self._data[name].data = data.encode(code)
 
         elif dtype == unicode:
-            self._logger.RTC_INFO("sending message to %s, %s" % (data,code))
+            self._logger.info("sending message to %s, %s" % (data,code))
             self._data[name].data = unicode(data)
 
         elif dtype == int or dtype == float :
@@ -147,12 +171,12 @@ class eSEAT_Core:
                 else:
                   self._data[name] = data
             except:
-                self._logger.RTC_ERROR( "ERROR in send: %s %s" % (name , data))
+                self._logger.error( "ERROR in send: %s %s" % (name , data))
 
         try:
             self._port[name].write(self._data[name])
         except:
-            self._logger.RTC_ERROR("Fail to sending message to %s" % (name,))
+            self._logger.error("Fail to sending message to %s" % (name,))
 
     ##################################
     #  Main event process 
@@ -164,7 +188,7 @@ class eSEAT_Core:
             s = str(s).encode('string_escape')
             s = unicode(s)
 
-        self._logger.RTC_INFO("got input %s (%s)" % (s, name))
+        self._logger.info("got input %s (%s)" % (s, name))
         cmds = None
 
         if s.count('<?xml') > 0:
@@ -173,7 +197,7 @@ class eSEAT_Core:
             cmds = self.lookupWithDefault(self.currentstate, name, s)
 
         if not cmds:
-            self._logger.RTC_INFO("no command found")
+            self._logger.info("no command found")
             return False
 
         #
@@ -191,27 +215,27 @@ class eSEAT_Core:
             rank = int(s['rank'])
             score = float(s['score'])
             text = s['text']
-            self._logger.RTC_INFO("#%i: %s (%f)" % (rank, text, score))
+            self._logger.info("#%i: %s (%f)" % (rank, text, score))
 
             if score < self._scorelimit[0]:
-                self._logger.RTC_INFO("[rejected] score under limit")
+                self._logger.info("[rejected] score under limit")
                 continue
 
             cmds = self.lookupWithDefault(self.currentstate, name, text)
             if cmds:
                 return cmds
             else:
-                self._logger.RTC_INFO("[rejected] no matching phrases")
+                self._logger.info("[rejected] no matching phrases")
         return None
 
     #
     #  Event process for data-in-event
     def processOnDataIn(self, name, data):
-        self._logger.RTC_INFO("got input from %s" %  (name,))
+        self._logger.info("got input from %s" %  (name,))
         cmds = self.lookupWithDefault(self.currentstate, name, "ondata")
 
         if not cmds:
-            self._logger.RTC_INFO("no command found")
+            self._logger.info("no command found")
             return False
 
         for c in cmds:
@@ -230,7 +254,7 @@ class eSEAT_Core:
     #
     def lookupWithDefault(self, state, name, s):
         s=s.split(",")[0]
-        self._logger.RTC_INFO('looking up...%s: %s' % (name,s,))
+        self._logger.info('looking up...%s: %s' % (name,s,))
         cmds = self.lookupCommand(state, name, s)
 
         if not cmds:
@@ -293,7 +317,7 @@ class eSEAT_Core:
         else:
             self.startstate = self.states[0]
         self.stateTransfer(self.startstate)
-        self._logger.RTC_INFO("current state " + self.currentstate)
+        self._logger.info("current state " + self.currentstate)
     #
     #
     def create_state(self, name):
@@ -356,9 +380,9 @@ class eSEAT_Core:
 
         except KeyError:
             if name :
-                self._logger.RTC_ERROR("no such adaptor:" + name)
+                self._logger.error("no such adaptor:" + name)
             else :
-                self._logger.RTC_ERROR("no such adaptor: None")
+                self._logger.error("no such adaptor: None")
 
     #
     #  Execute <statetransition>
@@ -372,12 +396,12 @@ class eSEAT_Core:
 
         elif (func == "pop"):
             if self.statestack.__len__() == 0:
-                self._logger.RTC_WARN("state buffer is empty")
+                self._logger.warn("state buffer is empty")
                 return
             self.stateTransfer(self.statestack.pop())
 
         else:
-            self._logger.RTC_INFO("state transition from "+self.currentstate+" to "+data)
+            self._logger.info("state transition from "+self.currentstate+" to "+data)
             self.stateTransfer(data)
 
     #
@@ -385,7 +409,7 @@ class eSEAT_Core:
     #
     def applyLog(self, c):
         data = c[1]
-        self._logger.RTC_INFO(data)
+        self._logger.info(data)
 
     #
     #  Execute <shell>
@@ -404,9 +428,9 @@ class eSEAT_Core:
             ad.send(name, res)
         except KeyError:
             if name :
-               self._logger.RTC_ERROR("no such adaptor:" + name)
+               self._logger.error("no such adaptor:" + name)
             else:
-               self._logger.RTC_ERROR("no such adaptor: None")
+               self._logger.error("no such adaptor: None")
 
     #
     #  Execute <script>
@@ -426,7 +450,7 @@ class eSEAT_Core:
             exec(data, globals())
         except:
           print data
-          #self._logger.RTC_ERROR("Fail to execute script:" + name)
+          #self._logger.error("Fail to execute script:" + name)
    
         # 
         #  Call 'send' method of Adaptor to send the result...
@@ -439,9 +463,9 @@ class eSEAT_Core:
                 ad.send(name, rtc_result)
             except KeyError:
                 if name :
-                   self._logger.RTC_ERROR("no such adaptor:" + name)
+                   self._logger.error("no such adaptor:" + name)
                 else:
-                   self._logger.RTC_ERROR("no such adaptor: None")
+                   self._logger.error("no such adaptor: None")
 
     ########################
     #
@@ -465,10 +489,10 @@ class eSEAT_Core:
     #  main SEATML loader
     #
     def loadSEATML(self, f):
-        self._logger.RTC_INFO("Start loadSEATML:"+f)
+        self._logger.info("Start loadSEATML:"+f)
         res = self.parser.load(f)
         if res == 1 : 
-            self._logger.RTC_ERROR("===> SEATML Parser error")
+            self._logger.error("===> SEATML Parser error")
             if self.manager : self.manager.shutdown()
             sys.exit(1)
 
@@ -476,11 +500,11 @@ class eSEAT_Core:
     #  register commands into self.keys
     #
     def registerCommands(self, key, cmds):
-        self._logger.RTC_INFO("register key="+key)
+        self._logger.info("register key="+key)
         self.keys[key] = cmds
 
     def appendCommands(self, key, cmds):
-        self._logger.RTC_INFO(" append key="+key)
+        self._logger.info(" append key="+key)
         self.keys[key].append(cmds) 
 
     def registerCommandArray(self, tag, cmds):
@@ -610,7 +634,7 @@ class eSEAT_Gui:
     def bind_commands_to_entry(self, enty, name, eid):
         key = name+":gui:"+eid
         if self.keys[key] :
-            self._logger.RTC_INFO("Register Entry callback")
+            self._logger.info("Register Entry callback")
             enty.bind('<Return>', self.mkinputcallback(eid))
         return 
 
