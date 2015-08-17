@@ -185,6 +185,7 @@ class SEATML_Parser():
         return val
 
     def parseGui(self, name, e):
+        if not isinstance(self.parent, eSEAT_Gui) : return
         commands = self.parseCommands(e)
 
         ################ GUI ###############
