@@ -25,6 +25,11 @@ import optparse
 import threading
 import subprocess
 
+if os.getenv('SEAT_ROOT') :
+  rootdir=os.getenv('SEAT_ROOT')
+  sys.path.append(rootdir)
+  sys.path.append(os.path.join(rootdir,'3rd party'))
+
 #
 #
 
