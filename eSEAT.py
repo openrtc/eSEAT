@@ -36,6 +36,9 @@ import OpenRTM_aist
 import omniORB
 from RTC  import *
 
+#######
+# XML Parser
+from bs4  import BeautifulSoup
 
 #########
 #  GUI etc.
@@ -237,14 +240,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     def deactivate(self):
       execContexts = self.get_owned_contexts()
       execContexts[0].deactivate_component(self.getObjRef())
-
-    ##############################################
-    #  Callback function for WebAdaptor
-    #
-    def callComet(self):
-      res = ""
-
-      return res
 
     ##########################################################
     # Create PORT
@@ -1041,6 +1036,14 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase):
     #
     ############### End of GUI part ################
 
+    ##############################################
+    #  Callback function for WebAdaptor
+    #
+    def callComet(self):
+      res = ""
+
+      return res
+
     ################################################ 
     #
     #  Sub-process
@@ -1223,11 +1226,6 @@ def instantiateDataType(dtype):
 #
 #  M A I N 
 #
-def main(ssml_file=None):
-    seatmgr = eSEATManager(ssml_file)
-    seatmgr.start()
-    return 0
-
 if __name__=='__main__':
     seatmgr = eSEATManager()
     seat = seatmgr.comp
