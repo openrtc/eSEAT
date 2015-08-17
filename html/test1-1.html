@@ -7,7 +7,8 @@
     <script type="text/javascript" src="comet.js"></script>
   </head>
   <body>
-    <button onClick="sendValueToRtc('Hello');">Push</button>
+	  <textarea id="Scr" width="100" height="10"></textarea><br>
+    <button onClick="sendScriptToRtc($('#Scr').val());">Send</button>
     <div id="response"></div>
   </body>
 </html>

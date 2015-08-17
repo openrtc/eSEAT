@@ -647,7 +647,8 @@ class CometReader(CommReader):
 	res={}
         try:
           if self.getServer().isInWhiteList(self.owner.host) :
-            exec(data)
+            globals()['seat'] = self.rtc
+            exec(data, globals())
           res["result"] = "OK"
 	except:
           res["result"] = "ERROR: in exec"

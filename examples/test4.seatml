@@ -2,6 +2,7 @@
 <seatml>
   <general name="test1">
     <adaptor name="web" type="web" port="8080" host="127.0.0.1" />
+    <adaptor name="str_in" type="rtcin" datatype="TimedString" />
   </general>
   <state name="main_mode">
     <input id="textOut" width="50" ></input>
@@ -12,6 +13,8 @@
         seat.setEntry("main_mode:textOut", rtc_in_data+" World")
       </script>
     </rule>
+
+    <rule file="test3.seatml" />
 
   </state>
 </seatml>

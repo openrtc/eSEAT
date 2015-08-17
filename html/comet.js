@@ -61,6 +61,7 @@ function sendValueToRtc(val, func){
     success: mfunc
   });
 }
+
 /*
  *
  */
@@ -71,6 +72,22 @@ function sendMessageToRtc(msg, func){
     type: "POST",
     url: "rtc_processResult",
     data: msg,
+    dataType: "json",
+    headers: {'eSEAT-Key' : getMySeatKey()},
+    success: mfunc
+  });
+}
+
+/*
+ *
+ */
+function sendScriptToRtc(scr, func){
+  var mfunc  = func || showReply;
+
+  $.ajax({
+    type: "POST",
+    url: "evalCommand",
+    data: scr,
     dataType: "json",
     headers: {'eSEAT-Key' : getMySeatKey()},
     success: mfunc
