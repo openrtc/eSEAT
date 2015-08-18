@@ -135,7 +135,7 @@ class eSEAT_Core:
             self._logger.info(u"Failed to create Webadaptor:" + name + " already exists")
 
     #
-    #
+    #  Create Adaptor called by SEATML_Parser
     #
     def createAdaptor(self, compname, tag):
         try:

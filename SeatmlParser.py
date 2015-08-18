@@ -28,8 +28,6 @@ import subprocess
 
 #
 #
-sys.path.append(os.path.abspath('./libs'))
-
 #########
 #  XML parse
 from lxml import etree
