@@ -11,14 +11,13 @@
 
   <xs:element name="general">
     <xs:complexType>
-      <xs:sequence>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="adaptor"/>
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="agent"/>
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="var"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="onexec"/>
         </xs:choice>
-      </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
@@ -48,6 +47,14 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="onexec">
+    <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="rule"/>
+        </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="state">
     <xs:complexType>
       <xs:sequence>
@@ -61,6 +68,7 @@
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="brk"/>
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="space"/>
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="rule"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="onexec"/>
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:string"/>

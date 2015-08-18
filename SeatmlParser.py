@@ -242,7 +242,7 @@ class SEATML_Parser():
                         self.parseRule(name, e)
                 return
 
-        self.logError(u"no rule foud: " + f +":"+sname)
+        self.logError(u"no rule foud: " + f +":"+unicode(sname))
 
     #
     #   Parse <rule>tag 

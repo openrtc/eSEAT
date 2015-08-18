@@ -14,6 +14,7 @@ Copyright (C) 2009-2014
 
 ############### import libraries
 import sys
+import os
 import getopt
 import codecs
 import locale
