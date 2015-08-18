@@ -5,6 +5,19 @@
     <adaptor name="str_out" type="rtcout" datatype="TimedString" />
     <adaptor name="str_in" type="rtcin" datatype="TimedString" />
     <adaptor name="web" type="web"  port="8080" />
+     <script>
+       global sendflag
+       sendflag=0
+     </script>
+    <onexec>
+     <script sendto="vel_out">
+     if sendflag > 10 :
+        rtc_result = TimedVelocity2D( Time(0, 0), Velocity2D(0, 0, 0) )
+        sendflag = 0
+     else:
+        sendflag += 1
+     </script>
+    </onexec>
   </general>
 
   <state name="main_mode">
@@ -53,6 +66,7 @@
         if 0.05 > x and x > -0.05: x=0
         if 0.05 > y and y > -0.05: y=0
         rtc_result = TimedVelocity2D( Time(0, 0), Velocity2D(y, 0, x) )
+        sendflag = 0
       </script>
 
     </rule>
