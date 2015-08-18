@@ -296,6 +296,14 @@ class SEATML_Parser():
                     self.parent.registerCommands(name+":"+source+":"+w, commands)
 
     #
+    #   Parse <exec>tag 
+    #
+    def parseExec(self, name, e):
+        commands = self.parseCommands(e)
+        self.parent.registerCommands(name+"::onexec", commands)
+        self.logInfo(u"register <onexec> on " + name)
+
+    #
     #   eSEAT Markup Language File loader
     #
     def load(self, f):
@@ -338,6 +346,9 @@ class SEATML_Parser():
                 #  <script>
                 elif a.tag == 'script':
                     self.procScript(a, a.get('execfile'))
+
+                elif a.tag == 'onexec':
+                    self.parseExec('all', a)
         # 
         #  <state>
         for s in doc.findall('state'):
@@ -355,6 +366,10 @@ class SEATML_Parser():
                 elif e.tag == 'rule':
                     self.include_rules = [ f.replace("\\\\", "\\")] 
                     self.parseRule(name, e)
+
+                elif e.tag == 'exec':
+                    self.parseExec(name, e)
+
                 else:
                 #
                 # GUI tags

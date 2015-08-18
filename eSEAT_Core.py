@@ -144,8 +144,11 @@ class eSEAT_Core:
 
             if type == 'web' :
                 self.createWebAdaptor(name, int(tag.get('port')), compname, tag.get('host'))
+            if type == 'socket' :
+                self.createSocketPort(name, tag.get('host'), int(tag.get('port')))
             else:
-                 self.createSocketPort(name, tag.get('host'), int(tag.get('port')))
+                self._logger.warn(u"invalid type: " + type + ": " + name)
+                return -1
         except:
             self._logger.error(u"invalid parameters: " + type + ": " + name)
             return -1
@@ -222,6 +225,23 @@ class eSEAT_Core:
         #
         for c in cmds:
             self.activateCommand(c, s)
+        return True
+
+    #
+    # processExec
+    #
+    def processExec(self, sname=None):
+        if sname is None : sname = self.currentstate
+        cmds = self.lookupWithDefault(sname, '', 'onexec')
+
+        if not cmds:
+            self._logger.info("no command found")
+            return False
+
+        #
+        #
+        for c in cmds:
+            self.activateCommand(c, '')
         return True
 
     #

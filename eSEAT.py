@@ -178,6 +178,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
     #
     def onExecute(self, ec_id):
         OpenRTM_aist.DataFlowComponentBase.onExecute(self, ec_id)
+        self.processExec('all')
         return RTC_OK
 
     #
