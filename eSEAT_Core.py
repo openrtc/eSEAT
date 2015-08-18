@@ -122,10 +122,11 @@ class eSEAT_Core:
             self.adaptors[name] = WebSocketServer(CometReader(self), name, "", port, index)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
-            whosts = whost.split(',')
-            for x in whosts:
-              if x :
-                self.webServer.appendWhiteList(x.strip())
+	    if whost :
+                whosts = whost.split(',')
+                for x in whosts:
+                    if x :
+                        self.webServer.appendWhiteList(x.strip())
         else:
             self._logger.info(u"Failed to create Webadaptor:" + name + " already exists")
 
@@ -136,10 +137,11 @@ class eSEAT_Core:
         try:
             name = str(tag.get('name'))
             type = tag.get('type')
+            self._logger.info(u"createAdaptor: " + type + ": " + name)
 
             if type == 'web' :
                 self.createWebAdaptor(name, int(tag.get('port')), compname, tag.get('host'))
-            if type == 'socket' :
+            elif type == 'socket' :
                 self.createSocketPort(name, tag.get('host'), int(tag.get('port')))
             else:
                 self._logger.warn(u"invalid type: " + type + ": " + name)

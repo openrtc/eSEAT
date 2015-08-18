@@ -4,18 +4,22 @@
     <adaptor name="vel_out" type="rtcout" datatype="TimedVelocity2D" />
     <adaptor name="str_out" type="rtcout" datatype="TimedString" />
     <adaptor name="str_in" type="rtcin" datatype="TimedString" />
-    <adaptor name="web" type="web"  port="8080" />
+    <adaptor name="web" type="web" port="8080" />
      <script>
-       global sendflag
+       global sendflag, velocity, theta
        sendflag=0
+       velocity=0
+       theta=0
      </script>
     <onexec>
      <script sendto="vel_out">
-     if sendflag > 10 :
-        rtc_result = TimedVelocity2D( Time(0, 0), Velocity2D(0, 0, 0) )
+     if sendflag > 3 :
+        velocity=0
+        theta=0
         sendflag = 0
      else:
         sendflag += 1
+     rtc_result = TimedVelocity2D( Time(0, 0), Velocity2D(velocity, 0, theta) )
      </script>
     </onexec>
   </general>
@@ -45,9 +49,6 @@
       <script>
        seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
       </script>
-<!--
-      <message sendto="web" input="main_mode:textOut" />
--->
       <script sendto="web">
         rtc_result = rtc_in_data.data
       </script>
@@ -55,17 +56,13 @@
 
 <!--  Input from Web Adaptor -->
     <rule source="web">
-<!--
-      <script>
-        seat.appendText("main_mode:textOut", jsonDump(web_in_data)+"\n")
-      </script>
--->
       <script sendto="vel_out">
         x=float(web_in_data["X"])/2
         y=float(web_in_data["Y"])/10
         if 0.05 > x and x > -0.05: x=0
         if 0.05 > y and y > -0.05: y=0
-        rtc_result = TimedVelocity2D( Time(0, 0), Velocity2D(y, 0, x) )
+        velocity=y
+        theta=x
         sendflag = 0
       </script>
 
