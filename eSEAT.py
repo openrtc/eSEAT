@@ -186,16 +186,8 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
                     data.data = data.data
                     if not self.processResult(name, data.data) :
                         self.processOnDataIn(name, data)
-                elif isinstance(data, str):
-                    if data :
-                        data2 = parseData(data)
-                        if data2 :
-                            self.processOnDataIn(name, data2)
-                        else :
-                            if not self.processResult(name, data) :
-                                self.processOnDataIn(name, data)
                 else:
-                    self.processOnDataIn(name, data)
+                    eSEAT_Core.onData(self, name, data)
             except:
                 self._logger.error(traceback.format_exc())
         else:

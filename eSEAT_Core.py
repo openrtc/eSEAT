@@ -197,6 +197,26 @@ class eSEAT_Core:
     ##################################
     #  Main event process 
     #
+
+    #  onData: this method called in comming data
+    #
+    def onData(self, name, data):
+        try:
+            if isinstance(data, str):
+                if data :
+                    data2 = parseData(data)
+                    if data2 :
+                        self.processOnDataIn(name, data2)
+                    else :
+                        if not self.processResult(name, data) :
+                            self.processOnDataIn(name, data)
+            else:
+                self.processOnDataIn(name, data)
+        except:
+            self._logger.error(traceback.format_exc())
+    #
+    #
+    #
     def processResult(self, name, s):
         try:
             s = unicode(s)
@@ -225,12 +245,13 @@ class eSEAT_Core:
     #
     # processExec
     #
-    def processExec(self, sname=None):
+    def processExec(self, sname=None, flag=False):
         if sname is None : sname = self.currentstate
-        cmds = self.lookupWithDefault(sname, '', 'onexec')
+        cmds = self.lookupWithDefault(sname, '', 'onexec', False)
 
-        if not cmds:
-            self._logger.info("no command found")
+        if not cmds :
+            if flag :
+                self._logger.info("no command found")
             return False
 
         #
@@ -285,9 +306,10 @@ class eSEAT_Core:
     #
     #  Lookup Registered Commands
     #
-    def lookupWithDefault(self, state, name, s):
+    def lookupWithDefault(self, state, name, s, flag=True):
         s=s.split(",")[0]
-        self._logger.info('looking up...%s: %s' % (name,s,))
+        if flag:
+            self._logger.info('looking up...%s: %s' % (name,s,))
         cmds = self.lookupCommand(state, name, s)
 
         if not cmds:
