@@ -29,11 +29,6 @@ import subprocess
 #
 sys.path.append(os.path.abspath('./libs'))
 
-########
-#  for OpenRTM-aist
-import OpenRTM_aist
-import omniORB
-from RTC  import *
 
 #######
 # XML Parser
@@ -110,7 +105,7 @@ class eSEAT_Core:
         self.webServer = None
         self.root = None
 
-	self._logger = SeatLogger("eSEAT")
+        self._logger = SeatLogger("eSEAT")
 
     ##### Other Adaptors
     #
@@ -580,6 +575,18 @@ class eSEAT_Core:
             if pid == None or p.pid == pid :
                 p.terminate()
         return 
+    #
+    # Finalize
+    #
+    def finalizeSEAT(self):
+        for a in self.adaptors.itervalues():
+            if isinstance(a, SocketAdaptor):
+                a.terminate()
+                a.join()
+            elif isinstance(a, WebSocketServer):
+                a.terminate()
+        if self.root : self.root.quit()
+        return 
 
 ###########################################################
 #   eSEAT_Gui
@@ -918,5 +925,22 @@ class eSEAT_Gui:
     def hideFrame(self, name):
         if self.frames[name] :
            self.frames[name].pack_forget()
+
+    #
+    #
+    #
+    def startGuiLoop(self):
+        self.root = Tk()
+        for st in self.states:
+            self.newFrame(st)
+            self.createGuiPanel(st)
+
+        self.showFrame(self.init_state)
+        self.frames[self.init_state].pack()
+
+        self.root.bind("<<state_transfer>>", self.stateChanged)
+        self.setTitle(self.getInstanceName())
+        self.root.mainloop()
+
     #
     ############### End of GUI part ################

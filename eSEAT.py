@@ -122,7 +122,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
     #
     def onInitialize(self):
         OpenRTM_aist.DataFlowComponentBase.onInitialize(self)
-        #self._logger = OpenRTM_aist.Manager.instance().getLogbuf(self._properties.getProperty("instance_name"))
         self._logger = RtcLogger(self._properties.getProperty("instance_name"))
         self._logger.info("eSEAT (Extended Simple Event Action Transfer) version " + __version__)
         self._logger.info("Copyright (C) 2009-2014 Yosuke Matsusaka and Isao Hara")
@@ -153,15 +152,7 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
     #
     def onFinalize(self):
         OpenRTM_aist.DataFlowComponentBase.onFinalize(self)
-        try:
-            for a in self.adaptors.itervalues():
-                if isinstance(a, SocketAdaptor):
-                    a.terminate()
-                    a.join()
-        except:
-            self._logger.error(traceback.format_exc())
-
-        if self.root : self.root.quit()
+        self.finalizeSEAT()
         return RTC_OK
 
     #
@@ -169,8 +160,6 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
     #  onShutdown
     #
     def onShutdown(self, ec_id):
-        if self.webServer :
-            self.webServer.terminate()
         return RTC_OK
     #
     # for RTC
@@ -400,18 +389,7 @@ class eSEATManager:
             self.manager.runManager(True)
 
             # GUI part
-            self.comp.root = Tk()
-            for st in self.comp.states:
-                self.comp.newFrame(st)
-                self.comp.createGuiPanel(st)
-
-            self.comp.showFrame(self.comp.init_state)
-            self.comp.frames[self.comp.init_state].pack()
-
-            self.comp.root.bind("<<state_transfer>>", self.comp.stateChanged)
-            self.comp.setTitle(self.comp.getInstanceName())
-            self.comp.root.mainloop()
-
+            self.comp.startGuiLoop()
             self.comp.disconnectAll()
 
             # Shutdown Component
