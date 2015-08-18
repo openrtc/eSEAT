@@ -50,7 +50,10 @@
   <xs:element name="onexec">
     <xs:complexType>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element minOccurs="0" maxOccurs="unbounded" ref="rule"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="message"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="command"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="shell"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="script"/>
         </xs:choice>
     </xs:complexType>
   </xs:element>
