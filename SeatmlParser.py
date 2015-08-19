@@ -15,34 +15,12 @@ Copyright (C) 2009-2014
 ############### import libraries
 import sys
 import os
-import getopt
-import codecs
-import locale
-import time
-import signal
-import re
-import traceback
-import optparse
-import threading
-import subprocess
 
-#
-#
-#########
+###########################################
 #  XML parse
 from lxml import etree
 
-#########
-#  GUI etc.
-import utils
-from Tkinter import * 
-from ScrolledText import * 
-
-###############################################################
-#
-__version__ = "0.3"
-
-#########################################################################
+###########################################
 #
 #  Class eSEAT Parser
 #
@@ -85,7 +63,7 @@ class SEATML_Parser():
             self._logger.error(msg)
 
     #
-    #    Create communication adaptor
+    #  Create communication adaptor
     #
     def createAdaptor(self, tag):
         try:
@@ -99,7 +77,7 @@ class SEATML_Parser():
         return 1
 
     #
-    #   Sub parser
+    #   Sub parser <message><command><statetransition><log><shell><script>
     #
     def parseCommands(self, r):
         commands = []
@@ -149,34 +127,47 @@ class SEATML_Parser():
             commands.append(['s', sendto, data, fname])
         return commands
 
+    #
+    #   delete spaces at the begining of the lines for python script
+    #
     def getScripts(self, tag):
         data = skipSps(tag.text)
         for ctag in tag.getchildren():
             data += skipSps(ctag.text)
         return data
 
+    #
+    # execute the python script
+    #
     def procScript(self, tag, fname):
         txt = self.getScripts(tag)
 
         if fname : execfile(fname, globals())
         if txt : exec(txt, globals())
 
+    #
+    # get attribute of the tag. If the attribute isnot found, set default value
+    #
     def getAttribute(self, e, name, def_val=None):
         val = e.get(name)
         if def_val is None: return val
         if not val : val = def_val
         return val
-
+    #
+    #  get text of the tag
+    #
     def getText(self, e):
         val = e.text
         if not val: val = ''
         return val
 
+    #
+    #  Sub parser for GUI items
+    #
     def parseGui(self, name, e):
         if not isinstance(self.parent, eSEAT_Gui) : return
         commands = self.parseCommands(e)
 
-        ################ GUI ###############
         #
         #  <label>
         if e.tag == 'label':
@@ -213,9 +204,14 @@ class SEATML_Parser():
             self.parent.addText(name, key, self.getAttribute(e, 'width', '20'),
                  self.getAttribute(e, 'height', '3'), self.getAttribute(e, 'colspan', 1),
                  self.getAttribute(e, 'rowspan', 1), self.getText(e))
+        #
+        #  Others
         else:
            self.logError(u"Invalid tag found: " + unicode(e.tag))
 
+    #
+    #  load rules from external seatml file
+    #
     def loadRuleFile(self, name, f, sname=None):
         f = f.replace("\\", "\\\\")
         self.logInfo(u"load script file(loadRuleFile): " + f)
@@ -245,7 +241,7 @@ class SEATML_Parser():
         self.logError(u"no rule foud: " + f +":"+unicode(sname))
 
     #
-    #   Parse <rule>tag 
+    #   Sub parser for <rule>tag 
     #
     def parseRule(self, name, e):
         if e.get('file'):
@@ -296,14 +292,14 @@ class SEATML_Parser():
                     self.parent.registerCommands(name+":"+source+":"+w, commands)
 
     #
-    #   Parse <exec>tag 
+    #   Sub parser for <exec>tag 
     #
     def parseExec(self, name, e):
         commands = self.parseCommands(e)
         self.parent.registerCommands(name+"::onexec", commands)
         self.logInfo(u"register <onexec> on " + name)
 
-    #
+    #######################################################
     #   eSEAT Markup Language File loader
     #
     def load(self, f):
@@ -346,7 +342,8 @@ class SEATML_Parser():
                 #  <script>
                 elif a.tag == 'script':
                     self.procScript(a, a.get('execfile'))
-
+                #
+                #  <onexec>
                 elif a.tag == 'onexec':
                     self.parseExec('all', a)
         # 
@@ -367,7 +364,9 @@ class SEATML_Parser():
                     self.include_rules = [ f.replace("\\\\", "\\")] 
                     self.parseRule(name, e)
 
-                elif e.tag == 'exec':
+                #
+                #  <onexec>
+                elif e.tag == 'onexec':
                     self.parseExec(name, e)
 
                 else:
@@ -385,7 +384,6 @@ class SEATML_Parser():
             return 1
 
         self.parent.initStartState("start")
-
         self.logInfo("loaded successfully")
 
         return 0
@@ -467,6 +465,7 @@ def decompStringSub(str):
     return ret
 
 #
+#  Convert datatype
 #
 def convertDataType(dtype, data, code='utf-8'):
   if dtype == str:
@@ -489,6 +488,9 @@ def formatInstanceName(name):
    rtcname = fullname[len(fullname) -1 ]
    return rtcname.split('.')[0]
 
+#
+#  Count spaces at the begining of the line
+#
 def countSp(s):
   c=0
   for x in s:
@@ -498,7 +500,7 @@ def countSp(s):
   return c
 
 #
-#
+#  Remove spaces at the begining of the lines
 #
 def skipSps(txt):
   try:

@@ -15,14 +15,7 @@ Copyright (C) 2009-2014
 ############### import libraries
 import sys
 import os
-import codecs
-import locale
-import time
-import signal
-import re
 import traceback
-import optparse
-import threading
 import subprocess
 
 #
@@ -30,8 +23,8 @@ import subprocess
 sys.path.append(os.path.abspath('./libs'))
 
 
-#######
-# XML Parser
+########
+# XML Parser of Julius result
 from bs4  import BeautifulSoup
 
 #########
@@ -54,8 +47,9 @@ from WebAdaptor import *
 #
 execfile('SeatmlParser.py', globals())
 
-#########################################################################
+###############################################################
 #
+# Dummy logger
 #
 class SeatLogger:
     def __init__(self, name):
@@ -122,7 +116,7 @@ class eSEAT_Core:
             self.adaptors[name] = WebSocketServer(CometReader(self), name, "", port, index)
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
-	    if whost :
+            if whost :
                 whosts = whost.split(',')
                 for x in whosts:
                     if x :
@@ -197,9 +191,8 @@ class eSEAT_Core:
             self._logger.error("Fail to sending message to %s" % (name,))
 
     ##################################
-    #  Main event process 
+    #  Event processes 
     #
-
     #  onData: this method called in comming data
     #
     def onData(self, name, data):
@@ -217,7 +210,7 @@ class eSEAT_Core:
         except:
             self._logger.error(traceback.format_exc())
     #
-    #
+    #   main event process 
     #
     def processResult(self, name, s):
         try:
@@ -245,7 +238,7 @@ class eSEAT_Core:
         return True
 
     #
-    # processExec
+    # process for the cyclic execution
     #
     def processExec(self, sname=None, flag=False):
         if sname is None : sname = self.currentstate
@@ -306,7 +299,7 @@ class eSEAT_Core:
         return True
 
     #
-    #  Lookup Registered Commands
+    #  Lookup Registered Commands with default
     #
     def lookupWithDefault(self, state, name, s, flag=True):
         s=s.split(",")[0]
@@ -326,6 +319,7 @@ class eSEAT_Core:
         return cmds
 
     #
+    #  Lookup Registered Commands
     #
     def lookupCommand(self, state, name, s):
         cmds = []
@@ -353,20 +347,35 @@ class eSEAT_Core:
     def getStates(self):
         return self.states
 
+    #
+    # set the begining state
+    #
     def setStartState(self, name):
         self.startstate = name
         return
 
+    #
+    #  Count the number of states 
+    #
     def countStates(self):
         return len(self.states)
 
+    #
+    #  check the named state
+    #
     def inStates(self, name):
         return ( self.states.count(name) > 0 )
 
+    #
+    #  append the named state
+    #
     def appendState(self, name):
         self.states.extend([name])
         return
 
+    #
+    #  initilaize the begining state
+    #
     def initStartState(self, name):
         self.startstate = None
         if self.states.count(name) > 0 :
@@ -376,6 +385,7 @@ class eSEAT_Core:
         self.stateTransfer(self.startstate)
         self._logger.info("current state " + self.currentstate)
     #
+    # create the named state
     #
     def create_state(self, name):
         self.items[name] = []
@@ -572,10 +582,9 @@ class eSEAT_Core:
 
     ##############################################
     #  Callback function for WebAdaptor
-    #
+    #     
     def callComet(self):
       res = ""
-
       return res
 
     ################################################ 
@@ -627,7 +636,9 @@ class eSEAT_Gui:
         self.buttons = {}
         self.labels = {}
 
-    ###################### GUI part ################
+    #
+    #  check the GUI items
+    #
     def hasGUI(self):
         for x in self.items.keys():
             if len(self.items[x]) : return True
@@ -676,7 +687,10 @@ class eSEAT_Gui:
     def addSpace(self, name,n):
         self.items[name].append(['space', n])
 
-    #############  CREATE GUI ITEMS ##############
+    ###################  CREATE GUI ITEMS ####################
+    #
+    #
+    #################  B U T T O N ################### 
     ## Create Button Item
     def createButtonItem(self, frame, sname, name, fg="#000000", bg="#cccccc", cspan=1):
         btn = Button(frame, text=name, command=self.mkcallback(name) , bg=bg, fg=fg)
@@ -690,6 +704,7 @@ class eSEAT_Gui:
             print "ERROR"
             pass
 
+    #################  L I N E I N P U T ################### 
     ## Create Entry Item
     def createEntryItem(self, frame, sname, name, eid, w, cspan=1, val=''):
         var=StringVar()
@@ -719,6 +734,7 @@ class eSEAT_Gui:
         except:
             return ""
 
+    #################  T E X T A R E A ################### 
     ## Create Text Item
     def createTextItem(self, frame, sname, name, eid, w, h, cspan=1, rspan=1, txt=""):
         stxt = ScrolledText(frame, width=int(w), height=int(h))
@@ -847,7 +863,8 @@ class eSEAT_Gui:
             return self.stext[eid].delete(1.0,END)
         except:
             return ""
-   
+
+    #################  L A B E L ################### 
     ## Create Label Item
     def createLabelItem(self, frame, sname, name, fg="#ffffff", bg="#444444", cspan=1):
         if not fg: fg="#ffffff"
@@ -951,7 +968,7 @@ class eSEAT_Gui:
            self.frames[name].pack_forget()
 
     #
-    #
+    #   Event loop for GUI
     #
     def startGuiLoop(self):
         self.root = Tk()
@@ -965,6 +982,3 @@ class eSEAT_Gui:
         self.root.bind("<<state_transfer>>", self.stateChanged)
         self.setTitle(self.getInstanceName())
         self.root.mainloop()
-
-    #
-    ############### End of GUI part ################
