@@ -864,7 +864,7 @@ class CometManager:
     self.server = server
     self.long_pollings = {}
 
-  def regieter(self, reader, id):
+  def register(self, reader, id):
     self.long_pollings[id] = reader
 
   def registerHandler(self, reader, id, data, force=False):

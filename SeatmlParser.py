@@ -71,7 +71,7 @@ class SEATML_Parser():
             type = tag.get('type')
             return self.parent.createAdaptor(self.componentName, tag)
         except:
-            self.logError(u"invalid parameters: " + type + ": " + name)
+            self.logError(u"invalid parameters(1): " + type + ": " + name)
             return -1
 
         return 1

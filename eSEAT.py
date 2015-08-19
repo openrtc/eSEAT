@@ -25,6 +25,7 @@ import traceback
 import optparse
 import threading
 import subprocess
+import utils
 
 if os.getenv('SEAT_ROOT') :
   rootdir=os.getenv('SEAT_ROOT')

@@ -29,7 +29,6 @@ from bs4  import BeautifulSoup
 
 #########
 #  GUI etc.
-import utils
 from Tkinter import * 
 from ScrolledText import * 
 
