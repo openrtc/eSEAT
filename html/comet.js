@@ -13,6 +13,7 @@ function requestComet(id, force){
     url: "comet_request",
     data: "force="+force_flag+"&id="+id,
     dataType: "json",
+    headers: {'eSEAT-Key' : getMySeatKey()},
     success: function(event){
        if(typeof processEvents == "function"){
          processEvents(event);

@@ -316,6 +316,7 @@ class WebSocketServer(SocketPort):
     return self
 
   def isInKey(self, key):
+    if not key : return False
     return key in self.service_keys
 
   def appendWhiteList(self, addr):
@@ -609,7 +610,6 @@ class CometReader(CommReader):
         response = self.parser.response400()
         self.sendResponse(response)
         return
-
 
       if fname == "/comet_request" :
         Data = parseData(data)
