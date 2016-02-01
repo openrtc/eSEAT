@@ -271,6 +271,7 @@ class eSEAT_Core:
 
             cmds = self.lookupWithDefault(self.currentstate, name, text)
             if cmds:
+                globals()['julius_result'] = {'rank': rank, 'score': score, 'text': text, 'stext': text.split(' ')}
                 return cmds
             else:
                 self._logger.info("[rejected] no matching phrases")
@@ -289,6 +290,7 @@ class eSEAT_Core:
         for c in cmds:
             kond = c[0]
             globals()['rtc_in_data'] = data
+            globals()['julius_result'] = None
             if kond[0] :
                 execfile(kond[0], globals())
 
