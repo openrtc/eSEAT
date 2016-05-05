@@ -19,6 +19,12 @@ import os
 ###########################################
 #  XML parse
 from lxml import etree
+#import xml.etree.ElementTree as etree
+
+##############################
+# utils
+import utils
+
 
 ###########################################
 #
@@ -33,7 +39,13 @@ class SEATML_Parser():
         else:
             self._logger = None
 
-        self.setXsd(xsd)
+        xsd_file = utils.findfile(xsd)
+        print "XSD file '"+xsd+"' = '"+xsd_file+"'."
+
+        if xsd_file:
+            self.setXsd(xsd_file)
+        else:
+            print "ERROR:XSD file '"+xsd+"' not found."
         self.include_rules = []
         self.seatml_base_dir = ""
 
@@ -142,7 +154,10 @@ class SEATML_Parser():
     def procScript(self, tag, fname):
         txt = self.getScripts(tag)
 
-        if fname : execfile(fname, globals())
+        if fname :
+            ffname = utils.findfile(fname)
+            if ffname :
+                execfile(ffname, globals())
         if txt : exec(txt, globals())
 
     #

@@ -23,6 +23,8 @@ try:
 except:
     _ = lambda s: s
 
+debug=False
+
 class MyParser(optparse.OptionParser):
     def _add_help_option (self):
         self.add_option("-h", "--help",
@@ -163,5 +165,12 @@ def array_flatten(ar):
   from itertools import chain
   return list(chain.from_iterable(ar))
 
-
+def findfile(fname, path=sys.path):
+  for f in path:
+   ff = os.path.join(f,fname)
+   if debug: print ff
+   if os.path.exists(ff):
+     if os.path.isfile(ff):
+       return ff
+  return None
 

@@ -29,8 +29,12 @@ import utils
 
 if os.getenv('SEAT_ROOT') :
   rootdir=os.getenv('SEAT_ROOT')
-  sys.path.append(rootdir)
-  sys.path.append(os.path.join(rootdir,'3rd party'))
+else:
+  rootdir='/usr/local/eSEAT/'
+
+sys.path.append(rootdir)
+sys.path.append(os.path.join(rootdir,'libs'))
+sys.path.append(os.path.join(rootdir,'3rd party'))
 
 #
 #
@@ -44,7 +48,13 @@ from RTC  import *
 ########################################
 #  eSEAT_Core
 #
-execfile('eSEAT_Core.py')
+#execfile(os.path.join(rootdir,'eSEAT_Core.py'))
+ffname = utils.findfile('eSEAT_Core.py')
+if ffname :
+    execfile(ffname)
+else:
+    print 'eSEAT_Core.py not found'
+    sys.exit(1)
 
 ###############################################################
 #
@@ -116,6 +126,10 @@ class eSEAT(OpenRTM_aist.DataFlowComponentBase, eSEAT_Gui, eSEAT_Core):
 
         self.manager = None
         self.activated=False
+
+    def exit(self):
+        eSEAT_Core.exit(self)
+        OpenRTM_aist.DataFlowComponentBase.exit(self)
 
     ##########################################################
     #  E v e n t   H a n d l e r 
@@ -307,15 +321,19 @@ class eSEATManager:
     def __init__(self, mlfile=None):
 
         if mlfile is None:
-           argv = self.parseArgs()
+            argv = self.parseArgs()
         else:
-           argv = [mlfile]
+            argv = [mlfile]
 
         self.comp = None
         self.manager = OpenRTM_aist.Manager.init(argv)
 
         if opts.naming_format:
             self.manager._config.setProperty("naming.formats", opts.naming_format)
+
+        self.run_as_daemon = opts.run_as_daemon
+        if opts.run_as_daemon :
+            deamonize()
 
         self.manager.setModuleInitProc(self.moduleInit)
         self.manager.activateManager()
@@ -342,6 +360,9 @@ class eSEATManager:
         parser.add_option('-n', '--name', dest='naming_format', type="string",
                             help='set naming format' )
 
+        parser.add_option('-d', '--daemon', dest='run_as_daemon', action="store_true",
+                            help='run as daemon' )
+
         try:
             opts, args = parser.parse_args()
         except optparse.OptionError, e:
@@ -355,6 +376,9 @@ class eSEATManager:
         if opts.naming_format:
            sys.argv.remove('-n')
            sys.argv.remove(opts.naming_format)
+
+        if opts.run_as_daemon:
+           sys.argv.remove('-d')
 
         if len(args) == 0:
             parser.error("wrong number of arguments")
@@ -382,18 +406,32 @@ class eSEATManager:
             self.manager.runManager(True)
 
             # GUI part
-            self.comp.startGuiLoop()
-            self.comp.disconnectAll()
+            res = self.comp.startGuiLoop()
+            if res == 0:
+              self.comp.disconnectAll()
 
-            # Shutdown Component
-            try:
-               self.manager.shutdown()
-            except:
-               pass 
-
-            sys.exit(1)
+              # Shutdown Component
+              try:
+                 self.manager.shutdown()
+              except:
+                 pass 
+              sys.exit(1)
+            else:
+              self.manager.runManager()
         else:
             self.manager.runManager()
+
+    #
+    #
+    def exit(self):
+        self.comp.exit()
+        self.manager.shutdown()
+        print "....eSEAT Manager shutdown"
+        if self.run_as_daemon:
+          os._exit(1)
+        else:
+          sys.exit(1)
+
 
 #########################################################################
 #   F U N C T I O N S
@@ -443,6 +481,34 @@ def instantiateDataType(dtype):
         return desc[1](*arg)
     return None
 
+def deamonize():
+  try:
+    pid=os.fork()
+  except:
+    print "ERROR in fork1"
+
+  if pid > 0:
+    os._exit(0)
+
+  try:
+    os.setsid()
+  except:
+    print "ERROR in setsid"
+
+  try:
+    pid=os.fork()
+  except:
+    print "ERROR in fork2"
+
+  if pid > 0:
+    os._exit(0)
+
+#  os.umask(0)
+#  os.close(sys.stdin.fileno())
+#  os.close(sys.stdout.fileno())
+#  os.close(sys.stderr.fileno())
+
+  
 #########################################################################
 #
 #  M A I N 
@@ -451,5 +517,10 @@ if __name__=='__main__':
     seatmgr = eSEATManager()
     seat = seatmgr.comp
     seatmgr.start()
-    sys.exit(1)
+
+    print "...Terminate." 
+    if seatmgr.run_as_daemon:
+      os._exit(1)
+    else:
+      sys.exit(1)
 

@@ -78,14 +78,16 @@ class SocketPort(threading.Thread):
   def bind(self):
     try:
       self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
       self.socket.bind((self.host, self.port))
 
     except socket.error:
-      print "Connection error"
+      print "Bind error"
       self.close()
       return 0
+
     except:
-      print "Error in connect " , self.host, self.port
+      print "Error in bind " , self.host, self.port
       self.close()
       return -1
 
@@ -100,6 +102,7 @@ class SocketPort(threading.Thread):
 
     try:
       self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
       self.socket.connect((self.host, self.port))
 
     except socket.error:
@@ -177,7 +180,7 @@ class SocketPort(threading.Thread):
   #
   def accept_service_loop(self, lno=5, timeout=1.0):
     print "No accept_service_loop defined"
-
+    self.close()
     return 
 
   #
@@ -201,6 +204,8 @@ class SocketPort(threading.Thread):
         print data
 
       time.sleep(0.01) 
+
+    self.close()
 
 #    print "Read thread terminated:",self.name
 
@@ -234,6 +239,7 @@ class SocketPort(threading.Thread):
   #
   def send(self, msg, name=None):
     if not self.socket :
+      print msg
       print "Error: Not connected"
       return None
     try:
@@ -262,7 +268,10 @@ class WebSocketServer(SocketPort):
     else:
       self.indexfile = "index"
     self.cometManager = CometManager(self)
-    self.bind()
+
+    self.bind_res = self.bind()
+#    if self.bind_res < 1:
+#      os._exit(1)
     self.service_keys=[]
     self.host_list=["localhost"]
 #    self.appendWhiteList("127.0.0.1")
@@ -279,6 +288,7 @@ class WebSocketServer(SocketPort):
       newadaptor = SocketService(self, reader, name, conn, addr)
       if flag :
         newadaptor.start()
+        self.service.append(newadaptor)
       return newadaptor
 
     except:
@@ -335,7 +345,6 @@ class WebSocketServer(SocketPort):
   def run(self):
     self.accept_service_loop()
     del self.reader
-
   #
   #
   #
@@ -438,6 +447,7 @@ class CommReader:
   def parse(self, data):
     if self.debug:
       print data
+
     self.appendBuffer( data )
     self.checkBuffer()
 
@@ -517,7 +527,8 @@ class CommReader:
 
   def sendResponse(self, res, flag=True):
     self.response = res
-    self.send(flag)
+    if self.owner.socket :
+      self.send(flag)
 
   def close(self, flag=False):
     if self.owner :

@@ -18,10 +18,8 @@ import os
 import traceback
 import subprocess
 
-#
-#
-sys.path.append(os.path.abspath('./libs'))
-
+import time
+import utils
 
 ########
 # XML Parser of Julius result
@@ -44,7 +42,12 @@ from WebAdaptor import *
 #
 #  execute seatml parser files
 #
-execfile('SeatmlParser.py', globals())
+ffname = utils.findfile('SeatmlParser.py')
+if ffname :
+    execfile(ffname, globals())
+else:
+    print "SeatmlParser.py not found"
+    os._exit(1)
 
 ###############################################################
 #
@@ -100,6 +103,15 @@ class eSEAT_Core:
 
         self._logger = SeatLogger("eSEAT")
 
+    #
+    #
+    def exit(self):
+        print  "Call eSEAT_Core.exit"
+        if self.webServer :
+            self.webServer.terminate()
+            time.sleep( 1 )
+        return
+
     ##### Other Adaptors
     #
     # Create the Raw Socket
@@ -110,9 +122,13 @@ class eSEAT_Core:
     #
     # Create the Web Server Port
     #
-    def createWebAdaptor(self, name, port, index, whost=""):
+    def createWebAdaptor(self, name, port, index, whost="", dirname="html"):
         if self.webServer  is None:
-            self.adaptors[name] = WebSocketServer(CometReader(self), name, "", port, index)
+            self.adaptors[name] = WebSocketServer(CometReader(self,dirname), name, "", port, index)
+            if self.adaptors[name].bind_res != 1 :
+                print "=== Bind ERROR ==="
+                os._exit(1)
+
             self.adaptors[name].start()
             self.webServer = self.adaptors[name]
             if whost :
@@ -133,7 +149,12 @@ class eSEAT_Core:
             self._logger.info(u"createAdaptor: " + type + ": " + name)
 
             if type == 'web' :
-                self.createWebAdaptor(name, int(tag.get('port')), compname, tag.get('host'))
+                dirname = tag.get('dir')
+                if dirname:
+                    self.createWebAdaptor(name, int(tag.get('port')), compname, tag.get('host'), dirname)
+                else:
+                    self.createWebAdaptor(name, int(tag.get('port')), compname, tag.get('host'))
+
             elif type == 'socket' :
                 self.createSocketPort(name, tag.get('host'), int(tag.get('port')))
             else:
@@ -292,7 +313,10 @@ class eSEAT_Core:
             globals()['rtc_in_data'] = data
             globals()['julius_result'] = None
             if kond[0] :
-                execfile(kond[0], globals())
+                ffname = utils.findfile(kond[0])
+                if ffname :
+                    execfile(ffname, globals())
+#                execfile(kond[0], globals())
 
             if eval(kond[1], globals()):
                 for cmd in c[1]:
@@ -512,7 +536,10 @@ class eSEAT_Core:
 
         #
         #   execute script or script file
-        if fname : execfile(fname,globals())
+        if fname :
+            ffname = utils.findfile(fname)
+            if ffname :
+                execfile(ffname,globals())
         try:
           if data :
             exec(data, globals())
@@ -972,7 +999,10 @@ class eSEAT_Gui:
     #   Event loop for GUI
     #
     def startGuiLoop(self):
-        self.root = Tk()
+        try:
+          self.root = Tk()
+        except:
+          return 1
         for st in self.states:
             self.newFrame(st)
             self.createGuiPanel(st)
@@ -983,3 +1013,4 @@ class eSEAT_Gui:
         self.root.bind("<<state_transfer>>", self.stateChanged)
         self.setTitle(self.getInstanceName())
         self.root.mainloop()
+        return 0
