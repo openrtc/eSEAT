@@ -34,7 +34,7 @@ else:
 
 sys.path.append(rootdir)
 sys.path.append(os.path.join(rootdir,'libs'))
-sys.path.append(os.path.join(rootdir,'3rd party'))
+sys.path.append(os.path.join(rootdir,'3rd_party'))
 
 #
 #
