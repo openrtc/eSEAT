@@ -28,6 +28,11 @@ def lightsensor():
 
 	return [ int(s) for s in vs ]
 
+def buzzer(l_hz):
+	f = open("/dev/rtbuzzer0","w")
+	print >> f, "%d" % (l_hz)
+	f.close()
+
 def switchButton():
 	f = open("/dev/rtswitch0","r")
 	s0 = int(f.readline().strip())

@@ -931,6 +931,7 @@ class CometManager:
 def get_file_contents(fname, dirname="."):
   contents = None
   try:
+    #print "get_file_contents: "+dirname+fname
     f=open(dirname+fname,'rb')
     contents = f.read()
     f.close()
