@@ -326,14 +326,14 @@ class eSEATManager:
             argv = [mlfile]
 
         self.comp = None
+        self.run_as_daemon = opts.run_as_daemon
+        if opts.run_as_daemon :
+            deamonize()
+
         self.manager = OpenRTM_aist.Manager.init(argv)
 
         if opts.naming_format:
             self.manager._config.setProperty("naming.formats", opts.naming_format)
-
-        self.run_as_daemon = opts.run_as_daemon
-        if opts.run_as_daemon :
-            deamonize()
 
         self.manager.setModuleInitProc(self.moduleInit)
         self.manager.activateManager()
