@@ -322,7 +322,8 @@ class WebSocketServer(SocketPort):
     return self
 
   def addKey(self, key):
-    self.service_keys.append(key)
+    if not self.isInKey(key) :
+      self.service_keys.append(key)
     return self
 
   def isInKey(self, key):
@@ -602,13 +603,22 @@ class CometReader(CommReader):
       if contents is None:
         response = self.parser.response404()
       else:
-        if fname == "/comet.js":
+        if fname in ["/comet.js"]  :
           eseatkey = str(uuid.uuid1())
           try:
             self.getServer().addKey(eseatkey)
           except:
             print "ERROR in add"
           contents=contents.replace("My_eSEAT_Key", eseatkey)
+
+        elif fname in ["/rtc_comet.js"] :
+          eseatkey = "__Snap_rtc__"
+          try:
+            self.getServer().addKey(eseatkey)
+          except:
+            print "ERROR in add"
+          contents=contents.replace("My_eSEAT_Key", eseatkey)
+
         response = self.parser.response200(ctype, contents)
 
       self.sendResponse(response)

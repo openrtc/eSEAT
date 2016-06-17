@@ -19,6 +19,7 @@
 
 var
   version = "0.1",
+  strundefined = typeof undefined,
 
   Rtc = function( selector, context ){
     //return new RTC.fn.init( selector, context );
@@ -29,6 +30,7 @@ Rtc.prototype ={
   constructor: Rtc,
   selector: "",
   showReply: false,
+  processEvents: strundefined,
 
   getMySeatKey: function(){
      return "My_eSEAT_Key";
@@ -51,15 +53,15 @@ Rtc.prototype ={
       dataType: "json",
       headers: {'eSEAT-Key' : this.getMySeatKey()},
       success: function(event){
-        if(typeof processEvents == "function"){
-          processEvents(event);
+        if(typeof this.processEvents == "function"){
+          this.processEvents(event);
         }else{
-          processEvents_default(event);
+          this.processEvents_default(event);
         }
         if (event.terminate){
           alert("Tarminate Long_polling..");
         }else{
-          requestComet(id, force_flag);
+          this.requestComet(id, force_flag);
         }
       },
       error: function(XMLHttpRequest, textStatus, errorThrown){
@@ -83,7 +85,6 @@ Rtc.prototype ={
   /*
    * send data to eSEAT
    */
-
   sendValueToRtc: function(val, func){
     var mfunc  = func || this.showReply;
 
@@ -100,7 +101,6 @@ Rtc.prototype ={
   /*
    *
    */
-
   sendMessageToRtc: function(msg, func){
     var mfunc  = func || this.showReply;
 
@@ -118,7 +118,6 @@ Rtc.prototype ={
   /*
    *
    */
-
   sendScriptToRtc: function(scr, func){
     var mfunc  = func || this.showReply;
 
@@ -147,7 +146,6 @@ Rtc.prototype ={
 
 };
 
-var strundefined = typeof undefined;
 
 if ( typeof noGlobal === strundefined ){
   window.Rtc = Rtc;
