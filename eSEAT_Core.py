@@ -310,6 +310,7 @@ class eSEAT_Core:
 
         for c in cmds:
             kond = c[0]
+            globals()['seat'] = self
             globals()['rtc_in_data'] = data
             globals()['julius_result'] = None
             if kond[0] :
