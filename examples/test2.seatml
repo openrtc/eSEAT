@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="test2">
+    <adaptor name="web" type="web" port="8080" />
+  </general>
+  <state name="main_mode">
+    <input id="textOut" width="50" ></input>
+ 
+    <rule source="web">
+      <script sendto="web">
+        rtc_result = "Hello!!"
+      </script>
+    </rule>
+
+  </state>
+</seatml>

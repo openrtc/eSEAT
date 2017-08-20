@@ -1,4 +1,6 @@
 import omniORB
+import json
+import types
 from RTC import *
 
 
@@ -122,3 +124,15 @@ def instantiateDataType(dtype):
        arg.append(instantiateDataType(attr_type))
      return desc[1](*arg)
    return None
+
+def convertVars(data):
+  if type(data) == types.InstanceType:
+    vv = vars(data)
+    for x in vv.keys():
+      vv[x] = convertVars(vv[x])
+    return vv
+  else:
+    return data
+
+def dumpVar(data):
+  return json.dumps(convertVars(data))

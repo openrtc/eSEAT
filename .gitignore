@@ -1,0 +1,7 @@
+*.pyc
+*.swp
+dist/
+build/
+seatsat.egg-info/
+contrib/
+test/

@@ -2,7 +2,7 @@
 #
 #import ssr
 
-execfile("rtc_handle.py")
+#execfile("rtc_handle.py")
 
 def initNS(hostname="localhost"):
   global rtm

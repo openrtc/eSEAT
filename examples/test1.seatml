@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="test1">
+    <adaptor name="web" type="web" port="8080" host="127.0.0.1" />
+  </general>
+  <state name="main_mode">
+    <input id="textOut" width="50" ></input>
+ 
+    <rule>
+      <key>Hello</key>
+      <script>
+        seat.setEntry("main_mode:textOut", rtc_in_data+" World")
+      </script>
+    </rule>
+
+  </state>
+</seatml>

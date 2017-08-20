@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TEST: WebAdaptor for VertualJoystick</title>
+
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="jquery-1.11.3.min.js"></script>
+    <script src="jquery-migrate-1.2.1.min.js"></script>
+    <script src="comet.js"></script>
+    <script src="virtualjoystick.js"></script>
+  
+  </head>
+
+  <body onLoad="requestComet('joystick');">
+
+  <div id="topbar">
+    <table><tr> <td> <img src="rtm_logo.png" /> </td>
+                <td><span id="title">Test for VirtualJoystick</span></td> </tr></table>
+  </div>
+
+  <div>
+	  <button onClick="sendMessageToRtc('activate');" >Activate</button>
+	  <button onClick="sendMessageToRtc('deactivate');" >Deactivate</button>
+  </div>
+
+  <script>
+	var joystick	= new VirtualJoystick({
+		container	: document.getElementById('container'),
+		mouseSupport	: true,
+	});
+
+	var status = 0;
+
+/*
+	joystick.addEventListener('touchStart', function(){
+		;
+	})
+*/
+	joystick.addEventListener('touchEnd', function(){
+		sendValueToRtc('Stop, 0, 0');
+	})
+
+	setInterval(function(){
+		var outputEl	= document.getElementById('result');
+		outputEl.innerHTML	= '<b>Result:</b> '
+				+ ' dx:'+joystick.deltaX()
+				+ ' dy:'+joystick.deltaY()
+				+ (joystick.right()	? ' right'	: '')
+				+ (joystick.up()	? ' up'		: '')
+				+ (joystick.left()	? ' left'	: '')
+				+ (joystick.down()	? ' down' 	: '');
+
+		if(joystick._pressed){
+			sendValueToRtc('Move,'+joystick.deltaY()
+						+','+joystick.deltaX());
+			status = 1;
+		}else if(status == 1){
+			sendValueToRtc('Stop, 0, 0');
+			status = 0;
+		}
+
+	}, 100);
+  </script>
+
+  <div id="result"></div>
+  <div id="container" style="width:600px;height:600px;background-color:#aaaaaa"></div>
+  <hr>
+  <div id="response"></div>
+  <div id="response2"></div>
+
+  </body>
+</html>
+

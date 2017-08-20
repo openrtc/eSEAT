@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <seatml>
   <general name="guicommand">
+    <adaptor name="vel_out" type="rtcout" datatype="TimedVelocity2D" />
     <adaptor name="str_out" type="rtcout" datatype="TimedString" />
     <adaptor name="str_in" type="rtcin" datatype="TimedString" />
 
-    <script execfile="libs/rtc_handle.py" />
-    <script execfile="libs/rtc_handle_tool.py" />
+    <script execfile="3rd party/rtc_handle/rtc_handle.py" />
+    <script execfile="3rd party/rtc_handle/rtc_handle_tool.py" />
 
       <script>
 def printText(msg, txt="main_mode:in2"):
@@ -147,9 +148,54 @@ seat.clearText("main_mode:in2")
     </button>
 
     <brk />
-    <text id="pyin" width="70" height="25" colspan="5" />
     <brk />
-    <label text="exec:" />
+    <brk />
+
+    <label text="MobileMotion:" colspan="3" />
+    <brk />
+    <space />
+    <button label="Go Front" >
+      <script sendto="vel_out" >
+val = TimedVelocity2D(Time(0,0), Velocity2D(1.0, 0.0, 0.0))
+rtc_result = val
+      </script>
+    </button>
+    <space />
+    <brk />
+
+    <button label="  Left  "  >
+      <script sendto="vel_out" >
+val = TimedVelocity2D(Time(0,0), Velocity2D(0.0, 0.0, 1.0))
+rtc_result = val
+      </script>
+    </button>
+    <button label="  Stop  "  >
+      <script sendto="vel_out" >
+val = TimedVelocity2D(Time(0,0), Velocity2D(0.0, 0.0, 0.0))
+rtc_result = val
+      </script>
+    </button>
+    <button label=" Right  "  >
+      <script sendto="vel_out" >
+val = TimedVelocity2D(Time(0,0), Velocity2D(0.0, 0.0, -1.0))
+rtc_result = val
+      </script>
+    </button>
+    <brk />
+
+    <space />
+    <button label="Go Back"  >
+      <script sendto="vel_out" >
+val = TimedVelocity2D(Time(0,0), Velocity2D(-1.0, 0.0, 0.0))
+rtc_result = val
+      </script>
+    </button>
+    <space />
+    <brk />
+    <brk />
+    <brk />
+
+    <label text="exec  :" />
     <button label="exec all" >
       <script>
 pycode = seat.getText("sub_mode:pyin")
@@ -157,7 +203,7 @@ exec(pycode, globals())
       </script>
     </button>
 
-    <button label="exec lastLine" >
+    <button label="exec lLine" >
       <script>
 pycode = seat.getLastLine("sub_mode:pyin")
 exec(pycode, globals())

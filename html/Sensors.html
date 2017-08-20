@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TEST: WebAdaptor for Sensors</title>
+
+    <link rel="stylesheet" href="style.css" type="text/css">
+
+    <script src="jquery-1.11.3.min.js"></script>
+    <script src="jquery-migrate-1.2.1.min.js"></script>
+    <script src="comet.js"></script>
+
+    <script>
+    // Direction
+    function findNorth(evt) {
+        if (evt.alpha < 5 || evt.alpha > 355) {
+            $("#directions").html("North!");
+        } else if (evt.alpha < 180) {
+            $("#directions").html("Turn Left");
+        } else {
+            $("#directions").html("Turn Right");
+        }
+    }
+
+    // GPS
+    function getLocation(position){
+      var lat = position.coords.latitude;
+      var lng = position.coords.longitude;
+      var alt = position.coords.altiude;
+      var acc = position.coords.accuracy;
+      var alc = position.coords.altiudeAccuracy;
+      var hed = position.coords.heading;
+      var spe = position.coords.speed;
+ 
+      var html ="";
+          html += "緯度:" + lat + "<br>";
+          html += "経度:" + lng + "<br>";
+          html += "高度:" + alt + "<br>";
+          html += "緯度経度誤差:" + acc + "<br>";
+          html += "高度誤差:" + alc + "<br>";
+          html += "方角:" + hed + "<br>";
+          html += "速度:" + spe + "<br>";
+      $("#geolocation").html( html );
+    }
+ 
+    //
+    window.addEventListener("deviceorientation", function(evt){
+      // Compass
+      var ch = evt.webkitCompassHeading;
+      var chAcc = evt.webkitCompassAccuracy;
+
+      $("#compass_heading").val(ch);
+      $("#compass_accuracy").val(chAcc);
+    
+      // Gyro Sensor
+      var alpha = evt.alpha;   // z-axis
+      var beta = evt.beta;     // x-axis
+      var gamma = evt.gamma;   // y-axis
+
+      $("#gyro_Z").val(alpha);
+      $("#gyro_X").val(beta);
+      $("#gyro_Y").val(gamma);
+      
+    }, false);
+
+    //Accel sensor
+    window.addEventListener("devicemotion", function(evt){
+   
+     //Accle
+     var x = evt.acceleration.x;
+     var y = evt.acceleration.y;
+     var z = evt.acceleration.z;
+
+     $("#accl_X").val(x);
+     $("#accl_Y").val(y);
+     $("#accl_Z").val(z);
+   
+   
+     //Rot
+     var xg = evt.accelerationIncludingGravity.x; //  right/left
+     var yg = evt.accelerationIncludingGravity.y; //  up/down
+     var zg = evt.accelerationIncludingGravity.z; //  fornt/back
+
+     $("#rot_X").val(xg);
+     $("#rot_Y").val(yg);
+     $("#rot_Z").val(zg);
+   
+     // Rotation Value
+     var a = evt.rotationRate.alpha;
+     var b = evt.rotationRate.beta;
+     var g = evt.rotationRate.gamma;
+
+     $("#rot_alpha").val(a);
+     $("#rot_beta").val(b);
+     $("#rot_gamma").val(g);
+    } , true); 
+
+     setInterval(function(){
+	     var val= {"X": $("#rot_X").val(), "Y": $("#rot_Y").val(), "Z": $("#rot_Z").val()};
+	     sendValueToRtc(val, function(data){
+		     $("#response").html(data.result + " on "+data.date);
+	     });
+    }, 100);
+  </script>
+  
+  </head>
+  <body onLoad="requestComet('sensors');">
+
+  <div id="topbar">
+  <table><tr> <td> <img src="rtm_logo.png" /></td><td><span id="title">Test for Sensors on portable devices</span></td> </tr></table>
+ </div>
+
+  <hr>
+  GeoLocation: <button onClick="navigator.geolocation.getCurrentPosition(getLocation);">GetLoc</button>
+   <div id="geolocation"></div>
+
+  <hr>
+  Compass:
+  <div id="compass"></div>
+  <form>
+	  Heading: <input id="compass_heading" type="text" value=""><br>
+	  Accuracy: <input id="compass_accuracy" type="text" value="">
+  </form>
+  <hr>
+  Gyroscope:
+  <div id="gyroscope"></div>
+  <form>
+	  Z-Axis: <input id="gyro_Z" type="text" value=""><br>
+	  X-Axis: <input id="gyro_X" type="text" value=""><br>
+	  Y-Axis: <input id="gyro_Y" type="text" value=""><br>
+  </form>
+
+  <hr>
+  Rotation:
+   <div id="rotation"></div>
+       Acceleration:<br>
+	  X-Axis: <input id="accl_X" type="text" value=""><br>
+	  Y-Axis: <input id="accl_Y" type="text" value=""><br>
+	  Z-Axis: <input id="accl_Z" type="text" value=""><br>
+       <br>
+       Rotation:<br>
+	  Right/Left: <input id="rot_X" type="text" value=""><br>
+	  Up/Down: <input id="rot_Y" type="text" value=""><br>
+	  Front/Back: <input id="rot_Z" type="text" value=""><br>
+       <br>
+       RotationValue:<br>
+	  alpha(z): <input id="rot_alpha" type="text" value=""><br>
+	  beta(x): <input id="rot_beta" type="text" value=""><br>
+	  gamma(y): <input id="rot_gamma" type="text" value=""><br>
+
+  <hr>
+
+  <div id="response"></div>
+  <div id="response"></div>
+
+  </body>
+</html>
+
