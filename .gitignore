@@ -3,3 +3,5 @@
 dist/
 build/
 seatsat.egg-info/
+contrib/
+test/
