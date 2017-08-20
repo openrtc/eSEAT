@@ -319,7 +319,7 @@ class eSEAT_Core:
                     execfile(ffname, globals())
 #                execfile(kond[0], globals())
 
-            if eval(kond[1], globals()):
+            if eval(kond[1].strip(), globals()):
                 for cmd in c[1]:
                     self.activateCommandEx(cmd, data)
         return True
