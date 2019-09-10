@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="RosClient" anonymous="1">
+    <adaptor name="add_two_ints" type="ros_client"
+             service_type="example_interfaces.AddTwoInts" />
+  </general>
+
+  <state name="main_mode">
+    <label text="Add two ints" colspan="5" bg_color="blue" />
+
+    <brk />
+    <label text="Input:" />
+    <input id="a1" width="5" ></input>
+    <label text=" +" />
+    <input id="a2" width="5" ></input>
+    <button label="Send">
+      <script>
+       a1 = seat.getEntry("main_mode:a1")
+       a2 = seat.getEntry("main_mode:a2")
+       retval=seat.callRosService("add_two_ints", int(a1), int(a2))
+       str_out=a1+" + "+a2+" = "+str(retval.sum)
+       seat.appendText("main_mode:ans", str_out + "\n")
+       print (str_out)
+      </script>
+    </button>
+
+    <brk />
+    <label text="Answer:" />
+    <text id="ans" width="50" height="5" colspan="4" >
+    </text>
+    <brk />
+    <button label="Clear">
+      <script>
+       seat.clearText("main_mode:ans")
+      </script>
+    </button>
+ 
+  </state>
+</seatml>

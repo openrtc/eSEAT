@@ -1,0 +1,142 @@
+
+
+
+module ssr {
+
+  struct Vector {
+    double x;
+    double y;
+    double z;
+  };
+
+  
+  struct Orientation {
+    double pitch;
+    double roll;
+    double yaw;
+  };
+
+  typedef long Zone;
+  const Zone ZONE_NONE = 0;
+  const Zone ZONE_HOVERING = 1;
+  const Zone ZONE_TOUCHING = 2;
+
+  struct Finger {
+    Vector tipPosition;
+    Zone touchZone;
+  };
+
+  struct Hand {
+
+    /**
+     * The center position of the palm in millimeters from the Leap Motion device origin.    
+     * 
+     * @returns The Vector representing the coordinates of the palm position.  
+     */
+    Vector palmPosition;
+
+    /**                                                                          
+     * The normal vector to the palm. If your hand is flat, this vector will     
+     * point downward, or "out" of the front surface of your palm.               
+     *                                                                           
+     * \image html images/Leap_Palm_Vectors.png                                  
+     *                                                                           
+     * The direction is expressed as a unit vector pointing in the same          
+     * direction as the palm normal (that is, a vector orthogonal to the palm).  
+     *                                                                           
+     * @returns The Vector normal to the plane formed by the palm.               
+     */    
+    Vector palmNormal;
+
+    /**                                                                          
+     * The direction from the palm position toward the fingers.                  
+     * 
+     * The direction is expressed as a unit vector pointing in the same         
+     * direction as the directed line from the palm position to the fingers.   
+     * 
+     * @returns The Vector pointing from the palm position toward the fingers.
+     */
+    Vector palmDirection;
+
+    /**
+     * The radius of a sphere fit to the curvature of this hand.
+     * 
+     * This sphere is placed roughly as if the hand were holding a ball. Thus the
+     * size of the sphere decreases as the fingers are curled into a fist.
+     * @returns The radius of the sphere in millimeters.
+     */
+    Vector sphereCenter;
+    
+    double sphereRadius;
+
+    Orientation palmOrientation;
+
+    sequence<Finger> fingers;
+  };
+
+  typedef long GestureState;
+
+
+  const GestureState STATE_INVALID = -1;
+  const GestureState STATE_START = 1;
+  const GestureState STATE_UPDATE = 2;
+  const GestureState STATE_STOP = 3;
+
+
+
+  struct CircleGesture {
+    GestureState state;
+    double progress;
+    double radius;
+    Vector center;
+    Vector normal;
+  };
+  
+
+  struct SwipeGesture {
+    GestureState state;
+    Vector startPosition;
+    Vector position;
+    Vector direction;
+    double speed;
+  };
+
+  struct KeyTapGesture {
+    GestureState state;
+    Vector direction;
+    Vector position;
+  };
+
+  struct ScreenTapGesture {
+    GestureState state;
+    Vector direction;
+    Vector position;
+  };
+
+  typedef long GestureType;
+  const GestureType TYPE_INVALID = -1;
+  const GestureType TYPE_SWIPE = 1;
+  const GestureType TYPE_CIRCLE = 4;
+  const GestureType TYPE_SCREEN_TAP = 5;
+  const GestureType TYPE_KEY_TAP = 6;
+
+  struct GestureFrame {
+    long id;
+    GestureType type;
+    CircleGesture circle;
+    SwipeGesture swipe;
+    KeyTapGesture key;
+    ScreenTapGesture screen;
+  };
+
+
+  struct Frame {
+    long id;
+    long long timestamp;
+    
+    sequence<Hand> hands;
+    sequence<GestureFrame> gestures;
+  };
+
+
+};

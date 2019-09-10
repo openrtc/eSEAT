@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="basic_shapes" anonymous="1" rate="1">
+    <adaptor name="/visualization_marker" type="ros_pub"
+              datatype="visualization_msgs/Marker" size="1" />
+
+    <script>
+     global marker
+
+     marker = visualization_msgs.Marker()
+     marker.header.frame_id = "/my_frame"
+
+     marker.ns="basic_shape"
+     marker.id=0
+     marker.action=visualization_msgs.Marker.ADD
+     marker.pose.orientation.w=1.0
+     marker.scale.x=1.0
+     marker.scale.y=1.0
+     marker.scale.z=1.0
+
+     marker.color.r=0.0
+     marker.color.g=1.0
+     marker.color.b=0.0
+     marker.color.a=1.0
+    </script>
+
+    <onexec>
+    </onexec>
+
+  </general>
+
+  <state name="main_mode">
+
+    <label text="Basic_shapes" colspan="3" bg_color="blue" />
+    <brk />
+
+    <label text="Shape:" />
+    <combobox id="Shape" values="Cube,Sphere,Arrow,Cylinder" >
+     <script>
+
+     </script>
+    </combobox>
+
+    <button label="Send">
+     <script>
+       shape=seat.getComboboxValue("main_mode:Shape")
+       msg="Create "+shape
+
+       marker.header.stamp=rospy.Time.now()
+
+       if shape=="Cube":
+         marker.type=visualization_msgs.Marker.CUBE
+         pass
+
+       elif shape=="Sphere":
+         marker.type=visualization_msgs.Marker.SPHERE
+         pass
+
+       elif shape=="Arrow":
+         marker.type=visualization_msgs.Marker.ARROW
+         pass
+
+       elif shape=="Cylinder":
+         marker.type=visualization_msgs.Marker.CYLINDER
+         pass
+
+       else:
+         msg="Invalid Shape: "+shape
+
+       marker.lifetime=rospy.Duration(1,0)
+
+       seat.ros_publish("/visualization_marker", marker)
+       seat.appendText("main_mode:textOut", msg+"\n")
+     </script>
+    </button>
+    <brk />
+
+    <label text="Output:" />
+    <text id="textOut" width="50" height="5" colspan="2" ></text>
+
+    <brk />
+
+    <button label="Clear">
+      <script>
+       seat.clearText("main_mode:textOut")
+      </script>
+    </button>
+ 
+  </state>
+</seatml>

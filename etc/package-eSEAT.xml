@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package>
+  <name>python-eSEAT</name>
+  <version>2.5</version>
+  <description>eSEAT(extended Speach-Event Translator)</description>
+  <license>MIT License</license>
+  <maintainer>Isao Hara(isao@hara.jpn.com)</maintainer>
+  <depend>python</depend>
+  <depend>python-bs4</depend>
+  <depend>python-soupsieve</depend>
+  <depend>python-lxml</depend>
+  <depend>python-pyreadline</depend>
+</package>

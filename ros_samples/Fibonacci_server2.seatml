@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<seatml>
+  <general name="Fibonacci_server">
+    <adaptor name="fibonacci" type="ros_action_server"
+             action_type="actionlib_tutorials.Fibonacci"
+             />
+  </general>
+
+  <state name="main_state">
+   <rule source="fibonacci">
+     <key>ros_action</key>
+     <script>
+        goal = seat_argv[0]
+        seat.setRate(1)
+        success = True
+        server=seat.getRosActionServer('fibonacci')
+        if server :
+          _feedback = server.newActionFeedback()
+          _feedback.sequence = []
+          _feedback.sequence.append(0)
+          _feedback.sequence.append(1)
+        
+          seat.loginfo('%s: Executing, creating fibonacci sequence of order %i with seeds %i, %i' % (server.getActionName(), goal.order, _feedback.sequence[0], _feedback.sequence[1]))
+        
+          for i in range(1, goal.order):
+            if server.isPreemptRequested():
+              seat.loginfo('%s: Preempted' % server.getActionName() )
+              server.setPreempted()
+              success = False
+              break
+            _feedback.sequence.append(_feedback.sequence[i] + _feedback.sequence[i-1])
+
+            server.publishFeedback(_feedback)
+            seat.sleep()
+          
+          if success:
+            _result=server.newActionResult()
+            _result.sequence = _feedback.sequence
+            seat.loginfo('%s: Succeeded' % server.getActionName() )
+            server.setSucceeded(_result)
+    </script>
+   </rule>
+  </state>
+</seatml>
+

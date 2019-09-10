@@ -1,3 +1,4 @@
+from __future__ import print_function
 from itertools import chain
 global center_r, center_l
 
@@ -40,7 +41,7 @@ def LeapGesture(frame, Info, Swipe, Circle, Screen, Key):
           seat.setEntry(Info, val[0].split(':')[1])
 
       else:
-          print "Gesture[ %d ]" % (g.type)
+          print ("Gesture[ %d ]" % (g.type))
 
 def getLeapGesture(ges):
   global seat

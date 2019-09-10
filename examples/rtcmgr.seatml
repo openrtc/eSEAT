@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<seatml>
+  <general name="RtcMgr">
+   <adaptor name="vel_in" type="rtcin" datatype="TimedFloatSeq" />
+   <adaptor name="vel_out" type="rtcout" datatype="TimedFloatSeq" />
+  </general>
+
+  <state name="main_state">
+   <onentry>
+    <script>
+     try:
+       seat.activate()
+     except:
+       seat.seat_mgr.exit()
+    </script>
+   </onentry>
+
+   <onexec>
+    <script>
+  try:
+     in_str=raw_input("==> ")
+     argv=in_str.split()
+
+     if argv[0] == "rtsh":
+       print(rtsh)
+
+     elif argv[0] == "list":
+       num=0
+       if len(argv) > 1 and argv[1] == '-r':
+         rtsh.refreshRTObjectList()
+  
+       print("===== RTCs =====")
+       res = rtsh.getRTObjectList()
+       for n in res:
+         num += 1
+         if n[1]:
+           print(num, ":", n[0])
+         else:
+           print(num, ":", n[0], "*")
+       print("")
+
+     elif argv[0] == "get_ports":
+       num=0
+       ports = rtsh.getPorts(argv[1])
+       print("====== Ports(%s) ======" % argv[0])
+       for pp in ports:
+         num += 1
+         print(num, ":", pp[0].split('.')[1])
+         for k in pp[1]:
+            print("   ", k,":", pp[1][k])
+            
+       print("")
+
+     elif argv[0] == "get_connection":
+       cons = rtsh.getConnections(argv[1], argv[2])
+       num=0
+       if cons:
+         for x in cons:
+           print(num, ":", cons)
+           num += 1
+       else:
+         print("No connection")
+
+     elif argv[0] == "disconnect":
+       rtsh.disconnect(argv[1], argv[2])
+
+     elif argv[0] == "connect":
+       rtsh.connect(argv[1], argv[2])
+
+     elif argv[0] == "activate":
+       rtsh.activate(argv[1])
+
+     elif argv[0] == "deactivate":
+       rtsh.deactivate(argv[1])
+
+     elif argv[0] == "get_state":
+       stat=rtsh.get_component_state(argv[1])
+       print("State:", argv[1],":",stat)
+
+     elif argv[0] == "terminate":
+       rtsh.terminate(argv[1])
+
+     elif argv[0] == "unbind":
+       rtsh.unbind(argv[1])
+
+     else:
+       print("No such command:", argv[0])
+       print("   rtsh")
+       print("   list")
+       print("   get_ports [rtc_name]")
+       print("   get_connection [rtc_name] [port_name]")
+       print("   connect [port_name1] [port_name2]")
+       print("   disconnect [port_name1] [port_name2] ")
+       print("   get_state [rtc_name]")
+       print("   activate [rtc_name]")
+       print("   deactivate [rtc_name]")
+       print("   terminate [rtc_name]")
+       print("   unbind [rtc_name]")
+  except:
+    sys.exit()
+    </script>
+   </onexec>
+  </state>
+</seatml>

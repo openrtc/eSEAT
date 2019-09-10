@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<seatml>
+ <general name="Joy2TurtleSim">
+   <adaptor name="/turtle1/cmd_vel" type="ros_pub"
+                datatype="geometry_msgs/Twist" size="1" />
+   <adaptor name="/joy" type="ros_sub" datatype="sensor_msgs/Joy" />
+ </general>
+ <state name="main_mode">
+   <rule source="/joy">
+     <script>
+     <!--
+      if rtc_in_data.axes[1] != 0:
+        lv=rtc_in_data.axes[1]
+      else:
+        lv=0
+      if rtc_in_data.axes[0] != 0:
+        rv=rtc_in_data.axes[0]
+      else:
+        rv=0
+
+      seat.ros_publish("/turtle1/cmd_vel" , [[lv,0,0], [0,0,rv]])
+      --> 
+     </script>
+   </rule>
+ </state>
+</seatml>
+

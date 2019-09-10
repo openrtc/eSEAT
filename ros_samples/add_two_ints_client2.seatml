@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="RosClient" anonymous="1">
+    <adaptor name="add_two_ints" type="ros_client"
+             service_type="example_interfaces.AddTwoInts" />
+  </general>
+
+  <state name="main_mode">
+   <onexec>
+   <script>
+   print("\n")
+   print("Input 2 ints> ", end="", flush=True)
+   args=str(sys.stdin.readline())
+   argv=args.split()
+   if argv :
+     argv[-1] = argv[-1].rstrip("\n")
+
+     if len(argv) > 1:
+       a=int(argv[0])
+       b=int(argv[1])
+       retval=seat.callRosService("add_two_ints", a, b)
+       if retval is not None:
+         print(a, "+", b, "=", retval.sum)
+       
+     else:
+       pass
+   </script>
+   </onexec>
+ 
+ 
+  </state>
+</seatml>

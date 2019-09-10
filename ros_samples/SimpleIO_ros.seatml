@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="SimpleIO_Ros">
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="str_in" type="rtcin" datatype="TimedString" />
+<!--
+    <adaptor name="/turtle1/cmd_vel" type="ros_pub"
+                    datatype="geometry_msgs/Twist" size="1" />
+
+    <adaptor name="/chatter" type="ros_sub" datatype="std_msgs/String"
+                     file="ros_samples/testprint.py"  callback="testprint"/>
+
+    <adaptor name="/chatter" type="ros_sub" datatype="std_msgs/String" />
+
+    <adaptor name="/joy" type="ros_sub" datatype="sensor_msgs/Joy" />
+-->
+  </general>
+  <state name="main_mode">
+    <label text="SimpleIO" colspan="3" bg_color="blue" />
+
+    <brk />
+    <button label="Exit">       <script> seat.exit() </script> </button>
+    <button label="Activate">   <script> seat.activate() </script> </button>
+    <button label="Deactivate"> <script> seat.deactivate() </script> </button>
+    <brk />
+
+    <label text="Input:" />
+    <input id="textIn" width="50" >
+        <message sendto="str_out" input="main_mode:textIn" />
+    </input>
+    <button label="Send">
+        <message sendto="str_out" input="main_mode:textIn" />
+    </button>
+    <brk />
+  
+    <label text="Coming Text:" />
+    <text id="textOut" width="50" height="5" colspan="2" >
+	    INIT String...
+    </text>
+    <brk />
+    <button label="Clear">
+      <script>
+      seat.clearText("main_mode:textOut")
+      </script>
+    </button>
+    <brk />
+
+    <button label="Move">
+      <script>
+<!--
+        seat.ros_publish("/turtle1/cmd_vel" , '[[2.0,0,0], [0,0,1.8]]')
+-->
+      </script>
+    </button>
+
+    <rule source="str_in">
+      <script>
+       seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
+      </script>
+    </rule>
+
+<!--
+    <rule source="/chatter">
+      <script>
+       seat.appendText("main_mode:textOut", rtc_in_data+"\n")
+      </script>
+    </rule>
+-->
+
+    <rule>
+      <key>hello</key>
+      <script>
+       seat.appendText("main_mode:textOut", rtc_in_data+"\n")
+      </script>
+    </rule>
+
+    <rule source="/joy">
+      <script>
+<!--
+       #seat.appendText("main_mode:textOut", str(rtc_in_data.buttons)+"\n")
+
+       if rtc_in_data.axes[1] != 0:
+         lv=rtc_in_data.axes[1]
+       else:
+         lv=0
+       if rtc_in_data.axes[0] != 0:
+         rv=rtc_in_data.axes[0]
+       else:
+         rv=0
+
+       seat.ros_publish("/turtle1/cmd_vel" , [[lv,0,0], [0,0,rv]])
+-->        
+      </script>
+    </rule>
+
+  </state>
+</seatml>

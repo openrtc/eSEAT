@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="talker" anonymous="1" rate="1">
+    <adaptor name="/chatter" type="ros_pub" datatype="std_msgs/String" size="1" />
+<!--
+    <adaptor name="/num" type="ros_pub" datatype="beginner_tutorials/Num" size="1" />
+-->
+  </general>
+
+  <state name="main_mode">
+    <onexec>
+      <script>
+       hello_str = "hello world" 
+       seat.loginfo(hello_str)
+       seat.sendto("/chatter", hello_str)
+      </script>
+    </onexec>
+
+<!--
+    <label text="Talker" colspan="3" bg_color="blue" />
+    <brk />
+    <button label="Exit">
+     <script>
+       seat.exit()
+     </script>
+    </button>
+-->
+  </state>
+</seatml>

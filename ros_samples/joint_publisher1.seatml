@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="vis_joint_publisher">
+    <adaptor name="/joint_states" type="ros_pub" datatype="sensor_msgs/JointState" size="1" />
+  </general>
+
+  <state name="main_mode">
+
+    <label text="Joint Publisher" colspan="3" bg_color="blue" />
+
+    <brk />
+    <label text="Input:" />
+    <input id="textIn" width="50" value="" />
+
+    <button label="Move">
+      <script>
+       vals = seat.getEntry("main_mode:textIn").split(",")
+
+       if len(vals) > 1 :
+         val1=int(vals[0])
+         val2=int(vals[1])
+         js0=sensor_msgs.JointState()
+         js0.header.stamp=rospy.Time.now()
+         js0.name.append("joint2")
+         js0.name.append("joint3")
+         js0.position.append( -1.0*val1/40.0)
+         js0.position.append(  2.0*val2/40.0)
+
+         seat.ros_publish("/joint_states", js0)
+      </script>
+    </button>
+    <brk />
+
+    <label text="Coming Text:" />
+    <text id="textOut" width="50" height="5" colspan="2" >
+    </text>
+    <brk />
+
+    <button label="Clear">
+      <script>
+       seat.clearText("main_mode:textOut")
+      </script>
+    </button>
+ 
+
+  </state>
+
+</seatml>

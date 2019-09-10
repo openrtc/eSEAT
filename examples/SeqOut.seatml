@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <seatml>
+   <general name="SeqOut">
+    <adaptor name="octet" type="rtcout" datatype="TimedOctet" />
+    <adaptor name="short" type="rtcout" datatype="TimedShort" />
+    <adaptor name="long" type="rtcout" datatype="TimedLong" />
+    <adaptor name="float" type="rtcout" datatype="TimedFloat" />
+    <adaptor name="double" type="rtcout" datatype="TimedDouble" />
+    <adaptor name="octetSeq" type="rtcout" datatype="TimedOctetSeq" />
+    <adaptor name="shortSeq" type="rtcout" datatype="TimedShortSeq" />
+    <adaptor name="longSeq" type="rtcout" datatype="TimedLongSeq" />
+    <adaptor name="floatSeq" type="rtcout" datatype="TimedFloatSeq" />
+    <adaptor name="doubleSeq" type="rtcout" datatype="TimedDoubleSeq" />
+      <script>
+        seat.setLogFlag(False)
+      </script>
+
+   </general>
+
+   <state name="main_state">
+    <onexec>
+      <script>
+    import random
+
+    octetSeq  = ""
+    shortSeq  = []
+    longSeq   = []
+    floatSeq  = []
+    doubleSeq = []
+
+    seat._data['octet'].data=int(random.uniform(0x41, 0x5a))
+    seat._data['short'].data=int(random.uniform(0, 10))
+    seat._data['long'].data=long(random.uniform(0, 10))
+    seat._data['float'].data=float(random.uniform(0.0, 10.0))
+    seat._data['double'].data=float(random.uniform(0.0, 10.0))
+
+    print('%3.2s   %10.8s %10.8s %10.8s %10.8s %10.8s' \
+          % (' ', 'octet', 'short', 'long', 'float', 'double'))
+    print('%3.2s   %7s[%s] %10.8s %10.8s %10.8s %10.8s' \
+          % (' ', seat._data['octet'].data, chr(seat._data['octet'].data),
+            seat._data['short'].data, seat._data['long'].data,
+            seat._data['float'].data, seat._data['double'].data))
+
+    print( '-------------------------------------------------------------')
+    print( '                 Sequence Data                     ')
+    print( '-------------------------------------------------------------')
+
+    for i in range(10):
+      octetSeq = octetSeq + chr(int(random.uniform(0x41, 0x5a)))
+      shortSeq.append(int(random.uniform(0, 10)))
+      longSeq.append(long(random.uniform(0, 10)))
+      floatSeq.append(float(random.uniform(0.0, 10.0)))
+      doubleSeq.append(float(random.uniform(0.0, 10.0)))
+
+      print( '%3.2s : %7s[%s] %10.8s %10.8s %10.8s %10.8s' \
+             % (str(i), ord(octetSeq[i]), octetSeq[i], shortSeq[i],
+                longSeq[i], floatSeq[i], doubleSeq[i]))
+
+
+    print('')
+    seat._data['octetSeq'].data=octetSeq
+    seat._data['shortSeq'].data=shortSeq
+    seat._data['longSeq'].data=longSeq
+    seat._data['floatSeq'].data=floatSeq
+    seat._data['doubleSeq'].data=doubleSeq
+
+    seat.writeData('octet')
+    seat.writeData('short')
+    seat.writeData('long')
+    seat.writeData('float')
+    seat.writeData('double')
+    seat.writeData('octetSeq')
+    seat.writeData('shortSeq')
+    seat.writeData('longSeq')
+    seat.writeData('floatSeq')
+    seat.writeData('doubleSeq')
+
+     </script>
+    </onexec>
+   </state>
+ </seatml>
+

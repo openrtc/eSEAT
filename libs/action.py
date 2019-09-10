@@ -1,5 +1,6 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 import sys
 import time
 import threading
@@ -9,7 +10,7 @@ g_sensor_values = [0,0,0,0]
 
 def motor(l_hz,r_hz,msec):
 	f = open("/dev/rtmotor0","w")
-	print >> f, "%d %d %d" % (l_hz,r_hz,msec)
+	print ("%d %d %d" % (l_hz,r_hz,msec), file=f)
 	f.close()
 
 def lightsensorLock():
@@ -30,7 +31,7 @@ def lightsensor():
 
 def buzzer(l_hz):
 	f = open("/dev/rtbuzzer0","w")
-	print >> f, "%d" % (l_hz)
+	print ("%d" % (l_hz), file=f)
 	f.close()
 
 def switchButton():

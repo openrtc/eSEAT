@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="RosService">
+    <adaptor name="add_two_ints" type="ros_server"
+             service_type="beginner_tutorials.AddTwoInts" />
+  </general>
+
+  <state name="main_mode">
+   <rule source="add_two_ints">
+    <key>ros_service</key>
+    <script>
+      req=seat_argv[0]
+      sum_val = req.a+req.b
+      print ("Returning [ %s + %s = %s]" % (req.a, req.b, sum_val))
+      __retval__ = sum_val
+    </script>
+   </rule>
+  </state>
+
+</seatml>

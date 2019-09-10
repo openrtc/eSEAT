@@ -19,24 +19,25 @@
                 <td><span id="title">Test for VirtualJoystick</span></td> </tr></table>
   </div>
 
-  <div>
+  <div id="cmd">
 	  <button onClick="sendMessageToRtc('activate');" >Activate</button>
 	  <button onClick="sendMessageToRtc('deactivate');" >Deactivate</button>
   </div>
+  <div id="result"></div>
+  <div id="container" style="width:600px;height:600px;background-color:#aaaaaa"></div>
+  <hr>
+  <div id="response"></div>
+  <div id="response2"></div>
+
 
   <script>
-	var joystick	= new VirtualJoystick({
+    var joystick	= new VirtualJoystick({
 		container	: document.getElementById('container'),
 		mouseSupport	: true,
 	});
 
 	var status = 0;
 
-/*
-	joystick.addEventListener('touchStart', function(){
-		;
-	})
-*/
 	joystick.addEventListener('touchEnd', function(){
 		sendValueToRtc('Stop, 0, 0');
 	})
@@ -62,12 +63,6 @@
 
 	}, 100);
   </script>
-
-  <div id="result"></div>
-  <div id="container" style="width:600px;height:600px;background-color:#aaaaaa"></div>
-  <hr>
-  <div id="response"></div>
-  <div id="response2"></div>
 
   </body>
 </html>

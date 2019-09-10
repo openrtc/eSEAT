@@ -1,7 +1,7 @@
 #
 #
 #import ssr
-
+from __future__ import print_function
 #execfile("rtc_handle.py")
 
 def initNS(hostname="localhost"):
@@ -27,7 +27,7 @@ def get_handle_list(hostname="localhost"):
   n=1
   res=[]
   for name in hdls_names:
-    print n,":", name 
+    print (n,":", name)
     res.append(name)
     n += 1
   return res
@@ -93,7 +93,7 @@ def create_connection_name(path1, path2):
     return [pn1, pn2]
 
   except:
-    print "ERROR in create_connection_name."
+    print ("ERROR in create_connection_name.")
     pass
 
   return None 
@@ -113,12 +113,12 @@ def connect_ports(path1, path2):
   path2=str(path2.strip())
 
   if check_connection(path1, path2):
-    print "Connection already exist."
+    print ("Connection already exist.")
     return None
 
   cnames = create_connection_name(path1, path2)
   if not cnames:
-    print "Invalid Path: %s, %s" % (path1, path2)
+    print ("Invalid Path: %s, %s" % (path1, path2))
     return None
 
     
@@ -135,7 +135,7 @@ def connect_ports(path1, path2):
       connections[con.name] = con
 
   except:
-    print "Connection error"
+    print ("Connection error")
     pass
 
   return con
@@ -147,7 +147,7 @@ def find_connection(path1, path2):
   cnames = create_connection_name(path1, path2)
 
   if not cnames:
-    print "Invalid Path: %s, %s" % (path1, path2)
+    print( "Invalid Path: %s, %s" % (path1, path2) )
 
   if cnames[0] in connections:
       return [cnames[0], connections[cnames[0]] ]
@@ -155,7 +155,7 @@ def find_connection(path1, path2):
   if cnames[1] in connections:
       return [cnames[1], connections[cnames[1]] ]
 
-  print "No connection exists."
+  print ("No connection exists.")
   return None
 
 def disconnect_ports(path1, path2):
@@ -163,7 +163,7 @@ def disconnect_ports(path1, path2):
   path1=str(path1.strip())
   path2=str(path2.strip())
   if not check_connection(path1, path2):
-    print "No connection exist."
+    print ("No connection exist.")
     return None
 
   res=remove_connection(path1, path2)
@@ -247,7 +247,7 @@ def remove_connection(path1, path2):
     con.ports[0].disconnect(con.connector_id)
     return con
   else:
-    print "No Connections"
+    print ("No Connections")
     return False
 
 def disconnect_all(path1):

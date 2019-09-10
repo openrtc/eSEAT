@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="listener" anonymous="1" >
+    <adaptor name="chatter" type="ros_sub" datatype="std_msgs/String" />
+  </general>
+
+  <state name="main_mode">
+    <rule source="chatter">
+      <script>
+        print(seat.get_caller_id()+" I harad %s" % rtc_in_data)
+        seat.loginfo( "I heard %s" % rtc_in_data)
+      </script>
+    </rule>
+  </state>
+
+</seatml>

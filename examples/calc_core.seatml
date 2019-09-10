@@ -4,35 +4,35 @@
     <adaptor name="out" type="rtcout" datatype="TimedString" />
     <adaptor name="in" type="rtcin" datatype="TimedString" />
     <script>
-global opr, ans, lastkey, current
-opr="="
-ans=None
-current="0"
+      global opr, ans, lastkey, current
+      opr="="
+      ans=None
+      current="0"
    </script>
 
    <script>
-def calc_exec():
-  global current, ans
-  print ans, opr, current
-  try:
-    exp = "float("+ans +")"+ opr + current
-    print exp
-    ans = str(eval(exp))
-    return ans
-  except:
-    return "ERROR"
-
-def getOperation(str):
-  if str == 'Add':
-    return '+'
-  elif str == 'Subtract':
-    return '-'
-  elif str == 'Multiply':
-    return '*'
-  elif str == 'Divide':
-    return '/'
-  else:
-    return None
+      def calc_exec():
+        global current, ans
+        print ans, opr, current
+        try:
+          exp = "float("+ans +")"+ opr + current
+          print exp
+          ans = str(eval(exp))
+          return ans
+        except:
+          return "ERROR"
+      
+      def getOperation(str):
+        if str == 'Add':
+          return '+'
+        elif str == 'Subtract':
+          return '-'
+        elif str == 'Multiply':
+          return '*'
+        elif str == 'Divide':
+          return '/'
+        else:
+          return None
    </script>
   </general>
 
@@ -40,27 +40,27 @@ def getOperation(str):
   <state name="reset_mode">
     <onentry>
        <script sendto="out">
-print "=== Reset Mode ===="
-current="0"
-ans=current
-opr=None
-rtc_result=current
+        print "=== Reset Mode ===="
+        current="0"
+        ans=current
+        opr=None
+        rtc_result=current
        </script>
     </onentry>
     
     <rule>
        <key>0</key>
        <script sendto="out">
-current=rtc_in_data
-rtc_result=current
+        current=rtc_in_data
+        rtc_result=current
        </script>
     </rule>
     
     <rule>
        <key>(1|2|3|4|5|6|7|8|9)</key>
        <script sendto="out">
-current=rtc_in_data
-rtc_result=current
+        current=rtc_in_data
+        rtc_result=current
        </script>
        <statetransition>int1_mode</statetransition>
     </rule>
@@ -68,8 +68,8 @@ rtc_result=current
     <rule>
       <key>Comma</key>
       <script sendto="out">
-current="0."
-rtc_result=current
+        current="0."
+        rtc_result=current
       </script>
       <statetransition>float1_mode</statetransition>
     </rule>
@@ -82,8 +82,8 @@ rtc_result=current
      <rule>
        <key>(Add|Subtract|Multiply|Divide)</key>
        <script sendto="out">
-ans=current
-opr=getOperation(rtc_in_data)
+        ans=current
+        opr=getOperation(rtc_in_data)
        </script>
        <statetransition>input2_mode</statetransition>
     </rule>
@@ -93,23 +93,23 @@ opr=getOperation(rtc_in_data)
   <state name="int1_mode">
     <onentry>
       <script >
-print "=== int1 Mode ===="
+        print "=== int1 Mode ===="
       </script>
     </onentry>
 
     <rule>
        <key>(0|1|2|3|4|5|6|7|8|9)</key>
        <script sendto="out">
-current=current+rtc_in_data
-rtc_result=current
+        current=current+rtc_in_data
+        rtc_result=current
        </script>
     </rule>
 
     <rule>
       <key>Comma</key>
       <script sendto="out">
-current=current+"."
-rtc_result=current
+        current=current+"."
+        rtc_result=current
       </script>
       <statetransition>float1_mode</statetransition>
     </rule>
@@ -117,8 +117,8 @@ rtc_result=current
     <rule>
        <key>(Add|Subtract|Multiply|Divide)</key>
        <script sendto="out">
-ans=current
-opr=getOperation(rtc_in_data)
+        ans=current
+        opr=getOperation(rtc_in_data)
        </script>
        <statetransition>input2_mode</statetransition>
     </rule>
@@ -133,22 +133,22 @@ opr=getOperation(rtc_in_data)
   <state name="float1_mode">
     <onentry>
       <script >
-print "=== float1 Mode ===="
+        print "=== float1 Mode ===="
       </script>
     </onentry>
     <rule>
        <key>(0|1|2|3|4|5|6|7|8|9)</key>
        <script sendto="out">
-current=current+rtc_in_data
-rtc_result=current
+        current=current+rtc_in_data
+        rtc_result=current
        </script>
     </rule>
 
     <rule>
        <key>(Add|Subtract|Multiply|Divide)</key>
        <script sendto="out">
-ans=current
-opr=getOperation(rtc_in_data)
+        ans=current
+        opr=getOperation(rtc_in_data)
        </script>
        <statetransition>input2_mode</statetransition>
     </rule>
@@ -164,7 +164,7 @@ opr=getOperation(rtc_in_data)
   <state name="input2_mode">
     <onentry>
       <script >
-print "=== input2 Mode ===="
+        print "=== input2 Mode ===="
       </script>
     </onentry>
 
@@ -176,16 +176,16 @@ print "=== input2 Mode ===="
     <rule>
        <key>0</key>
        <script sendto="out">
-current=rtc_in_data
-rtc_result=current
+        current=rtc_in_data
+        rtc_result=current
        </script>
     </rule>
     
     <rule>
        <key>(1|2|3|4|5|6|7|8|9)</key>
        <script sendto="out">
-current=rtc_in_data
-rtc_result=current
+        current=rtc_in_data
+        rtc_result=current
        </script>
        <statetransition>int2_mode</statetransition>
     </rule>
@@ -193,8 +193,8 @@ rtc_result=current
     <rule>
       <key>Comma</key>
       <script sendto="out">
-current="0."
-rtc_result=current
+        current="0."
+        rtc_result=current
       </script>
       <statetransition>float2_mode</statetransition>
     </rule>
@@ -207,7 +207,7 @@ rtc_result=current
     <rule>
        <key>(Add|Subtract|Multiply|Divide)</key>
        <script sendto="out">
-opr=getOperation(rtc_in_data)
+        opr=getOperation(rtc_in_data)
        </script>
     </rule>
     
@@ -216,23 +216,23 @@ opr=getOperation(rtc_in_data)
   <state name="int2_mode">
     <onentry>
       <script >
-print "=== int2 Mode ===="
+        print "=== int2 Mode ===="
       </script>
     </onentry>
 
     <rule>
        <key>(0|1|2|3|4|5|6|7|8|9)</key>
        <script sendto="out">
-current=current+rtc_in_data
-rtc_result=current
+        current=current+rtc_in_data
+        rtc_result=current
        </script>
     </rule>
 
     <rule>
       <key>Comma</key>
       <script sendto="out">
-current=current+"."
-rtc_result=current
+        current=current+"."
+        rtc_result=current
       </script>
       <statetransition>float2_mode</statetransition>
     </rule>
@@ -240,9 +240,9 @@ rtc_result=current
     <rule>
        <key>(Add|Subtract|Multiply|Divide)</key>
        <script sendto="out">
-ans=current
-opr=getOperation(rtc_in_data)
-rtc_result=calc_exec()
+        ans=current
+        opr=getOperation(rtc_in_data)
+        rtc_result=calc_exec()
        </script>
        <statetransition>calc_mode</statetransition>
     </rule>
@@ -255,8 +255,8 @@ rtc_result=calc_exec()
     <rule>
       <key>Equal</key>
       <script sendto="out">
-ans=calc_exec()
-rtc_result=ans
+        ans=calc_exec()
+        rtc_result=ans
       </script>
        <statetransition>calc_mode</statetransition>
     </rule>
@@ -266,24 +266,24 @@ rtc_result=ans
   <state name="float2_mode">
     <onentry>
       <script >
-print "=== float2 Mode ===="
+        print "=== float2 Mode ===="
       </script>
     </onentry>
 
     <rule>
        <key>(0|1|2|3|4|5|6|7|8|9)</key>
        <script sendto="out">
-current=current+rtc_in_data
-rtc_result=current
+        current=current+rtc_in_data
+        rtc_result=current
        </script>
     </rule>
 
     <rule>
        <key>(Add|Subtract|Multiply|Divide)</key>
        <script sendto="out">
-ans=current
-opr=getOperation(rtc_in_data)
-rtc_result=calc_exec()
+        ans=current
+        opr=getOperation(rtc_in_data)
+        rtc_result=calc_exec()
        </script>
        <statetransition>calc_mode</statetransition>
     </rule>
@@ -296,8 +296,8 @@ rtc_result=calc_exec()
     <rule>
       <key>Equal</key>
       <script sendto="out">
-ans=calc_exec()
-rtc_result=ans
+        ans=calc_exec()
+        rtc_result=ans
       </script>
        <statetransition>calc_mode</statetransition>
     </rule>
@@ -308,7 +308,7 @@ rtc_result=ans
   <state name="calc_mode">
     <onentry>
       <script >
-print "=== calc Mode ===="
+        print "=== calc Mode ===="
       </script>
     </onentry>
 
@@ -320,8 +320,8 @@ print "=== calc Mode ===="
     <rule>
        <key>(1|2|3|4|5|6|7|8|9)</key>
        <script sendto="out">
-current=rtc_in_data
-rtc_result=current
+        current=rtc_in_data
+        rtc_result=current
        </script>
        <statetransition>int2_mode</statetransition>
     </rule>
@@ -329,8 +329,8 @@ rtc_result=current
     <rule>
       <key>Comma</key>
       <script sendto="out">
-current="0."
-rtc_result=current
+        current="0."
+        rtc_result=current
       </script>
       <statetransition>float2_mode</statetransition>
     </rule>
@@ -338,7 +338,7 @@ rtc_result=current
     <rule>
        <key>(Add|Subtract|Multiply|Divide)</key>
        <script sendto="out">
-opr=getOperation(rtc_in_data)
+        opr=getOperation(rtc_in_data)
        </script>
        <statetransition>input2_mode</statetransition>
     </rule>
@@ -346,12 +346,10 @@ opr=getOperation(rtc_in_data)
     <rule>
        <key>Equal</key>
        <script sendto="out">
-ans=calc_exec()
-rtc_result=ans
+        ans=calc_exec()
+        rtc_result=ans
        </script>
     </rule>
-
-
   </state>
 
 </seatml>

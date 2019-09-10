@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title> WebAdaptor for SimpleIO_web</title>
+
+    <script src="jquery-1.11.3.min.js"></script>
+    <script src="jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src="comet.js"></script>
+
+    <!-- Local functions -->
+    <script type="text/javascript">
+      function registerHandler(){ requestComet(1); }
+      function sendEventToRtc(){ sendValueToRtc($("input[name='msg']").val()); }
+      function processEvents(event){
+        $('textarea[name="fromSeat"]').val( 
+          $('textarea[name="fromSeat"]').val()+event.message+"\n");
+      }
+    </script>
+    <!-- ///Local functions -->
+  </head>
+
+  <body onLoad="registerHandler();">
+  <h3>Test of WebAdaptor with SimpleIO component</h3>
+  <hr>
+  <form name="myform">
+    <table>
+    <tr>
+    <td>Send: </td>
+    <td><input type="text" name="msg" size="40" value=""> </td>
+    <td><input type="button" value="Send"  onClick="sendEventToRtc();"></td>
+    </tr>
+    <tr>
+    <td>Outcome: </td>
+    <td> <textarea name="fromSeat" cols="50" rows="10"></textarea></td>
+    <td></td>
+    <tr>
+    </table>
+  </form>
+
+  <h3> RESPONSE</h3>
+  <hr>
+  <div id="response"></div>
+  </body>
+</html>
+

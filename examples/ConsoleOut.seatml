@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <seatml>
+   <general name="ConsoleOut">
+   <adaptor name="in" type="rtcin" datatype="TimedLong" />
+   </general>
+
+   <state name="main_state">
+    <rule source="in">
+     <script>
+     <!--
+      data=seat.get_in_data()
+      print( "Received: ", data)
+      print( "Received: ", data.data)
+      print( "TimeStamp: ", data.tm.sec, "[s] ", data.tm.nsec, "[ns]")
+     -->
+     </script>
+    </rule>
+   </state>
+ </seatml>
+

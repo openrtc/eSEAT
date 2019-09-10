@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<seatml>
+  <general name="ConsoleIn" >
+    <adaptor name="out" type="rtcout" datatype="TimedLong" />
+  </general>
+
+  <state name="main_state">
+   <onexec>
+     <script sendto="out">
+      print("Please input number: ", end="")
+      val = long(sys.stdin.readline())
+      data=TimedLong(Time(0,0), val)
+      OpenRTM_aist.setTimestamp(data)
+      print("Sending to subscriber: ", data)
+      seat.set_result(data)
+     </script>
+   </onexec>
+  </state>
+</seatml>

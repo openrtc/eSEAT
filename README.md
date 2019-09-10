@@ -3,7 +3,7 @@ eSEAT
 
 eSEAT is the extension of the SEAT.
 Originally the SEAT developed by I.Hara with C-Language in 2003.
-Dr.Matsusaka and OpenHRI development team rewrite the SEAT with python from scratch and released under ELP-1.0.
+Dr.Matsusaka and OpenHRI development team rewrite the SEAT with python from scratch and released under EPL-1.0.
 The secound version had been supported the connection with the OpenRTM-aist, but suppoeted data-type was only 'String'.
 
 The eSEAT is extened the secound version and has released under the MIT License.

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ `lsb_release -rs` == "16.04" ];then
+  export ROS_DISTRO=kinetic
+elif [ `lsb_release -rs` == "18.04" ];then
+  export ROS_DISTRO=melodic
+else
+  export ROS_DISTRO=
+  echo "Unknown distribution...."
+  exit
+fi
+
+if [ $# -lt 2 ]; then
+  echo "Usage: $0 <pkg-name> <action-name>"
+  exit
+fi
+
+PKG_NAME=$1
+ACTION_NAME=$2
+
+GENACTION=/opt/ros/$ROS_DISTRO/lib/actionlib_msgs/genaction.py
+PKG_DIR=ros/packages/$PKG_NAME
+
+$GENACTION $PKG_DIR/action/$ACTION_NAME.action -o $PKG_DIR/msg

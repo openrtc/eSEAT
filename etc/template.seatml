@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<seatml>
+  <general name="_sample_">
+  </general>
+
+  <state name="main_state">
+  </state>
+</seatml>

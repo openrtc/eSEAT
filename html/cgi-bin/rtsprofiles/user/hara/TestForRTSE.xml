@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<rts:RtsProfile rts:updateDate="2013-07-02T15:07:01.597+09:00" rts:creationDate="2013-07-02T15:07:01.593+09:00" rts:version="0.2" rts:id="RTSystem:AIST:TestSystem...:0.0.1" xmlns:rtsExt="http://www.openrtp.org/namespaces/rts_ext" xmlns:rts="http://www.openrtp.org/namespaces/rts" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <rts:Components xsi:type="rtsExt:component_ext" rts:isRequired="true" rts:compositeType="None" rts:activeConfigurationSet="default" rts:instanceName="CommandIn0" rts:pathUri="localhost/LetsNote-hara.host_cxt/CommandIn0.rtc" rts:id="RTC:AIST:Sampl:CommandIn:1.0.0">
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="CommandIn0.command">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedString:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="flush,new,periodic" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:ConfigurationSets rts:id="default"/>
+        <rts:ExecutionContexts xsi:type="rtsExt:execution_context_ext" rts:rate="100.0" rts:kind="PERIODIC" rts:id="0"/>
+        <rtsExt:Location rtsExt:direction="RIGHT" rtsExt:width="-1" rtsExt:height="-1" rtsExt:y="57" rtsExt:x="130"/>
+        <rtsExt:Properties rtsExt:value="CommandIn" rtsExt:name="implementation_id"/>
+        <rtsExt:Properties rtsExt:value="CommandIn" rtsExt:name="type_name"/>
+        <rtsExt:Properties rtsExt:value="Command Input Sample for GRobotRTC" rtsExt:name="description"/>
+        <rtsExt:Properties rtsExt:value="1.0.0" rtsExt:name="version"/>
+        <rtsExt:Properties rtsExt:value="AIST" rtsExt:name="vendor"/>
+        <rtsExt:Properties rtsExt:value="Sampl" rtsExt:name="category"/>
+        <rtsExt:Properties rtsExt:value="PERIODIC" rtsExt:name="activity_type"/>
+        <rtsExt:Properties rtsExt:value="1" rtsExt:name="max_instance"/>
+        <rtsExt:Properties rtsExt:value="C++" rtsExt:name="language"/>
+        <rtsExt:Properties rtsExt:value="compile" rtsExt:name="lang_type"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="conf.default"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.provider.enabled_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.provider.available_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.consumer.enabled_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.consumer.available_services"/>
+        <rtsExt:Properties rtsExt:value="DataFlowComponent" rtsExt:name="kind"/>
+        <rtsExt:Properties rtsExt:value="CommandIn0" rtsExt:name="instance_name"/>
+        <rtsExt:Properties rtsExt:value="1.1.0" rtsExt:name="config.version"/>
+        <rtsExt:Properties rtsExt:value="OpenRTM-aist-1.1.0" rtsExt:name="openrtm.name"/>
+        <rtsExt:Properties rtsExt:value="1.1.0" rtsExt:name="openrtm.version"/>
+        <rtsExt:Properties rtsExt:value="Win32" rtsExt:name="os.name"/>
+        <rtsExt:Properties rtsExt:value="Windows NT 6.1" rtsExt:name="os.release"/>
+        <rtsExt:Properties rtsExt:value="Build 7601 Service Pack 1" rtsExt:name="os.version"/>
+        <rtsExt:Properties rtsExt:value="Intel Pentium Pro" rtsExt:name="os.arch"/>
+        <rtsExt:Properties rtsExt:value="LetsNote-hara" rtsExt:name="os.hostname"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="corba.endpoint"/>
+        <rtsExt:Properties rtsExt:value="omniORB" rtsExt:name="corba.id"/>
+        <rtsExt:Properties rtsExt:value="PeriodicExecutionContext" rtsExt:name="exec_cxt.periodic.type"/>
+        <rtsExt:Properties rtsExt:value="100" rtsExt:name="exec_cxt.periodic.rate"/>
+        <rtsExt:Properties rtsExt:value="EventDrivenExecutionContext" rtsExt:name="exec_cxt.evdriven.type"/>
+        <rtsExt:Properties rtsExt:value="NO" rtsExt:name="logger.enable"/>
+        <rtsExt:Properties rtsExt:value="INFO" rtsExt:name="logger.log_level"/>
+        <rtsExt:Properties rtsExt:value="YES" rtsExt:name="naming.enable"/>
+        <rtsExt:Properties rtsExt:value="corba" rtsExt:name="naming.type"/>
+        <rtsExt:Properties rtsExt:value="%h.host_cxt/%n.rtc" rtsExt:name="naming.formats"/>
+        <rtsExt:Properties rtsExt:value="LetsNote-hara.host_cxt/CommandIn0.rtc" rtsExt:name="naming.names"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="config_file"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.dataport"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.command"/>
+        <rtsExt:Properties rtsExt:value="IOR:000000000000003549444c3a6f70656e72746d2e616973742e676f2e6a702f4f70656e52544d2f44617461466c6f77436f6d706f6e656e743a312e3000000000000000010000000000000064000102000000000e3135302e32392e39372e313630008b620000000efe7e48d251000026f8000000000000000000000200000000000000080000000041545400000000010000001c00000000000100010000000105010001000101090000000100010109" rtsExt:name="IOR"/>
+    </rts:Components>
+    <rts:Components xsi:type="rtsExt:component_ext" rts:isRequired="true" rts:compositeType="None" rts:activeConfigurationSet="default" rts:instanceName="CVPresentation0" rts:pathUri="localhost/LetsNote-hara.host_cxt/CVPresentation0.rtc" rts:id="RTC:TakeshiSasaki:Presentation:CVPresentation:1.0.0">
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="CVPresentation0.SlideNumberOut">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedShort:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="flush,new,periodic" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="CVPresentation0.Key">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedChar:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="flush,new,periodic" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="CVPresentation0.MouseEvent">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedShortSeq:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="flush,new,periodic" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="CVPresentation0.SlideNumberIn">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedShort:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="CVPresentation0.Pen">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedShortSeq:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="CVPresentation0.Comment">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedString:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:ServicePorts xsi:type="rtsExt:serviceport_ext" rts:name="CVPresentation0.SlideSizeInfoPort">
+            <rtsExt:Properties rtsExt:value="CorbaPort" rtsExt:name="port.port_type"/>
+        </rts:ServicePorts>
+        <rts:ConfigurationSets rts:id="default">
+            <rts:ConfigurationData rts:data="./" rts:name="SlideFilePath"/>
+            <rts:ConfigurationData rts:data="test***.jpg" rts:name="SlideFileName"/>
+            <rts:ConfigurationData rts:data="1" rts:name="SlideFileInitialNumber"/>
+            <rts:ConfigurationData rts:data="1" rts:name="SlideNumberInRelative"/>
+            <rts:ConfigurationData rts:data="0" rts:name="SlideSizeWidth"/>
+            <rts:ConfigurationData rts:data="0" rts:name="SlideSizeHeight"/>
+            <rts:ConfigurationData rts:data="0,0,0" rts:name="CommentColorRGB"/>
+            <rts:ConfigurationData rts:data="1.0" rts:name="CommentSize"/>
+            <rts:ConfigurationData rts:data="4" rts:name="CommentBaseSpeed"/>
+            <rts:ConfigurationData rts:data="255,0,0" rts:name="PenColorRGB"/>
+            <rts:ConfigurationData rts:data="4" rts:name="PenThickness"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__widget__">
+            <rts:ConfigurationData rts:data="text" rts:name="SlideFilePath"/>
+            <rts:ConfigurationData rts:data="text" rts:name="SlideFileName"/>
+            <rts:ConfigurationData rts:data="text" rts:name="SlideFileInitialNumber"/>
+            <rts:ConfigurationData rts:data="radio" rts:name="SlideNumberInRelative"/>
+            <rts:ConfigurationData rts:data="text" rts:name="SlideSizeWidth"/>
+            <rts:ConfigurationData rts:data="text" rts:name="SlideSizeHeight"/>
+            <rts:ConfigurationData rts:data="text" rts:name="CommentColorRGB"/>
+            <rts:ConfigurationData rts:data="text" rts:name="CommentSize"/>
+            <rts:ConfigurationData rts:data="text" rts:name="CommentBaseSpeed"/>
+            <rts:ConfigurationData rts:data="text" rts:name="PenColorRGB"/>
+            <rts:ConfigurationData rts:data="text" rts:name="PenThickness"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__constraints__">
+            <rts:ConfigurationData rts:data="x&gt;=0" rts:name="SlideFileInitialNumber"/>
+            <rts:ConfigurationData rts:data="(0,1)" rts:name="SlideNumberInRelative"/>
+            <rts:ConfigurationData rts:data="x&gt;=0" rts:name="SlideSizeWidth"/>
+            <rts:ConfigurationData rts:data="x&gt;=0" rts:name="SlideSizeHeight"/>
+            <rts:ConfigurationData rts:data="x&gt;0" rts:name="CommentSize"/>
+            <rts:ConfigurationData rts:data="x&gt;0" rts:name="CommentBaseSpeed"/>
+            <rts:ConfigurationData rts:data="x&gt;0" rts:name="PenThickness"/>
+        </rts:ConfigurationSets>
+        <rts:ExecutionContexts xsi:type="rtsExt:execution_context_ext" rts:rate="1000.0" rts:kind="PERIODIC" rts:id="0"/>
+        <rtsExt:Location rtsExt:direction="RIGHT" rtsExt:width="-1" rtsExt:height="-1" rtsExt:y="106" rtsExt:x="277"/>
+        <rtsExt:Properties rtsExt:value="CVPresentation" rtsExt:name="implementation_id"/>
+        <rtsExt:Properties rtsExt:value="CVPresentation" rtsExt:name="type_name"/>
+        <rtsExt:Properties rtsExt:value="Presentation component using OpenCV" rtsExt:name="description"/>
+        <rtsExt:Properties rtsExt:value="1.0.0" rtsExt:name="version"/>
+        <rtsExt:Properties rtsExt:value="TakeshiSasaki" rtsExt:name="vendor"/>
+        <rtsExt:Properties rtsExt:value="Presentation" rtsExt:name="category"/>
+        <rtsExt:Properties rtsExt:value="PERIODIC" rtsExt:name="activity_type"/>
+        <rtsExt:Properties rtsExt:value="0" rtsExt:name="max_instance"/>
+        <rtsExt:Properties rtsExt:value="C++" rtsExt:name="language"/>
+        <rtsExt:Properties rtsExt:value="compile" rtsExt:name="lang_type"/>
+        <rtsExt:Properties rtsExt:value="./" rtsExt:name="conf.default.SlideFilePath"/>
+        <rtsExt:Properties rtsExt:value="test***.jpg" rtsExt:name="conf.default.SlideFileName"/>
+        <rtsExt:Properties rtsExt:value="1" rtsExt:name="conf.default.SlideFileInitialNumber"/>
+        <rtsExt:Properties rtsExt:value="1" rtsExt:name="conf.default.SlideNumberInRelative"/>
+        <rtsExt:Properties rtsExt:value="0" rtsExt:name="conf.default.SlideSizeWidth"/>
+        <rtsExt:Properties rtsExt:value="0" rtsExt:name="conf.default.SlideSizeHeight"/>
+        <rtsExt:Properties rtsExt:value="0,0,0" rtsExt:name="conf.default.CommentColorRGB"/>
+        <rtsExt:Properties rtsExt:value="1.0" rtsExt:name="conf.default.CommentSize"/>
+        <rtsExt:Properties rtsExt:value="4" rtsExt:name="conf.default.CommentBaseSpeed"/>
+        <rtsExt:Properties rtsExt:value="255,0,0" rtsExt:name="conf.default.PenColorRGB"/>
+        <rtsExt:Properties rtsExt:value="4" rtsExt:name="conf.default.PenThickness"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.SlideFilePath"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.SlideFileName"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.SlideFileInitialNumber"/>
+        <rtsExt:Properties rtsExt:value="radio" rtsExt:name="conf.__widget__.SlideNumberInRelative"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.SlideSizeWidth"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.SlideSizeHeight"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.CommentColorRGB"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.CommentSize"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.CommentBaseSpeed"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.PenColorRGB"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.PenThickness"/>
+        <rtsExt:Properties rtsExt:value="x&gt;=0" rtsExt:name="conf.__constraints__.SlideFileInitialNumber"/>
+        <rtsExt:Properties rtsExt:value="(0,1)" rtsExt:name="conf.__constraints__.SlideNumberInRelative"/>
+        <rtsExt:Properties rtsExt:value="x&gt;=0" rtsExt:name="conf.__constraints__.SlideSizeWidth"/>
+        <rtsExt:Properties rtsExt:value="x&gt;=0" rtsExt:name="conf.__constraints__.SlideSizeHeight"/>
+        <rtsExt:Properties rtsExt:value="x&gt;0" rtsExt:name="conf.__constraints__.CommentSize"/>
+        <rtsExt:Properties rtsExt:value="x&gt;0" rtsExt:name="conf.__constraints__.CommentBaseSpeed"/>
+        <rtsExt:Properties rtsExt:value="x&gt;0" rtsExt:name="conf.__constraints__.PenThickness"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.provider.enabled_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.provider.available_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.consumer.enabled_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.consumer.available_services"/>
+        <rtsExt:Properties rtsExt:value="DataFlowComponent" rtsExt:name="kind"/>
+        <rtsExt:Properties rtsExt:value="CVPresentation0" rtsExt:name="instance_name"/>
+        <rtsExt:Properties rtsExt:value="1.1.0" rtsExt:name="config.version"/>
+        <rtsExt:Properties rtsExt:value="OpenRTM-aist-1.1.0" rtsExt:name="openrtm.name"/>
+        <rtsExt:Properties rtsExt:value="1.1.0" rtsExt:name="openrtm.version"/>
+        <rtsExt:Properties rtsExt:value="Win32" rtsExt:name="os.name"/>
+        <rtsExt:Properties rtsExt:value="Windows NT 6.1" rtsExt:name="os.release"/>
+        <rtsExt:Properties rtsExt:value="Build 7601 Service Pack 1" rtsExt:name="os.version"/>
+        <rtsExt:Properties rtsExt:value="Intel Pentium Pro" rtsExt:name="os.arch"/>
+        <rtsExt:Properties rtsExt:value="LetsNote-hara" rtsExt:name="os.hostname"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="corba.endpoint"/>
+        <rtsExt:Properties rtsExt:value="omniORB" rtsExt:name="corba.id"/>
+        <rtsExt:Properties rtsExt:value="PeriodicExecutionContext" rtsExt:name="exec_cxt.periodic.type"/>
+        <rtsExt:Properties rtsExt:value="1000" rtsExt:name="exec_cxt.periodic.rate"/>
+        <rtsExt:Properties rtsExt:value="EventDrivenExecutionContext" rtsExt:name="exec_cxt.evdriven.type"/>
+        <rtsExt:Properties rtsExt:value="NO" rtsExt:name="logger.enable"/>
+        <rtsExt:Properties rtsExt:value="INFO" rtsExt:name="logger.log_level"/>
+        <rtsExt:Properties rtsExt:value="YES" rtsExt:name="naming.enable"/>
+        <rtsExt:Properties rtsExt:value="corba" rtsExt:name="naming.type"/>
+        <rtsExt:Properties rtsExt:value="%h.host_cxt/%n.rtc" rtsExt:name="naming.formats"/>
+        <rtsExt:Properties rtsExt:value="LetsNote-hara.host_cxt/CVPresentation0.rtc" rtsExt:name="naming.names"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="config_file"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.inport.dataport"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.inport.SlideNumberIn"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.inport.Pen"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.inport.Comment"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.dataport"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.SlideNumberOut"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.Key"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.MouseEvent"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.corba"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.corbaport."/>
+        <rtsExt:Properties rtsExt:value="IOR:000000000000003549444c3a6f70656e72746d2e616973742e676f2e6a702f4f70656e52544d2f44617461466c6f77436f6d706f6e656e743a312e3000000000000000010000000000000064000102000000000e3135302e32392e39372e313630008b760000000efe8148d251000027b8000000000000000000000200000000000000080000000041545400000000010000001c00000000000100010000000105010001000101090000000100010109" rtsExt:name="IOR"/>
+    </rts:Components>
+    <rts:Components xsi:type="rtsExt:component_ext" rts:isRequired="true" rts:compositeType="None" rts:activeConfigurationSet="default" rts:instanceName="PresentationLPInterface0" rts:pathUri="localhost/LetsNote-hara.host_cxt/PresentationLPInterface0.rtc" rts:id="RTC:TakeshiSasaki:Presentation:PresentationLPInterface:1.0.0">
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="PresentationLPInterface0.SlideRelativeCommand">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedShort:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="flush,new,periodic" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="PresentationLPInterface0.DrawPositions">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedShortSeq:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="flush,new,periodic" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="PresentationLPInterface0.Image">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:Img/TimedCameraImage:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="PresentationLPInterface0.BgUpdateTrigger">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedShort:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:ServicePorts xsi:type="rtsExt:serviceport_ext" rts:name="PresentationLPInterface0.SlideSizeInfoPort">
+            <rtsExt:Properties rtsExt:value="CorbaPort" rtsExt:name="port.port_type"/>
+        </rts:ServicePorts>
+        <rts:ConfigurationSets rts:id="default">
+            <rts:ConfigurationData rts:data="30" rts:name="DetectLuminanceDiff"/>
+            <rts:ConfigurationData rts:data="5" rts:name="DetectBgUpdate"/>
+            <rts:ConfigurationData rts:data="0.5" rts:name="DetectUpdateTime"/>
+            <rts:ConfigurationData rts:data="0.0" rts:name="ScreenZ"/>
+            <rts:ConfigurationData rts:data="top" rts:name="SlideChangeArea"/>
+            <rts:ConfigurationData rts:data="50" rts:name="SlideChangeAreaSize"/>
+            <rts:ConfigurationData rts:data="5" rts:name="SlideChangeCount"/>
+            <rts:ConfigurationData rts:data="1.0" rts:name="SlideChangeWait"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__widget__">
+            <rts:ConfigurationData rts:data="text" rts:name="DetectLuminanceDiff"/>
+            <rts:ConfigurationData rts:data="text" rts:name="DetectBgUpdate"/>
+            <rts:ConfigurationData rts:data="text" rts:name="DetectUpdateTime"/>
+            <rts:ConfigurationData rts:data="text" rts:name="ScreenZ"/>
+            <rts:ConfigurationData rts:data="radio" rts:name="SlideChangeArea"/>
+            <rts:ConfigurationData rts:data="text" rts:name="SlideChangeAreaSize"/>
+            <rts:ConfigurationData rts:data="text" rts:name="SlideChangeCount"/>
+            <rts:ConfigurationData rts:data="text" rts:name="SlideChangeWait"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__constraints__">
+            <rts:ConfigurationData rts:data="x&gt;=0" rts:name="DetectUpdateTime"/>
+            <rts:ConfigurationData rts:data="(top,left,right,bottom)" rts:name="SlideChangeArea"/>
+            <rts:ConfigurationData rts:data="x&gt;0" rts:name="SlideChangeAreaSize"/>
+            <rts:ConfigurationData rts:data="x&gt;0" rts:name="SlideChangeCount"/>
+            <rts:ConfigurationData rts:data="x&gt;=0" rts:name="SlideChangeWait"/>
+        </rts:ConfigurationSets>
+        <rts:ExecutionContexts xsi:type="rtsExt:execution_context_ext" rts:rate="1000.0" rts:kind="PERIODIC" rts:id="0"/>
+        <rtsExt:Location rtsExt:direction="RIGHT" rtsExt:width="-1" rtsExt:height="-1" rtsExt:y="222" rtsExt:x="140"/>
+        <rtsExt:Properties rtsExt:value="PresentationLPInterface" rtsExt:name="implementation_id"/>
+        <rtsExt:Properties rtsExt:value="PresentationLPInterface" rtsExt:name="type_name"/>
+        <rtsExt:Properties rtsExt:value="Create slide change and draw commands for presentation component based on laser light pointing" rtsExt:name="description"/>
+        <rtsExt:Properties rtsExt:value="1.0.0" rtsExt:name="version"/>
+        <rtsExt:Properties rtsExt:value="TakeshiSasaki" rtsExt:name="vendor"/>
+        <rtsExt:Properties rtsExt:value="Presentation" rtsExt:name="category"/>
+        <rtsExt:Properties rtsExt:value="PERIODIC" rtsExt:name="activity_type"/>
+        <rtsExt:Properties rtsExt:value="0" rtsExt:name="max_instance"/>
+        <rtsExt:Properties rtsExt:value="C++" rtsExt:name="language"/>
+        <rtsExt:Properties rtsExt:value="compile" rtsExt:name="lang_type"/>
+        <rtsExt:Properties rtsExt:value="30" rtsExt:name="conf.default.DetectLuminanceDiff"/>
+        <rtsExt:Properties rtsExt:value="5" rtsExt:name="conf.default.DetectBgUpdate"/>
+        <rtsExt:Properties rtsExt:value="0.5" rtsExt:name="conf.default.DetectUpdateTime"/>
+        <rtsExt:Properties rtsExt:value="0.0" rtsExt:name="conf.default.ScreenZ"/>
+        <rtsExt:Properties rtsExt:value="top" rtsExt:name="conf.default.SlideChangeArea"/>
+        <rtsExt:Properties rtsExt:value="50" rtsExt:name="conf.default.SlideChangeAreaSize"/>
+        <rtsExt:Properties rtsExt:value="5" rtsExt:name="conf.default.SlideChangeCount"/>
+        <rtsExt:Properties rtsExt:value="1.0" rtsExt:name="conf.default.SlideChangeWait"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.DetectLuminanceDiff"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.DetectBgUpdate"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.DetectUpdateTime"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.ScreenZ"/>
+        <rtsExt:Properties rtsExt:value="radio" rtsExt:name="conf.__widget__.SlideChangeArea"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.SlideChangeAreaSize"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.SlideChangeCount"/>
+        <rtsExt:Properties rtsExt:value="text" rtsExt:name="conf.__widget__.SlideChangeWait"/>
+        <rtsExt:Properties rtsExt:value="x&gt;=0" rtsExt:name="conf.__constraints__.DetectUpdateTime"/>
+        <rtsExt:Properties rtsExt:value="(top,left,right,bottom)" rtsExt:name="conf.__constraints__.SlideChangeArea"/>
+        <rtsExt:Properties rtsExt:value="x&gt;0" rtsExt:name="conf.__constraints__.SlideChangeAreaSize"/>
+        <rtsExt:Properties rtsExt:value="x&gt;0" rtsExt:name="conf.__constraints__.SlideChangeCount"/>
+        <rtsExt:Properties rtsExt:value="x&gt;=0" rtsExt:name="conf.__constraints__.SlideChangeWait"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.provider.enabled_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.provider.available_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.consumer.enabled_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.consumer.available_services"/>
+        <rtsExt:Properties rtsExt:value="DataFlowComponent" rtsExt:name="kind"/>
+        <rtsExt:Properties rtsExt:value="PresentationLPInterface0" rtsExt:name="instance_name"/>
+        <rtsExt:Properties rtsExt:value="1.1.0" rtsExt:name="config.version"/>
+        <rtsExt:Properties rtsExt:value="OpenRTM-aist-1.1.0" rtsExt:name="openrtm.name"/>
+        <rtsExt:Properties rtsExt:value="1.1.0" rtsExt:name="openrtm.version"/>
+        <rtsExt:Properties rtsExt:value="Win32" rtsExt:name="os.name"/>
+        <rtsExt:Properties rtsExt:value="Windows NT 6.1" rtsExt:name="os.release"/>
+        <rtsExt:Properties rtsExt:value="Build 7601 Service Pack 1" rtsExt:name="os.version"/>
+        <rtsExt:Properties rtsExt:value="Intel Pentium Pro" rtsExt:name="os.arch"/>
+        <rtsExt:Properties rtsExt:value="LetsNote-hara" rtsExt:name="os.hostname"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="corba.endpoint"/>
+        <rtsExt:Properties rtsExt:value="omniORB" rtsExt:name="corba.id"/>
+        <rtsExt:Properties rtsExt:value="PeriodicExecutionContext" rtsExt:name="exec_cxt.periodic.type"/>
+        <rtsExt:Properties rtsExt:value="1000" rtsExt:name="exec_cxt.periodic.rate"/>
+        <rtsExt:Properties rtsExt:value="EventDrivenExecutionContext" rtsExt:name="exec_cxt.evdriven.type"/>
+        <rtsExt:Properties rtsExt:value="NO" rtsExt:name="logger.enable"/>
+        <rtsExt:Properties rtsExt:value="INFO" rtsExt:name="logger.log_level"/>
+        <rtsExt:Properties rtsExt:value="YES" rtsExt:name="naming.enable"/>
+        <rtsExt:Properties rtsExt:value="corba" rtsExt:name="naming.type"/>
+        <rtsExt:Properties rtsExt:value="%h.host_cxt/%n.rtc" rtsExt:name="naming.formats"/>
+        <rtsExt:Properties rtsExt:value="LetsNote-hara.host_cxt/PresentationLPInterface0.rtc" rtsExt:name="naming.names"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="config_file"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.inport.dataport"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.inport.Image"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.inport.BgUpdateTrigger"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.dataport"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.SlideRelativeCommand"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.DrawPositions"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.corba"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.corbaport."/>
+        <rtsExt:Properties rtsExt:value="IOR:000000000000003549444c3a6f70656e72746d2e616973742e676f2e6a702f4f70656e52544d2f44617461466c6f77436f6d706f6e656e743a312e3000000000000000010000000000000064000102000000000e3135302e32392e39372e313630008b770000000efe8148d25100002694000000000000000000000200000000000000080000000041545400000000010000001c00000000000100010000000105010001000101090000000100010109" rtsExt:name="IOR"/>
+    </rts:Components>
+    <rts:DataPortConnectors xsi:type="rtsExt:dataport_connector_ext" rts:subscriptionType="flush" rts:dataflowType="push" rts:interfaceType="corba_cdr" rts:dataType="IDL:RTC/TimedShort:1.0" rts:name="PresentationLPInterface0.SlideRelativeCommand_CVPresentation0.SlideNumberIn" rts:connectorId="64d0a381-f5f6-43bf-b2c0-a22c77ab9d86">
+        <rts:sourceDataPort xsi:type="rtsExt:target_port_ext" rts:portName="PresentationLPInterface0.SlideRelativeCommand" rts:instanceName="PresentationLPInterface0" rts:componentId="RTC:TakeshiSasaki:Presentation:PresentationLPInterface:1.0.0">
+            <rtsExt:Properties rtsExt:value="localhost/LetsNote-hara.host_cxt/PresentationLPInterface0.rtc" rtsExt:name="COMPONENT_PATH_ID"/>
+        </rts:sourceDataPort>
+        <rts:targetDataPort xsi:type="rtsExt:target_port_ext" rts:portName="CVPresentation0.SlideNumberIn" rts:instanceName="CVPresentation0" rts:componentId="RTC:TakeshiSasaki:Presentation:CVPresentation:1.0.0">
+            <rtsExt:Properties rtsExt:value="localhost/LetsNote-hara.host_cxt/CVPresentation0.rtc" rtsExt:name="COMPONENT_PATH_ID"/>
+        </rts:targetDataPort>
+        <rtsExt:Properties rtsExt:value="all" rtsExt:name="dataport.publisher.push_policy"/>
+        <rtsExt:Properties rtsExt:value="IDL:RTC/TimedShort:1.0" rtsExt:name="dataport.data_type"/>
+        <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        <rtsExt:Properties rtsExt:value="push" rtsExt:name="dataport.dataflow_type"/>
+        <rtsExt:Properties rtsExt:value="flush" rtsExt:name="dataport.subscription_type"/>
+        <rtsExt:Properties rtsExt:value="little,big" rtsExt:name="dataport.serializer.cdr.endian"/>
+        <rtsExt:Properties rtsExt:value="IOR:010000001a00000049444c3a4f70656e52544d2f496e506f72744364723a312e30000000010000000000000064000000010102000e0000003135302e32392e39372e31363000768b0e000000fe8148d251000027b8000000000b00000200000000000000080000000100000000545441010000001c00000001000000010001000100000001000105090101000100000009010100" rtsExt:name="dataport.corba_cdr.inport_ior"/>
+        <rtsExt:Properties rtsExt:name="dataport.corba_cdr.inport_ref"/>
+    </rts:DataPortConnectors>
+    <rts:ServicePortConnectors xsi:type="rtsExt:serviceport_connector_ext" rts:name="CVPresentation0.SlideSizeInfoPort_PresentationLPInterface0.SlideSizeInfoPort" rts:connectorId="f20a9e28-109f-4c37-8998-25f6bf58881d">
+        <rts:sourceServicePort xsi:type="rtsExt:target_port_ext" rts:portName="CVPresentation0.SlideSizeInfoPort" rts:instanceName="CVPresentation0" rts:componentId="RTC:TakeshiSasaki:Presentation:CVPresentation:1.0.0">
+            <rtsExt:Properties rtsExt:value="localhost/LetsNote-hara.host_cxt/CVPresentation0.rtc" rtsExt:name="COMPONENT_PATH_ID"/>
+        </rts:sourceServicePort>
+        <rts:targetServicePort xsi:type="rtsExt:target_port_ext" rts:portName="PresentationLPInterface0.SlideSizeInfoPort" rts:instanceName="PresentationLPInterface0" rts:componentId="RTC:TakeshiSasaki:Presentation:PresentationLPInterface:1.0.0">
+            <rtsExt:Properties rtsExt:value="localhost/LetsNote-hara.host_cxt/PresentationLPInterface0.rtc" rtsExt:name="COMPONENT_PATH_ID"/>
+        </rts:targetServicePort>
+        <rtsExt:Properties rtsExt:value="IOR:010000001c00000049444c3a536c6964652f536c69646553697a65496e666f3a312e3000010000000000000064000000010102000e0000003135302e32392e39372e31363000768b0e000000fe8148d251000027b8000000000a00000200000000000000080000000100000000545441010000001c00000001000000010001000100000001000105090101000100000009010100" rtsExt:name="CVPresentation0.port.SlideSizeInfoPort.provided.Slide::SlideSizeInfo.SlideSizeInfo"/>
+        <rtsExt:Properties rtsExt:value="IOR:010000001c00000049444c3a536c6964652f536c69646553697a65496e666f3a312e3000010000000000000064000000010102000e0000003135302e32392e39372e31363000768b0e000000fe8148d251000027b8000000000a00000200000000000000080000000100000000545441010000001c00000001000000010001000100000001000105090101000100000009010100" rtsExt:name="port.Slide::SlideSizeInfo.SlideSizeInfo"/>
+    </rts:ServicePortConnectors>
+</rts:RtsProfile>
+

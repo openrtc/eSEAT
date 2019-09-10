@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="SimpleIO_web">
+    <adaptor name="out" type="rtcout" datatype="TimedLong" />
+    <adaptor name="in" type="rtcin" datatype="TimedLong" />
+    <adaptor name="web" type="web"  port="8080" dir="html" />
+  </general>
+
+  <state name="main_mode">
+    <rule source="in">
+      <script sendto="web">
+        print(rtc_in_data)
+        seat.set_result(rtc_in_data.data)
+      </script>
+    </rule>
+
+    <rule source="web">
+      <script sendto="out">
+        print(web_in_data)
+        seat.set_result(int(web_in_data))
+      </script>
+    </rule>
+  </state>
+</seatml>

@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="TestGui" rate="2" >
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="str_in" type="rtcin" datatype="TimedString" />
+<!--
+    <adaptor name="web" type="web"  port="8080" document_root="/usr/local/eSEAT/html" />
+-->
+<!--
+   <onexec>
+     <script>
+       print( "Hello", time.time())
+     </script>
+   </onexec>
+-->
+  </general>
+
+  <state name="main_mode">
+
+    <label text="TestGui" colspan="3" bg_color="blue" />
+
+    <brk />
+
+    <label text="Input:" />
+    <input id="textIn" width="50" >
+        <message sendto="str_out" input="main_mode:textIn" />
+    </input>
+
+    <button label="Send">
+        <message sendto="str_out" input="main_mode:textIn" />
+        <message sendto="web" input="main_mode:textIn" />
+    </button>
+    <brk />
+  
+    <label text="Coming Text:" />
+    <text id="textOut" width="50" height="5" colspan="2" >
+    </text>
+    <brk />
+
+    <button label="Clear">
+      <script>
+       seat.clearText("main_mode:textOut")
+      </script>
+    </button>
+
+    <combobox id="combo1" values="Foo,Bar,Baz" default="Bar">
+      <script>
+       val=seat.getComboboxValue("main_mode:combo1")
+       seat.appendText("main_mode:textOut", val+"\n")
+      </script>
+    </combobox>
+
+    <checkbutton name="Check1">
+      <script>
+       val=seat.getCheckValue("main_mode:Check1")
+       seat.appendText("main_mode:textOut", str(val)+"\n")
+      </script>
+    </checkbutton>
+ 
+    <brk />
+
+    <labelframe label="RadioButtons" colspan="2" />
+    <radiobutton label="Radio1" variable="r1" value="aaa" frame="RadioButtons" />
+    <brk frame="RadioButtons" />
+    <radiobutton label="Radio2" variable="r1" value="bbb" frame="RadioButtons" />
+    <brk frame="RadioButtons" />
+    <radiobutton label="Radio3" variable="r1" value="ccc" frame="RadioButtons" />
+
+    <listbox name="lb1" values="Red,Green,Blue" height="4" > </listbox>
+    <brk />
+
+    <scale name="scale1" from="0" to="10"  resolution="1" orientation="h" colspan="3">
+    </scale>
+
+
+<!--
+    <rule source="str_in">
+      <script>
+       seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
+      </script>
+      <message sendto="web" input="main_mode:textOut" />
+      <script sendto="web">
+        rtc_result = rtc_in_data.data
+      </script>
+    </rule>
+
+-->
+<!--
+    <rule source="web">
+      <script>
+        seat.appendText("main_mode:textOut", web_in_data+"\n")
+      </script>
+      <script sendto="str_out">
+        rtc_result = web_in_data
+      </script>
+    </rule>
+-->
+  </state>
+</seatml>

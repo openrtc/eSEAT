@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="JoystickWeb">
+    <adaptor name="vel_out" type="rtcout" datatype="TimedVelocity2D" />
+    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
+    <adaptor name="str_in" type="rtcin" datatype="TimedString" />
+    <adaptor name="/turtle1/cmd_vel" type="ros_pub" datatype="geometry_msgs/Twist" size="1" />
+    <adaptor name="web" type="web"  port="8080" />
+  </general>
+
+  <state name="main_mode">
+    <!--- GUI part -->
+    <label text="JoystickWeb" colspan="3" bg_color="blue" />
+    <brk />
+
+    <button label="Exit">       <script> seat.exit() </script> </button>
+    <button label="Activate">   <script> seat.activate() </script> </button>
+    <button label="Deactivate"> <script> seat.deactivate() </script> </button>
+
+    <brk />
+
+    <label text="Info Text:" />
+    <text id="textOut" width="50" height="5" colspan="2" >
+    </text>
+
+    <brk />
+
+    <button label="Clear">
+      <script>
+        seat.clearText("main_mode:textOut")
+      </script>
+    </button>
+
+    <button label="Move">
+      <script>
+        seat.ros_publish("/turtle1/cmd_vel" , '[[2.0,0,0], [0,0,1.8]]')
+      </script>
+    </button>
+
+    <button label="Back" >
+      <script sendto="/turtle1/cmd_vel">
+        rtc_result = '[[-2.0,0,0], [0,0,1.8]]'
+      </script>
+    </button>
+
+    <!--- onData -->
+    <rule source="str_in">
+      <script>
+       seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
+      </script>
+      <!--
+      <message sendto="web" input="main_mode:textOut" />
+      -->
+      <script sendto="web">
+        rtc_result = rtc_in_data.data
+        #rtc_result = rtc_in_data
+      </script>
+    </rule>
+
+    <rule source="web">
+
+      <script>
+        seat.appendText("main_mode:textOut", web_in_data+"\n")
+      </script>
+
+      <script sendto="vel_out">
+        data = web_in_data.split(',')
+        if len(data) == 3:
+          v = max(min(float(data[1].strip())/1000,1), -1)
+          vth = max(min(float(data[2].strip())/100,1), -1)
+          #print TimedVelocity2D(Time(0,0), Velocity2D(v, 0, vth))
+          rtc_result = TimedVelocity2D(Time(0,0), Velocity2D(-v, 0, -vth))
+      </script>
+
+      <script sendto="str_out">
+        rtc_result = web_in_data
+      </script>
+
+      <script sendto="/turtle1/cmd_vel">
+        data = web_in_data.split(',')
+        if len(data) == 3:
+          v = max(min(float(data[1].strip())/1000,1), -1)
+          vth = max(min(float(data[2].strip())/100,1), -1)
+          rtc_result = [[-v*2,0,0], [0,0,-vth*2]]
+      </script>
+
+
+    </rule>
+
+    <!--- Message received -->
+    <rule>
+      <key>activate</key>
+      <script>seat.activate()</script>
+    </rule>
+    <rule>
+      <key>deactivate</key>
+      <script>seat.deactivate()</script>
+    </rule>
+
+  </state>
+
+</seatml>

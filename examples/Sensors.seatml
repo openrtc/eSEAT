@@ -1,25 +1,16 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <seatml>
   <general name="Sensors">
-    <adaptor name="vel_out" type="rtcout" datatype="TimedVelocity2D" />
-    <adaptor name="str_out" type="rtcout" datatype="TimedString" />
-    <adaptor name="str_in" type="rtcin" datatype="TimedString" />
+    <adaptor name="vel" type="rtcout" datatype="TimedFloatSeq" />
     <adaptor name="web" type="web" port="8080" />
      <script>
-       global sendflag, velocity, theta
-       sendflag=0
-       velocity=0
-       theta=0
+       global vl, vr
+       vl=0
+       vr=0
      </script>
     <onexec>
-     <script sendto="vel_out">
-     if sendflag > 3 :
-        velocity=0
-        theta=0
-        sendflag = 0
-     else:
-        sendflag += 1
-     rtc_result = TimedVelocity2D( Time(0, 0), Velocity2D(velocity, 0, theta) )
+     <script sendto="vel">
+     rtc_result = TimedFloatSeq( Time(0, 0), [vl, vr] )
      </script>
     </onexec>
   </general>
@@ -45,30 +36,15 @@
       </script>
     </button>
  
-    <rule source="str_in">
-      <script>
-       seat.appendText("main_mode:textOut", rtc_in_data.data+"\n")
-      </script>
-      <script sendto="web">
-        rtc_result = rtc_in_data.data
-      </script>
-    </rule>
-
-<!--  Input from Web Adaptor -->
+   <!--  Input from Web Adaptor -->
     <rule source="web">
-      <script sendto="vel_out">
-        x=float(web_in_data["X"])/2
-        y=float(web_in_data["Y"])/10
-        if 0.05 > x and x > -0.05: x=0
-        if 0.05 > y and y > -0.05: y=0
-        velocity=y
-        theta=x
-        sendflag = 0
+      <script sendto="vel">
+        seat.appendText(web_in_data)
+        vl=float(web_in_data["X"])
+        vr=float(web_in_data["Y"])
       </script>
 
     </rule>
-<!--  End of Input from Web Adaptor -->
-
+   <!--  End of Input from Web Adaptor -->
   </state>
-
 </seatml>

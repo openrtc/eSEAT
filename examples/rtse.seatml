@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="rtse">
+    <adaptor name="web" type="web"  port="11080" dir="/usr/local/eSEAT/html" />
+  </general>
+
+  <state name="main_mode">
+    <!--- onData -->
+    <rule source="web">
+
+      <script>
+        seat.appendText("main_mode:textOut", web_in_data+"\n")
+      </script>
+
+    </rule>
+
+    <!--- Message received -->
+    <rule>
+      <key>activate</key>
+      <script>seat.activate()</script>
+    </rule>
+
+    <rule>
+      <key>deactivate</key>
+      <script>seat.deactivate()</script>
+    </rule>
+
+    <rule>
+      <key>exit</key>
+      <script>seat.exit()</script>
+    </rule>
+
+  </state>
+
+</seatml>

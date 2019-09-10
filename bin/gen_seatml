@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 <seatml-name>"
+  exit
+fi
+
+SEATML=$1
+TEMPLATE=/usr/local/eSEAT/template.seatml
+
+/bin/sed s/_sample_/$SEATML/ $TEMPLATE > $SEATML.seatml

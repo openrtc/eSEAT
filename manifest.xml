@@ -1,0 +1,18 @@
+<package>
+  <description brief="">
+  </description>
+  <author>Yosuke Matsusaka and Isao Hara(isao-hara@aist.go.jp</author>
+  <license>MIT</license>
+  <url>http://hara.jpn.com/_default/ja/Software/eSEAT2.html</url>
+
+  <depend package="python-pip">
+  <depend package="python-tk">
+  <depend package="python-yaml">
+  <depend package="python-lxml">
+
+  <rtmdep name="python">
+
+  <versioncontrol type="git" url="https://github.com/haraisao/eSEAT" />
+  <export>
+  </export>
+</package>

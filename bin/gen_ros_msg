@@ -1,0 +1,69 @@
+#!/usr/bin/python
+#
+#
+import glob
+import os
+import sys
+import genpy.genpy_main
+import genpy.generator
+
+
+try:
+  DIST=os.environ['ROS_DISTRO']
+except:
+  DIST="kinetic"
+
+ROS_SHARE_DIR = os.path.join("/","opt","ros",DIST,'share')
+ROS_DIR = os.path.join(os.getcwd(), 'ros')
+LIB_DIR = os.path.join(ROS_DIR, 'lib', 'site-packages')
+PKG_DIR = os.path.join(ROS_DIR, 'packages')
+DEFAULT_INCLUDES = ['std_msgs', 'geometry_msgs', 'sensor_msgs', 'actionlib_msgs' ]
+
+def generate_messages(package, includes=DEFAULT_INCLUDES):
+  print("Generating {0} ...".format(package))
+  package_path = os.path.join(PKG_DIR, package)
+  output_path = os.path.join(LIB_DIR, package)
+
+  try:
+   alib_mod=os.environ['ROS_MSG_LIBS']
+   add_mod=alib_mod.split(',')
+  except:
+   add_mod=[]
+   
+  for gentype in ('msg', 'srv'):
+    files=glob.glob(os.path.join(package_path, gentype,'*.{0}'.format(gentype)))
+
+    if files:
+      print("  ...{0}/{1}".format(package, gentype))
+      if gentype == 'msg':
+        gen = genpy.generator.MsgGenerator()
+      elif gentype == 'srv':
+        gen = genpy.generator.SrvGenerator()
+      search_path = {}
+
+      for include in set(includes+add_mod+get_package_names()):
+          search_path[include]=[os.path.join(PKG_DIR, include, 'msg') ,os.path.join(ROS_SHARE_DIR, include, 'msg')]
+
+      ret = gen.generate_messages(package, files,
+                      os.path.join(output_path, gentype), search_path)
+      if ret:
+        raise RuntimeError('Failed to generate python files from msg files.')
+      genpy.generate_initpy.write_modules(os.path.join(output_path, gentype))
+  genpy.generate_initpy.write_modules(os.path.join(output_path))
+  print("...done")
+
+#
+def get_package_names():
+  pkgs=[]
+  dirs = glob.glob(os.path.join(PKG_DIR,'*'))
+  for x in dirs:
+    pkgs.append(os.path.basename(x))
+  return pkgs
+
+#
+if __name__=='__main__':
+  if len(sys.argv) < 2:
+    for pkg in get_package_names():
+      generate_messages(pkg)
+  else:
+    generate_messages(sys.argv[1])

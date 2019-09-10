@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <seatml>
   <general name="Leap_GR001">
-    <agent name="gesture" type="rtcin" datatype="TimedString" />
-    <agent name="hand_in" type="rtcin" datatype="TimedFloatSeq" />
-    <agent name="command" type="rtcout" datatype="TimedString" />
-    <agent name="target_out" type="rtcout" datatype="TimedShortSeq" />
-
+    <adaptor name="gesture" type="rtcin" datatype="TimedString" />
+    <adaptor name="hand_in" type="rtcin" datatype="TimedFloatSeq" />
+    <adaptor name="command" type="rtcout" datatype="TimedString" />
+    <adaptor name="target_out" type="rtcout" datatype="TimedShortSeq" />
   </general>
 
   <state name="both_down">
@@ -99,30 +98,30 @@
    <rule source="hand_in">
       <script sendto="target_out">
 <!--
-in_data = rtc_in_data.data
-len_in_data = len(in_data)
+      in_data = rtc_in_data.data
+      len_in_data = len(in_data)
 
-if len_in_data == 6:
-  r = in_data[0:3]
-  l = in_data[3:]
+      if len_in_data == 6:
+        r = in_data[0:3]
+        l = in_data[3:]
 
-  rd=[ utils.maxmin(int(r[1])* -10, 1500, -1500),
-       utils.maxmin(int(r[0])* -10, 200, -1500),
-       utils.maxmin(int(r[2] -50) * 10, 200, -1300)]
-  ld=[ utils.maxmin(int(l[1])*  10, 1500, -1500),
-       utils.maxmin(int(l[0])* -10, 1500, -200),
-       utils.maxmin(int(l[2] -50)* -10, 1300, -200) ]
+        rd=[ utils.maxmin(int(r[1])* -10, 1500, -1500),
+             utils.maxmin(int(r[0])* -10, 200, -1500),
+             utils.maxmin(int(r[2] -50) * 10, 200, -1300)]
+        ld=[ utils.maxmin(int(l[1])*  10, 1500, -1500),
+             utils.maxmin(int(l[0])* -10, 1500, -200),
+             utils.maxmin(int(l[2] -50)* -10, 1300, -200) ]
     
-  data1=[14, rd[0], 15, rd[1], 16, rd[2]]
-  data2=[17, ld[0], 18, ld[1], 19, ld[2]]
+        data1=[14, rd[0], 15, rd[1], 16, rd[2]]
+        data2=[17, ld[0], 18, ld[1], 19, ld[2]]
 
-  data = utils.array_flatten([data1, data2])
+        data = utils.array_flatten([data1, data2])
   
-else:
-  data = None
+      else:
+        data = None
 
-if data and len(data) > 0:
-  rtc_result=TimedShortSeq(Time(0,0), data)
+      if data and len(data) > 0:
+        rtc_result=TimedShortSeq(Time(0,0), data)
 -->
     </script>
     </rule>
@@ -143,40 +142,40 @@ if data and len(data) > 0:
    <rule source="hand_in">
       <script sendto="target_out">
 <!--
-in_data = rtc_in_data.data
-len_in_data = len(in_data)
+      in_data = rtc_in_data.data
+      len_in_data = len(in_data)
 
-if len_in_data >= 3:
-  y = int(in_data[1])
+      if len_in_data >= 3:
+        y = int(in_data[1])
+      
+        if -5 < y < 5:
+          data1 = [2, 200, 3, -400, 4, -200, 8, -200, 9, 400, 10, 200]
 
-  if -5 < y < 5:
-    data1 = [2, 200, 3, -400, 4, -200, 8, -200, 9, 400, 10, 200]
+        elif y < -100 or y > 100:
+          data1 = []
 
-  elif y < -100 or y > 100:
-    data1 = []
+        else:
+          data1 = [2,  200 - 2 * y, 3, -400 + 4 * y,  4, -200 + 2 * y,
+	           8, -200 + 2 * y, 9,  400 - 4 * y, 10,  200 - 2 * y ]
 
-  else:
-    data1 = [2,  200 - 2 * y, 3, -400 + 4 * y,  4, -200 + 2 * y,
-	     8, -200 + 2 * y, 9,  400 - 4 * y, 10,  200 - 2 * y ]
+        x = int(in_data[0])
 
-  x = int(in_data[0])
+        if -5 < x < 5:
+          data2 = [1, 0, 5, 0, 7, 0, 11, 0]
 
-  if -5 < x < 5:
-    data2 = [1, 0, 5, 0, 7, 0, 11, 0]
+        elif x < -100 or x > 100:
+          data2 = []
+        else:
+          data2 = [1, 4 * x,  5, 4 * x,
+                   7, 4 * x, 11, 4 * x ]
 
-  elif x < -100 or x > 100:
-    data2 = []
-  else:
-    data2 = [1, 4 * x,  5, 4 * x,
-             7, 4 * x, 11, 4 * x ]
+        data = utils.array_flatten([data1, data2])
 
-  data = utils.array_flatten([data1, data2])
+      else:
+        data = None
 
-else:
-  data = None
-
-if data and len(data) > 0:
-  rtc_result=TimedShortSeq(Time(0,0), data)
+      if data and len(data) > 0:
+        rtc_result=TimedShortSeq(Time(0,0), data)
 -->
     </script>
     </rule>

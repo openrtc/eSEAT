@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<seatml>
+  <general name="Fibonacci_client">
+    <adaptor name="fibonacci" type="ros_action_client"
+             action_type="actionlib_tutorials.Fibonacci" />
+  </general>
+
+  <state name="main_state">
+   <onentry>
+    <script>
+     client=seat.getRosActionClient('fibonacci')
+     if client: 
+       goal=client.newActionGoal(order=10)
+       client.setActionGoalEx(goal, feedback_cb='fback')
+       result=client.waitActionResult()
+       print("  Result==>", result)
+
+    </script>
+   </onentry>
+
+   <rule source="fibonacci">
+    <key>fback</key>
+    <script>
+      fback=seat.get_in_data()[0]
+      print(fback)
+    </script>
+   </rule>
+
+   <onexec>
+    <script>
+     seat.exit()
+    </script>
+   </onexec>
+  </state>
+</seatml>
+

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <seatml>
+   <general name="SeqIn">
+    <adaptor name="octet" type="rtcin" datatype="TimedOctet" />
+    <adaptor name="short" type="rtcin" datatype="TimedShort" />
+    <adaptor name="long" type="rtcin" datatype="TimedLong" />
+    <adaptor name="float" type="rtcin" datatype="TimedFloat" />
+    <adaptor name="double" type="rtcin" datatype="TimedDouble" />
+    <adaptor name="octetSeq" type="rtcin" datatype="TimedOctetSeq" />
+    <adaptor name="shortSeq" type="rtcin" datatype="TimedShortSeq" />
+    <adaptor name="longSeq" type="rtcin" datatype="TimedLongSeq" />
+    <adaptor name="floatSeq" type="rtcin" datatype="TimedFloatSeq" />
+    <adaptor name="doubleSeq" type="rtcin" datatype="TimedDoubleSeq" />
+
+    <script>
+     seat.setLogFlag(False)
+    </script>
+   </general>
+
+   <state name="main_state">
+    <onexec>
+     <script>
+  <!--
+    octet_  = seat.readData('octet')
+    short_  = seat.readData('short')
+    long_   = seat.readData('long')
+    float_  = seat.readData('float')
+    double_ = seat.readData('double')
+
+    octetSeq_  = seat.readData('octetSeq')
+    shortSeq_  = seat.readData('shortSeq')
+    longSeq_   = seat.readData('longSeq')
+    floatSeq_  = seat.readData('floatSeq')
+    doubleSeq_ = seat.readData('doubleSeq')
+
+    octetSize_  = len(octetSeq_.data)
+    shortSize_  = len(shortSeq_.data)
+    longSize_   = len(longSeq_.data)
+    floatSize_  = len(floatSeq_.data)
+    doubleSize_ = len(doubleSeq_.data)
+
+    octetSeqDisp_ = []
+    for i in range(octetSize_):
+      octetSeqDisp_.append(ord(octetSeq_.data[i]))
+
+    maxsize = max(octetSize_, shortSize_, longSize_, floatSize_, doubleSize_)
+    octetSeqDisp_   = octetSeqDisp_   + ['-'] * (maxsize - octetSize_)
+    shortSeq_.data  = shortSeq_.data  + ['-'] * (maxsize - shortSize_)
+    longSeq_.data   = longSeq_.data   + ['-'] * (maxsize - longSize_)
+    floatSeq_.data  = floatSeq_.data  + ['-'] * (maxsize - floatSize_)
+    doubleSeq_.data = doubleSeq_.data + ['-'] * (maxsize - doubleSize_)
+
+    if 0x20 <= octet_.data < 0x7e :
+      octetDisp_ = chr(octet_.data)
+    else:
+      octetDisp_ = ' '
+    print( '%3.2s %10.8s %10.8s %10.8s %10.8s %10.8s' \
+        % (' ', 'octet', 'short', 'long', 'float', 'double'))
+    print( '%3.2s %7s[%s] %10.8s %10.8s %10.8s %10.8s' \
+        % (' ', octet_.data, octetDisp_, short_.data, long_.data,
+           float_.data, double_.data))
+    print( '===================================================' )
+    print( '                 Sequence Data                     ' )
+    print( '===================================================' )
+    for i in range(maxsize):
+      if 0x20 <= octetSeqDisp_[i] < 0x7e :
+        octetDisp_ = chr(octetSeqDisp_[i])
+      else:
+        octetDisp_ = ' '
+      print( '%3.2s %7s[%s] %10.8s %10.8s %10.8s %10.8s' \
+          % (i, octetSeqDisp_[i], octetDisp_, shortSeq_.data[i],
+           longSeq_.data[i], floatSeq_.data[i], doubleSeq_.data[i]))
+
+    print(' ')
+-->
+    </script>
+   </onexec>
+   </state>
+ </seatml>
+

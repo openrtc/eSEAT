@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<seatml>
+  <general name="Fibonacci_client">
+    <adaptor name="fibonacci" type="ros_action_client"
+             action_type="actionlib_tutorials.Fibonacci" />
+  </general>
+
+  <state name="main_state">
+   <onentry>
+    <script>
+     client=seat.getRosActionClient('fibonacci')
+     if client: 
+       goal=client.newActionGoal(order=10)
+       client.setActionGoal(goal)
+       result=client.waitActionResult()
+       print("  Result==>", result)
+
+     seat.exit()
+    </script>
+   </onentry>
+  </state>
+</seatml>
+

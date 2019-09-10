@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<seatml>
+  <general name="MyServiceProvider">
+    <script import="SimpleService__POA" >
+      class seq_print:
+        def __init__(self):
+          self._cnt = 0
+          return
+      
+        def __call__(self, val):
+          print( self._cnt, ": ", val)
+          self._cnt += 1
+          return
+      
+      class MyServiceSVC_impl(SimpleService__POA.MyService):
+        def __init__(self):
+          self._echoList = []
+          self._valueList = []
+          self._value = 0
+          return
+      
+        def __del__(self):
+          pass
+      
+        def echo(self, msg):
+          self._echoList.append(msg)
+          print( "MyService::echo() was called.")
+          for i in range(10):
+            print( "Message: ", msg )
+            time.sleep(1)
+          print( "MyService::echo() was finished." )
+          return msg
+      
+        def get_echo_history(self):
+          print( "MyService::get_echo_history() was called.")
+      
+          func=seq_print()
+          for val in self._echoList:
+            func(val)
+          return self._echoList
+      
+        def set_value(self, value):
+          self._valueList.append(value)
+          self._value = value
+          print( "MyService::set_value() was called." )
+          print( "Current value: ", self._value )
+          return
+      
+        def get_value(self):
+          print( "MyService::get_value() was called." )
+          print( "Current value: ", self._value )
+          return float(self._value)
+      
+        def get_value_history(self):
+          print( "MyService::get_value_history() was called." )
+          func=seq_print()
+          for val in self._valueList:
+            func(val)
+      
+          return self._valueList
+
+    </script>  
+
+    <adaptor name="myservice0" type="provider"
+          interface="SimpleService::MyService|SimpleService.MyService"
+          if_class="MyServiceSVC_impl"  />
+  </general>
+
+  <state name="main_mode">
+  </state>
+
+</seatml>

@@ -1,12 +1,16 @@
 #/usr/bin/env python
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 iuuuuu-*-
 # -*- Python -*-
 
+from __future__ import print_function
 import sys
 from omniORB import CORBA, URI
 # from omniORB import any
 from omniORB import any, cdrMarshal, cdrUnmarshal, findType, findTypeCode
+from omniORB import setClientConnectTimeout
 #import omniORB 
+
+setClientConnectTimeout(1000)
 
 import OpenRTM_aist
 import RTC
@@ -98,21 +102,21 @@ class NameSpace :
         if bd.binding_type == CosNaming.nobject :
             tmp = name_context.resolve(bd.binding_name)
             self.obj_list[nam]=tmp
-            print 'objcet '+nam+' was listed.'
+            print ('objcet '+nam+' was listed.')
             try :
                 tmp = tmp._narrow(RTC.RTObject)
             except :
-                print nam+' is not RTC.'
+                print (nam+' is not RTC.')
                 tmp = None
             try :
                 if tmp :
                    rslt = [[nam, tmp]]
                    self.rtc_handles[nam]=RtcHandle(nam,self,tmp)
-                   print 'handle for '+nam+' was created.'
+                   print ('handle for '+nam+' was created.')
                 else :
                    pass
             except :
-                print nam+' is not alive.' , sys.exc_info()[0]
+                print (nam+' is not alive.' , sys.exc_info()[0])
                 pass
         else :
             tmp = name_context.resolve(bd.binding_name)
@@ -163,7 +167,7 @@ class Connector :
            for pp in self.plist :  
                if not ((self.prop_dict_req[kk] in pp.prop[kk]) or 
                                  ('Any' in    pp.prop[kk])) :
-                   print kk, self.prop_dict_req[kk]
+                   print (kk, self.prop_dict_req[kk])
                    self.prop_dict_req[kk] = ""
                    self.possible = False
        self.prop_nvlist_req = dict2nvlist(self.prop_dict_req)
@@ -377,7 +381,7 @@ class RtcOutport(Port) :
            except :
                 return None
         else :
-           print "not supported"
+           print ("not supported")
            return None
 
     def open(self) :
@@ -440,7 +444,7 @@ class RtcHandle :
         else:
             pass
 
-        print 'port_name:', tmp_name
+        print ('port_name:', tmp_name)
 #       self.ports[tmp.name]=Port(tmp, tmp_prop)
 
         if tmp_prop['port.port_type']=='DataInPort' :

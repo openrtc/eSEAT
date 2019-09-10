@@ -8,7 +8,7 @@
  
     <rule source="web">
       <script sendto="web">
-        rtc_result = "Hello!!"
+        seat.set_result( "Hello!!" )
       </script>
     </rule>
 

@@ -1,0 +1,40 @@
+<html>
+<head>
+<meta charset="utf-8">
+<!--
+<meta name="viewport" content="user-scalavle=no,maximum-scale=1.00">
+-->
+<title>RT System Editor on the Web(RtcProfile)</title>
+
+<!--
+<script type="text/javascript" src="js/canvas.js"></script>
+<script type="text/javascript" src="js/event.js"></script>
+-->
+<script type="text/javascript" src="js/rtsprofile.js"></script>
+<script type="text/javascript" src="js/rtse.js"></script>
+<script type="text/javascript">
+  rtsh_com="/cgi-bin/rtsh.py";
+</script>
+
+<link rel="stylesheet" type="text/css" href="css/rtse.css">
+
+</head>
+<body >
+
+
+<h1>Load Rtc Profile...</h1>
+<hr>
+
+Local File:<input type="file" id="files" name="files[]" multiple /><br>
+Remote File:<input type="button" id="remotefiles" name="remotefile" value="List..."  onClick="ListRemoteRtcProfile();"  >
+<input type="button" value="Open..."  onClick="OpenRemoteRtcProfile();" >
+<dvi id="listview"></div>
+<output id="list"></output>
+
+<script type="text/javascript">
+document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+
+
+</body>
+</html>

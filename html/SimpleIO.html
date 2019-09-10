@@ -11,62 +11,38 @@
 
     <!-- Local functions -->
     <script type="text/javascript">
-	    function registerHandler(){
-		requestComet($("input[name='id']").val(), -1);
-	    }
-
-	   function sendEvent(){
-             sendComet($("input[name='eid']").val(), "hello",
-	    	   function(data){
-      			$("#response2").html(data.result+" on "+data.date);
-    	  	  });
-	   }
-
-	   function sendEventToRtc(){
-             sendValueToRtc($("input[name='msg']").val(), function(data){
-      			$("#response2").html(data.result+" on "+data.date);
-    	     });
-	   }
+      function registerHandler(){ requestComet(1); }
+      function sendEventToRtc(){ sendValueToRtc($("input[name='msg']").val()); }
+      function processEvents(event){
+//        var msg = $('textarea[name="fromSeat"]').val();
+        $('textarea[name="fromSeat"]').val( 
+          $('textarea[name="fromSeat"]').val()+event.message+"\n");
+      }
     </script>
     <!-- ///Local functions -->
-
-    <link rel="stylesheet" href="style.css" type="text/css">
   </head>
-  <body>
 
-  <div id="topbar">
-  <table><tr>
-   <td> <img src="rtm_logo.png" /> </td>
-   <td><span id="title">Test of WebAdaptor with SimpleIO component</span></td>
-   </tr>
-  </table>
- </div>
-
+  <body onLoad="registerHandler();">
+  <h1>Test of WebAdaptor with SimpleIO component</h1>
+  <hr>
   <form name="myform">
     <table>
     <tr>
-    <td>Register Callback : </td>
-    <td> <input type="text" name="id" value="1"> </td>
-    <td> <input type="button" name="b2" value="Register" onClick="registerHandler();"> </td>
-    </tr>
-    <tr>
-    <td>Send Event : </td>
-    <td><input type="text" name="eid" value="1"> </td>
-    <td><input type="button"  value="Call" onClick="sendEvent();"></td>
-    </tr>
-    <tr>
     <td>Send Message : </td>
-    <td><input type="text" name="msg" value="TestMessage"> </td>
+    <td><input type="text" name="msg" size="40" value="TestMessage"> </td>
     <td><input type="button"  value="Send" onClick="sendEventToRtc();"></td>
     </tr>
+    <tr>
+    <td>Outcome Message : </td>
+    <td> <textarea name="fromSeat" cols="50" rows="10"></textarea></td>
+    <td></td>
+    <tr>
     </table>
   </form>
 
   <h2> RESPONSE</h2>
   <hr>
   <div id="response"></div>
-  <hr>
-  <div id="response2"></div>
   </body>
 </html>
 

@@ -1,0 +1,59 @@
+<html>
+<head>
+
+<meta charset="utf-8">
+<!--
+<meta name="viewport" content="user-scalavle=no,maximum-scale=1.00">
+-->
+<title>RT System Editor on the Web (Download Dialog)</title>
+
+
+
+<script type="text/javascript" src="js/canvas.js"></script>
+<!--
+<script type="text/javascript" src="js/event.js"></script>
+-->
+<script type="text/javascript" src="js/rtsprofile.js"></script>
+<script type="text/javascript" src="js/rtse.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="css/rtse.css">
+
+<script type="text/javascript">
+<!--
+function setDataInfo(){
+  if(!window.opener || window.opener.closed){
+    window.close();
+  } else{
+        var name_ele = document.getElementById('rtsname');
+        var data_ele = document.getElementById('data_area');
+
+        name_ele.value = window.opener.getDownloadFilename();
+        data_ele.value = window.opener.getDownloadData();
+
+  }
+}
+
+function testfunc(){
+  window.opener.displayInfoMessage("Hello");
+
+}
+
+// -->
+</script>
+
+</head>
+<body onload="setDataInfo();">
+
+<form>
+File Name:<input type="text" id="rtsname" name="rtsname" value="rtse.xml"  />
+<input type="button" id="setupbutton" name="setupbutton" value="Setup Download"  onClick="handleDownload('data_area');" />
+<a id="anchor" href=""></a>
+<br>
+
+<textarea cols="80" rows="25" id="data_area" name="data_area" ></textarea>
+</form>
+
+
+</body>
+</html>

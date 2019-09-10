@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<rts:RtsProfile rts:updateDate="2013-07-01T15:42:40+09:00" rts:creationDate="2013-07-01T15:37:01+09:00" rts:version="0.2" rts:id="RTSystem:AIST:SimpleHRI_demo:1.0.0" xmlns:rtsExt="http://www.openrtp.org/namespaces/rts_ext" xmlns:rts="http://www.openrtp.org/namespaces/rts" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <rts:Components xsi:type="rtsExt:component_ext" rts:isRequired="true" rts:compositeType="None" rts:activeConfigurationSet="default" rts:instanceName="SEAT0" rts:pathUri="127.0.0.1/LetsNote-hara.host_cxt/SEAT0.rtc" rts:id="RTC:Yosuke Matsusaka and Isao Hara, AIST:Speech:SEAT:2.00">
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="SEAT0.command">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedString:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="flush, new, periodic" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push, pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="SEAT0.gesture">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedString:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push, pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="SEAT0.longvalue">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="IDL:RTC/TimedLong:1.0" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push, pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:ConfigurationSets rts:id="default">
+            <rts:ConfigurationData rts:data="none" rts:name="scriptfile"/>
+            <rts:ConfigurationData rts:data="0.0" rts:name="scorelimit"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__description__">
+            <rts:ConfigurationData rts:data="Script file to load (unimplemented)." rts:name="scriptfile"/>
+            <rts:ConfigurationData rts:data="Lower limit of speech recognition score to consider." rts:name="scorelimit"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__widget__">
+            <rts:ConfigurationData rts:data="slider" rts:name="scorelimit"/>
+        </rts:ConfigurationSets>
+        <rts:ExecutionContexts xsi:type="rtsExt:execution_context_ext" rts:rate="1.0" rts:kind="PERIODIC" rts:id="0"/>
+        <rtsExt:Location rtsExt:direction="RIGHT" rtsExt:width="-1" rtsExt:height="-1" rtsExt:y="160" rtsExt:x="276"/>
+        <rtsExt:Properties rtsExt:value="SEAT" rtsExt:name="implementation_id"/>
+        <rtsExt:Properties rtsExt:value="SEAT" rtsExt:name="type_name"/>
+        <rtsExt:Properties rtsExt:value="SEAT(Speech Event Action Transfer) is a simple dialog manager for robotic applications.
+The interactive behavior of the system can be realized without complex programming.
+
+SEAT has following features:
+ 1. Paraphrase matching function.
+ 2. Conversation management function based on state transition model.
+ 3. Adapter functions (supports OpenRTM , BSD socket, etc...)." rtsExt:name="description"/>
+        <rtsExt:Properties rtsExt:value="2.00" rtsExt:name="version"/>
+        <rtsExt:Properties rtsExt:value="Yosuke Matsusaka and Isao Hara, AIST" rtsExt:name="vendor"/>
+        <rtsExt:Properties rtsExt:value="Speech" rtsExt:name="category"/>
+        <rtsExt:Properties rtsExt:value="DataFlowComponent" rtsExt:name="activity_type"/>
+        <rtsExt:Properties rtsExt:value="1" rtsExt:name="max_instance"/>
+        <rtsExt:Properties rtsExt:value="Python" rtsExt:name="language"/>
+        <rtsExt:Properties rtsExt:value="script" rtsExt:name="lang_type"/>
+        <rtsExt:Properties rtsExt:value="none" rtsExt:name="conf.default.scriptfile"/>
+        <rtsExt:Properties rtsExt:value="0.0" rtsExt:name="conf.default.scorelimit"/>
+        <rtsExt:Properties rtsExt:value="Script file to load (unimplemented)." rtsExt:name="conf.__description__.scriptfile"/>
+        <rtsExt:Properties rtsExt:value="Lower limit of speech recognition score to consider." rtsExt:name="conf.__description__.scorelimit"/>
+        <rtsExt:Properties rtsExt:value="slider" rtsExt:name="conf.__widget__.scorelimit"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.provider.available_services"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="sdo.service.consumer.available_services"/>
+        <rtsExt:Properties rtsExt:value="1" rtsExt:name="exec_cxt.periodic.rate"/>
+        <rtsExt:Properties rtsExt:value="PeriodicExecutionContext" rtsExt:name="exec_cxt.periodic.type"/>
+        <rtsExt:Properties rtsExt:value="EventDrivenExecutionContext" rtsExt:name="exec_cxt.evdriven.type"/>
+        <rtsExt:Properties rtsExt:value="1.1.0" rtsExt:name="config.version"/>
+        <rtsExt:Properties rtsExt:value="OpenRTM-aist-1.1.0" rtsExt:name="openrtm.name"/>
+        <rtsExt:Properties rtsExt:value="1.1.0" rtsExt:name="openrtm.version"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="os.name"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="os.release"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="os.version"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="os.arch"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="os.hostname"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="corba.endpoint"/>
+        <rtsExt:Properties rtsExt:value="omniORB" rtsExt:name="corba.id"/>
+        <rtsExt:Properties rtsExt:value="YES" rtsExt:name="logger.enable"/>
+        <rtsExt:Properties rtsExt:value="INFO" rtsExt:name="logger.log_level"/>
+        <rtsExt:Properties rtsExt:value="YES" rtsExt:name="naming.enable"/>
+        <rtsExt:Properties rtsExt:value="corba" rtsExt:name="naming.type"/>
+        <rtsExt:Properties rtsExt:value="%h.host_cxt/%n.rtc" rtsExt:name="naming.formats"/>
+        <rtsExt:Properties rtsExt:value="LetsNote-hara.host_cxt/SEAT0.rtc" rtsExt:name="naming.names"/>
+        <rtsExt:Properties rtsExt:value="SEAT0" rtsExt:name="instance_name"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.inport.dataport"/>
+        <rtsExt:Properties rtsExt:value="" rtsExt:name="port.outport.dataport"/>
+        <rtsExt:Properties rtsExt:value="IOR:000000000000003549444c3a6f70656e72746d2e616973742e676f2e6a702f4f70656e52544d2f44617461466c6f77436f6d706f6e656e743a312e3000000000000000010000000000000064000102000000000e3135302e32392e39372e313436005f990000000efec423d15100002064000000000100000000000200000000000000080000000041545400000000010000001c00000000000100010000000105010001000101090000000100010109" rtsExt:name="IOR"/>
+    </rts:Components>
+    <rts:Components xsi:type="rtsExt:component_ext" rts:isRequired="true" rts:compositeType="None" rts:activeConfigurationSet="default" rts:instanceName="PortAudioInput0" rts:pathUri="127.0.0.1/LetsNote-hara.host_cxt/PortAudioInput0.rtc" rts:id="RTC:AIST:communication:PortAudioInput:1.00">
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="PortAudioInput0.AudioDataOut">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="TimedOctetSeq" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="flush,new,periodic" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+            <rtsExt:Properties rtsExt:value="Audio data in packet." rtsExt:name="description"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="PortAudioInput0.GainDataIn">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="TimedLong" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="push,pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+            <rtsExt:Properties rtsExt:value="Gain." rtsExt:name="description"/>
+        </rts:DataPorts>
+        <rts:ConfigurationSets rts:id="default">
+            <rts:ConfigurationData rts:data="16000" rts:name="InputSampleRate"/>
+            <rts:ConfigurationData rts:data="int16" rts:name="InputSampleByte"/>
+            <rts:ConfigurationData rts:data="1" rts:name="InputChannelNumbers"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__widget__">
+            <rts:ConfigurationData rts:data="radio" rts:name="InputSampleByte"/>
+            <rts:ConfigurationData rts:data="spin" rts:name="InputChannelNumbers"/>
+            <rts:ConfigurationData rts:data="spin" rts:name="InputSampleRate"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__constraints__">
+            <rts:ConfigurationData rts:data="(int8, int16, int24, int32)" rts:name="InputSampleByte"/>
+            <rts:ConfigurationData rts:data="x &gt;= 1" rts:name="InputChannelNumbers"/>
+            <rts:ConfigurationData rts:data="x &gt;= 1" rts:name="InputSampleRate"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__description__">
+            <rts:ConfigurationData rts:data="Sample byte of audio capture." rts:name="InputSampleByte"/>
+            <rts:ConfigurationData rts:data="Number of audio channel." rts:name="InputChannelNumbers"/>
+            <rts:ConfigurationData rts:data="Sample rate of audio capture." rts:name="InputSampleRate"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__doc__">
+            <rts:ConfigurationData rts:data="
+  ::
+
+  $ portaudioinput
+" rts:name="usage"/>
+        </rts:ConfigurationSets>
+        <rts:ExecutionContexts xsi:type="rtsExt:execution_context_ext" rts:rate="1000.0" rts:kind="PERIODIC" rts:id="0"/>
+        <rtsExt:Location rtsExt:direction="RIGHT" rtsExt:width="-1" rtsExt:height="-1" rtsExt:y="286" rtsExt:x="111"/>
+        <rtsExt:Properties rtsExt:value="IOR:000000000000003549444c3a6f70656e72746d2e616973742e676f2e6a702f4f70656e52544d2f44617461466c6f77436f6d706f6e656e743a312e3000000000000000010000000000000064000102000000000e3135302e32392e39372e313436005f930000000efec323d151000023f4000000000000000000000200000000000000080000000041545400000000010000001c00000000000100010000000105010001000101090000000100010109" rtsExt:name="IOR"/>
+    </rts:Components>
+    <rts:Components xsi:type="rtsExt:component_ext" rts:isRequired="true" rts:compositeType="None" rts:activeConfigurationSet="default" rts:instanceName="JuliusRTC0" rts:pathUri="127.0.0.1/LetsNote-hara.host_cxt/JuliusRTC0.rtc" rts:id="RTC:AIST:communication:JuliusRTC:2.00">
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="JuliusRTC0.status">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="TimedString" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="new, periodic, flush" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="Status of the recognizer (one of &quot;LISTEN [accepting speech]&quot;, &quot;STARTREC [start recognition process]&quot;, &quot;ENDREC [end recognition process]&quot;, &quot;REJECTED [rejected speech input]&quot;)" rtsExt:name="description"/>
+            <rtsExt:Properties rtsExt:value="push, pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="JuliusRTC0.result">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="TimedString" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="new, periodic, flush" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="Recognition result in XML format." rtsExt:name="description"/>
+            <rtsExt:Properties rtsExt:value="push, pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="JuliusRTC0.log">
+            <rtsExt:Properties rtsExt:value="DataOutPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="TimedOctetSeq" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="new, periodic, flush" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="Log of audio data." rtsExt:name="description"/>
+            <rtsExt:Properties rtsExt:value="push, pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="JuliusRTC0.data">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="TimedOctetSeq" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="Audio data (in packets) to be recognized." rtsExt:name="description"/>
+            <rtsExt:Properties rtsExt:value="push, pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:DataPorts xsi:type="rtsExt:dataport_ext" rts:name="JuliusRTC0.activegrammar">
+            <rtsExt:Properties rtsExt:value="DataInPort" rtsExt:name="port.port_type"/>
+            <rtsExt:Properties rtsExt:value="TimedString" rtsExt:name="dataport.data_type"/>
+            <rtsExt:Properties rtsExt:value="Any" rtsExt:name="dataport.subscription_type"/>
+            <rtsExt:Properties rtsExt:value="Grammar ID to be activated." rtsExt:name="description"/>
+            <rtsExt:Properties rtsExt:value="push, pull" rtsExt:name="dataport.dataflow_type"/>
+            <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        </rts:DataPorts>
+        <rts:ConfigurationSets rts:id="default">
+            <rts:ConfigurationData rts:data="japanese" rts:name="language"/>
+            <rts:ConfigurationData rts:data="male" rts:name="phonemodel"/>
+            <rts:ConfigurationData rts:data="internal" rts:name="voiceactivitydetection"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__descirption__">
+            <rts:ConfigurationData rts:data="Specify target language." rts:name="language"/>
+            <rts:ConfigurationData rts:data="Specify acoustic model (fixed to male)" rts:name="phonemodel"/>
+            <rts:ConfigurationData rts:data="Specify voice activity detection trigger (fixed to internal)." rts:name="voiceactivitydetection"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__widget__">
+            <rts:ConfigurationData rts:data="radio" rts:name="language"/>
+            <rts:ConfigurationData rts:data="radio" rts:name="phonemodel"/>
+            <rts:ConfigurationData rts:data="radio" rts:name="voiceactivitydetection"/>
+        </rts:ConfigurationSets>
+        <rts:ConfigurationSets rts:id="__constraints__">
+            <rts:ConfigurationData rts:data="(japanese, english, german)" rts:name="language"/>
+            <rts:ConfigurationData rts:data="(male)" rts:name="phonemodel"/>
+            <rts:ConfigurationData rts:data="(internal)" rts:name="voiceactivitydetection"/>
+        </rts:ConfigurationSets>
+        <rts:ExecutionContexts xsi:type="rtsExt:execution_context_ext" rts:rate="1.0" rts:kind="PERIODIC" rts:id="0"/>
+        <rtsExt:Location rtsExt:direction="RIGHT" rtsExt:width="-1" rtsExt:height="-1" rtsExt:y="41" rtsExt:x="157"/>
+        <rtsExt:Properties rtsExt:value="IOR:000000000000003549444c3a6f70656e72746d2e616973742e676f2e6a702f4f70656e52544d2f44617461466c6f77436f6d706f6e656e743a312e3000000000000000010000000000000064000102000000000e3135302e32392e39372e313436005f960000000efec423d151000023b8000000000100000000000200000000000000080000000041545400000000010000001c00000000000100010000000105010001000101090000000100010109" rtsExt:name="IOR"/>
+    </rts:Components>
+    <rts:DataPortConnectors xsi:type="rtsExt:dataport_connector_ext" rts:subscriptionType="new" rts:dataflowType="push" rts:interfaceType="corba_cdr" rts:dataType="TimedString" rts:name="resultgesture" rts:connectorId="392a00cf-e219-11e2-bb23-04209a40bddf">
+        <rts:sourceDataPort xsi:type="rtsExt:target_port_ext" rts:portName="JuliusRTC0.result" rts:instanceName="JuliusRTC0" rts:componentId="RTC:AIST:communication:JuliusRTC:2.00">
+            <rtsExt:Properties rtsExt:value="127.0.0.1/LetsNote-hara.host_cxt/JuliusRTC0.rtc" rtsExt:name="COMPONENT_PATH_ID"/>
+        </rts:sourceDataPort>
+        <rts:targetDataPort xsi:type="rtsExt:target_port_ext" rts:portName="SEAT0.gesture" rts:instanceName="SEAT0" rts:componentId="RTC:Yosuke Matsusaka and Isao Hara, AIST:Speech:SEAT:2.00">
+            <rtsExt:Properties rtsExt:value="127.0.0.1/LetsNote-hara.host_cxt/SEAT0.rtc" rtsExt:name="COMPONENT_PATH_ID"/>
+        </rts:targetDataPort>
+        <rtsExt:Properties rtsExt:value="{1:(276,113)}" rtsExt:name="BEND_POINT"/>
+        <rtsExt:Properties rtsExt:value="push" rtsExt:name="dataport.dataflow_type"/>
+        <rtsExt:Properties rtsExt:value="TimedString" rtsExt:name="dataport.data_type"/>
+        <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        <rtsExt:Properties rtsExt:value="new" rtsExt:name="dataport.subscription_type"/>
+        <rtsExt:Properties rtsExt:value="little,big" rtsExt:name="dataport.serializer.cdr.endian"/>
+        <rtsExt:Properties rtsExt:value="IOR:010000001a00000049444c3a4f70656e52544d2f496e506f72744364723a312e30000000010000000000000064000000010102000e0000003135302e32392e39372e31343600995f0e000000fec423d15100002064000000000600000200000000000000080000000100000000545441010000001c00000001000000010001000100000001000105090101000100000009010100" rtsExt:name="dataport.corba_cdr.inport_ior"/>
+        <rtsExt:Properties rtsExt:name="dataport.corba_cdr.inport_ref"/>
+    </rts:DataPortConnectors>
+    <rts:DataPortConnectors xsi:type="rtsExt:dataport_connector_ext" rts:subscriptionType="new" rts:dataflowType="push" rts:interfaceType="corba_cdr" rts:dataType="TimedOctetSeq" rts:name="dataAudioDataOut" rts:connectorId="391196cf-e219-11e2-ad30-04209a40bddf">
+        <rts:sourceDataPort xsi:type="rtsExt:target_port_ext" rts:portName="JuliusRTC0.data" rts:instanceName="JuliusRTC0" rts:componentId="RTC:AIST:communication:JuliusRTC:2.00">
+            <rtsExt:Properties rtsExt:value="127.0.0.1/LetsNote-hara.host_cxt/JuliusRTC0.rtc" rtsExt:name="COMPONENT_PATH_ID"/>
+        </rts:sourceDataPort>
+        <rts:targetDataPort xsi:type="rtsExt:target_port_ext" rts:portName="PortAudioInput0.AudioDataOut" rts:instanceName="PortAudioInput0" rts:componentId="RTC:AIST:communication:PortAudioInput:1.00">
+            <rtsExt:Properties rtsExt:value="127.0.0.1/LetsNote-hara.host_cxt/PortAudioInput0.rtc" rtsExt:name="COMPONENT_PATH_ID"/>
+        </rts:targetDataPort>
+        <rtsExt:Properties rtsExt:value="{1:(67,158),2:(181,243)}" rtsExt:name="BEND_POINT"/>
+        <rtsExt:Properties rtsExt:value="push" rtsExt:name="dataport.dataflow_type"/>
+        <rtsExt:Properties rtsExt:value="TimedOctetSeq" rtsExt:name="dataport.data_type"/>
+        <rtsExt:Properties rtsExt:value="corba_cdr" rtsExt:name="dataport.interface_type"/>
+        <rtsExt:Properties rtsExt:value="new" rtsExt:name="dataport.subscription_type"/>
+        <rtsExt:Properties rtsExt:value="little,big" rtsExt:name="dataport.serializer.cdr.endian"/>
+        <rtsExt:Properties rtsExt:value="IOR:010000001a00000049444c3a4f70656e52544d2f496e506f72744364723a312e30000000010000000000000064000000010102000e0000003135302e32392e39372e31343600965f0e000000fec423d151000023b8000000000800000200000000000000080000000100000000545441010000001c00000001000000010001000100000001000105090101000100000009010100" rtsExt:name="dataport.corba_cdr.inport_ior"/>
+        <rtsExt:Properties rtsExt:name="dataport.corba_cdr.inport_ref"/>
+    </rts:DataPortConnectors>
+</rts:RtsProfile>
+
