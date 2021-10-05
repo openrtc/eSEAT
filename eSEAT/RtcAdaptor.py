@@ -746,7 +746,15 @@ def instantiateDataType(dtype):
     if isinstance(dtype, int) : desc = [dtype]
     elif isinstance(dtype, tuple) : desc = dtype
     else : 
-        desc=omniORB.findType(dtype._NP_RepositoryId) 
+        try:
+            desc = omniORB.findType(dtype._NP_RepositoryId)
+        except:
+            # for error of "'str' has no attribute"
+            dtype = eval("%s" % dtype)
+            desc  = omniORB.findType(dtype._NP_RepositoryId)
+            desc_list = list(desc)
+            desc_list[0] = 20
+            desc = tuple(desc_list)
 
     if desc[0] in [omniORB.tcInternal.tv_alias ]: return instantiateDataType(desc[2])
 
